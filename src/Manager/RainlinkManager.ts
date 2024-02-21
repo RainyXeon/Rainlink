@@ -4,6 +4,8 @@ import { RainlinkNode } from '../Node/RainlinkNode';
 import { RainlinkConnection } from '../Player/RainlinkConnection';
 import { AbstractLibrary } from '../Library/AbstractLibrary';
 import { VoiceChannelOptions } from '../Interface/Player';
+import { RainlinkConnectState } from '../Interface/Constants';
+import { RainlinkPlayer } from '../Player/RainlinkPlayer';
 
 export declare interface RainlinkManager {
   on(event: 'debug', listener: (logs: string) => void): this;
@@ -40,6 +42,10 @@ export class RainlinkManager extends EventEmitter {
    * Bot id
    */
   public id: string | undefined;
+  /**
+   * Player maps
+   */
+  public players: Map<string, RainlinkPlayer>;
 
   constructor(options: RainlinkOptions) {
     super();
@@ -52,6 +58,7 @@ export class RainlinkManager extends EventEmitter {
     this.connections = new Map();
     this.nodes = new Map<string, RainlinkNode>();
     this.library.listen(this.options.nodes);
+    this.players = new Map<string, RainlinkPlayer>();
   }
 
   addNode(node: RainlinkNodeOptions) {
@@ -72,5 +79,31 @@ export class RainlinkManager extends EventEmitter {
       this.connections.delete(options.guildId);
       throw error;
     }
+  }
+
+  /**
+   * Get a least used node.
+   * @returns Node
+   */
+  public async getLeastUsedNode(): Promise<RainlinkNode> {
+    const nodes: RainlinkNode[] = [...this.nodes.values()];
+
+    const onlineNodes = nodes.filter(
+      node => node.state === RainlinkConnectState.Connected,
+    );
+    if (!onlineNodes.length) throw new Error('No nodes are online');
+
+    // .filter((x) => x.manager.node.name === node.node.name)
+
+    const temp = await Promise.all(
+      onlineNodes.map(async node => ({
+        node,
+        players: (await node.rest.getPlayers())
+          .filter(x => this.players.get(x.guildId))
+          .map(x => this.players.get(x.guildId)!).length,
+      })),
+    );
+
+    return temp.reduce((a, b) => (a.players < b.players ? a : b)).node;
   }
 }

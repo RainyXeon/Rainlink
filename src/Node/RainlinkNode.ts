@@ -37,7 +37,7 @@ export class RainlinkNode {
   public node: RainlinkNodeOptions;
   private wsUrl: string;
   public rest: RainlinkRest;
-  private sessionId: string | null = null;
+  public sessionId: string | null;
   public online: boolean = false;
   private retryCounter = 0;
   public state: RainlinkConnectState = RainlinkConnectState.Closed;
@@ -48,7 +48,8 @@ export class RainlinkNode {
     this.manager = manager;
     this.node = node;
     this.wsUrl = `${node.secure ? 'wss' : 'ws'}://${node.host}:${node.port}/v${metadata.lavalink}/websocket`;
-    this.rest = new RainlinkRest(manager, node);
+    this.rest = new RainlinkRest(manager, node, this);
+    this.sessionId = null;
   }
 
   public connect(): WebSocket {
@@ -87,10 +88,11 @@ export class RainlinkNode {
   }
 
   protected wsMessageEvent(data: RawData, isBin: boolean) {
-    const wsData: Record<string, unknown> = JSON.parse(data.toString());
+    const wsData = JSON.parse(data.toString());
     switch (wsData.op) {
       case LavalinkEvents.Ready: {
-        this.sessionId == wsData.sessionId;
+        this.sessionId = wsData.sessionId;
+        this.rest = new RainlinkRest(this.manager, this.node, this);
         break;
       }
     }
