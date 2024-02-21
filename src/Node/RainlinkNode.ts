@@ -47,7 +47,7 @@ export class RainlinkNode {
   constructor(manager: RainlinkManager, node: RainlinkNodeOptions) {
     this.manager = manager;
     this.node = node;
-    this.wsUrl = `${node.secure ? 'wss' : 'ws'}://${node.host}:${node.port}/v4/websocket`;
+    this.wsUrl = `${node.secure ? 'wss' : 'ws'}://${node.host}:${node.port}/v${metadata.lavalink}/websocket`;
     this.rest = new RainlinkRest(manager, node);
   }
 
