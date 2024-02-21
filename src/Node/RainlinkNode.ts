@@ -38,30 +38,23 @@ export class RainlinkNode {
   private wsUrl: string;
   public rest: RainlinkRest;
   private sessionId: string | null = null;
-  private clientId: string;
   public online: boolean = false;
   private retryCounter = 0;
   public state: RainlinkConnectState = RainlinkConnectState.Closed;
-  private ws: WebSocket;
+  private ws?: WebSocket;
   private sudoDisconnect = false;
 
-  constructor(
-    manager: RainlinkManager,
-    node: RainlinkNodeOptions,
-    clientId: string,
-  ) {
+  constructor(manager: RainlinkManager, node: RainlinkNodeOptions) {
     this.manager = manager;
     this.node = node;
-    this.clientId = clientId;
     this.wsUrl = `${node.secure ? 'wss' : 'ws'}://${node.host}:${node.port}/v4/websocket`;
-    this.ws = this.connect();
     this.rest = new RainlinkRest(manager, node);
   }
 
   public connect(): WebSocket {
     const header = {
       Authorization: this.node.auth,
-      'User-Id': this.clientId,
+      'User-Id': this.manager.id,
       'Client-Name': `rainlink@${metadata.version}`,
       'Session-Id': this.sessionId == null ? '' : this.sessionId,
     };
@@ -84,7 +77,7 @@ export class RainlinkNode {
   }
 
   protected wsOpenEvent() {
-    this.online = true;
+    this.clean(true);
     this.state = RainlinkConnectState.Connected;
     this.manager.emit(
       RainlinkEvents.Debug,
@@ -138,15 +131,22 @@ export class RainlinkNode {
       RainlinkEvents.Debug,
       `[Rainlink]: Node ${this.node.name} closed! URL: ${this.wsUrl}`,
     );
-    this.manager.node.delete(this.node.name);
   }
 
   public disconnect() {
     this.sudoDisconnect = true;
-    this.ws.close();
+    this.ws?.close();
   }
 
   public reconnect() {
+    this.clean();
     this.ws = this.connect();
+  }
+
+  public clean(online: boolean = false) {
+    this.sudoDisconnect = false;
+    this.retryCounter = 0;
+    this.online = online;
+    this.state = RainlinkConnectState.Closed;
   }
 }

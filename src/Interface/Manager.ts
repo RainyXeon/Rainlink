@@ -1,4 +1,4 @@
-import { Library } from '../Library/Library';
+import { AbstractLibrary } from '../Library/AbstractLibrary';
 
 export interface RainlinkNodeOptions {
   name: string;
@@ -11,10 +11,11 @@ export interface RainlinkNodeOptions {
 export interface RainlinkAdditionalOptions {
   retryTimeout: number;
   retryCount: number;
+  voiceConnectionTimeout: number;
 }
 
 export interface RainlinkOptions {
   nodes: RainlinkNodeOptions[];
   options: RainlinkAdditionalOptions;
-  library: Library;
+  library: AbstractLibrary;
 }

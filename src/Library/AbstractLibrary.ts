@@ -2,7 +2,7 @@ import { RainlinkNodeOptions } from '../Interface/Manager';
 import { RainlinkManager } from '../Manager/RainlinkManager';
 export const AllowedPackets = ['VOICE_STATE_UPDATE', 'VOICE_SERVER_UPDATE'];
 
-export abstract class Library {
+export abstract class AbstractLibrary {
   protected readonly client: any;
   protected manager: RainlinkManager | null;
   constructor(client: any) {
@@ -15,7 +15,7 @@ export abstract class Library {
     for (const node of nodes) this.manager!.addNode(node);
   }
 
-  public set(manager: RainlinkManager): Library {
+  public set(manager: RainlinkManager): AbstractLibrary {
     this.manager = manager;
     return this;
   }

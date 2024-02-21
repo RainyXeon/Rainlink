@@ -2,7 +2,8 @@ import { RainlinkNodeOptions, RainlinkOptions } from '../Interface/Manager';
 import { EventEmitter } from 'events';
 import { RainlinkNode } from '../Node/RainlinkNode';
 import { RainlinkConnection } from '../Player/RainlinkConnection';
-import { Library } from '../Library/Library';
+import { AbstractLibrary } from '../Library/AbstractLibrary';
+import { VoiceChannelOptions } from '../Interface/Player';
 
 export declare interface RainlinkManager {
   on(event: 'debug', listener: (logs: string) => void): this;
@@ -22,7 +23,7 @@ export class RainlinkManager extends EventEmitter {
   /**
    * Discord library connector
    */
-  public readonly library: Library;
+  public readonly library: AbstractLibrary;
   /**
    * Voice connections being handled
    */
@@ -30,7 +31,7 @@ export class RainlinkManager extends EventEmitter {
   /**
    * Lavalink server that has been configured
    */
-  public node: Map<string, RainlinkNode>;
+  public nodes: Map<string, RainlinkNode>;
   /**
    * Rainlink options
    */
@@ -42,20 +43,34 @@ export class RainlinkManager extends EventEmitter {
 
   constructor(options: RainlinkOptions) {
     super();
-    this.options = options;
-    this.connections = new Map();
-    this.node = new Map<string, RainlinkNode>();
     if (!options.library)
       throw new Error(
         'Please set an new lib to connect, example: \nlibrary: new Library.DiscordJS(client) ',
       );
     this.library = options.library.set(this);
+    this.options = options;
+    this.connections = new Map();
+    this.nodes = new Map<string, RainlinkNode>();
+    this.library.listen(this.options.nodes);
   }
 
   addNode(node: RainlinkNodeOptions) {
-    this.removeAllListeners();
-    const newNode = new RainlinkNode(this, node, this.id!);
-    this.node.set(node.name, newNode);
+    const newNode = new RainlinkNode(this, node);
+    newNode.connect();
+    this.nodes.set(node.name, newNode);
     return newNode;
+  }
+
+  async create(options: VoiceChannelOptions) {
+    if (this.connections.has(options.guildId))
+      throw new Error('This guild already have an existing connection');
+    const connection = new RainlinkConnection(this, options);
+    this.connections.set(connection.guildId, connection);
+    try {
+      await connection.connect();
+    } catch (error) {
+      this.connections.delete(options.guildId);
+      throw error;
+    }
   }
 }

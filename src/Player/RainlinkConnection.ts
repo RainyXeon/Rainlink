@@ -6,6 +6,7 @@ import {
 } from '../Interface/Constants';
 import { RainlinkManager } from '../Manager/RainlinkManager';
 import { VoiceChannelOptions } from '../Interface/Player';
+import { Options } from './../../node_modules/prettier/index.d';
 
 /**
  * Represents the payload from a serverUpdate event
@@ -39,7 +40,6 @@ export class RainlinkConnection extends EventEmitter {
    * ID of the connected voice channel
    */
   public channelId: string | null;
-
   /**
    * ID of the Shard that contains the guild that contains the connected voice channel
    */
@@ -103,6 +103,59 @@ export class RainlinkConnection extends EventEmitter {
     this.state = VoiceConnectState.DISCONNECTED;
   }
 
+  /**
+   * Connect the current bot user to a voice channel
+   * @internal
+   */
+  public async connect(): Promise<void> {
+    if (
+      this.state === VoiceConnectState.CONNECTING ||
+      this.state === VoiceConnectState.CONNECTED
+    )
+      return;
+    this.state = VoiceConnectState.CONNECTING;
+    this.sendVoiceUpdate();
+    this.manager.emit(
+      RainlinkEvents.Debug,
+      `[Voice]: Requesting Connection | Guild: ${this.guildId}`,
+    );
+    const controller = new AbortController();
+    const timeout = setTimeout(
+      () => controller.abort(),
+      this.manager.options.options.voiceConnectionTimeout,
+    );
+    try {
+      const [status] = await RainlinkConnection.once(this, 'connectionUpdate', {
+        signal: controller.signal,
+      });
+      if (status !== VoiceState.SESSION_READY) {
+        switch (status) {
+          case VoiceState.SESSION_ID_MISSING:
+            throw new Error(
+              'The voice connection is not established due to missing session id',
+            );
+          case VoiceState.SESSION_ENDPOINT_MISSING:
+            throw new Error(
+              'The voice connection is not established due to missing connection endpoint',
+            );
+        }
+      }
+      this.state = VoiceConnectState.CONNECTED;
+    } catch (error: any) {
+      this.manager.emit(
+        RainlinkEvents.Debug,
+        `[Voice]: Request Connection Failed | Guild: ${this.guildId}`,
+      );
+      if (error.name === 'AbortError')
+        throw new Error(
+          `The voice connection is not established in ${this.manager.options.options.voiceConnectionTimeout}ms`,
+        );
+      throw error;
+    } finally {
+      clearTimeout(timeout);
+    }
+  }
+
   public setServerUpdate(data: ServerUpdate): void {
     if (!data.endpoint) {
       this.emit('connectionUpdate', VoiceState.SESSION_ENDPOINT_MISSING);
@@ -163,5 +216,27 @@ export class RainlinkConnection extends EventEmitter {
       RainlinkEvents.Debug,
       `[Voice]: State Update Received | Channel: ${this.channelId} Session ID: ${session_id} Guild: ${this.guildId}`,
     );
+  }
+
+  /**
+   * Send voice data to discord
+   * @internal
+   */
+  private sendVoiceUpdate() {
+    this.send({
+      guild_id: this.guildId,
+      channel_id: this.channelId,
+      self_deaf: this.deafened,
+      self_mute: this.muted,
+    });
+  }
+
+  /**
+   * Send data to Discord
+   * @param data The data to send
+   * @internal
+   */
+  private send(data: any): void {
+    this.manager.library.sendPacket(this.shardId, { op: 4, d: data }, false);
   }
 }
