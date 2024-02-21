@@ -1,6 +1,8 @@
-import { RainlinkOptions } from '../Interface/Manager';
+import { RainlinkNodeOptions, RainlinkOptions } from '../Interface/Manager';
 import { EventEmitter } from 'events';
 import { RainlinkNode } from '../Node/RainlinkNode';
+import { RainlinkConnection } from '../Player/RainlinkConnection';
+import { Library } from '../Library/Library';
 
 export declare interface RainlinkManager {
   on(event: 'debug', listener: (logs: string) => void): this;
@@ -17,18 +19,43 @@ export declare interface RainlinkManager {
 }
 
 export class RainlinkManager extends EventEmitter {
-  node: Map<string, RainlinkNode>;
-  options: RainlinkOptions;
+  /**
+   * Discord library connector
+   */
+  public readonly library: Library;
+  /**
+   * Voice connections being handled
+   */
+  public readonly connections: Map<string, RainlinkConnection>;
+  /**
+   * Lavalink server that has been configured
+   */
+  public node: Map<string, RainlinkNode>;
+  /**
+   * Rainlink options
+   */
+  public options: RainlinkOptions;
+  /**
+   * Bot id
+   */
+  public id: string | undefined;
 
   constructor(options: RainlinkOptions) {
     super();
-    this.node = new Map<string, RainlinkNode>();
     this.options = options;
+    this.connections = new Map();
+    this.node = new Map<string, RainlinkNode>();
+    if (!options.library)
+      throw new Error(
+        'Please set an new lib to connect, example: \nlibrary: new Library.DiscordJS(client) ',
+      );
+    this.library = options.library.set(this);
   }
 
-  init(clientId: string) {
-    for (const nodeData of this.options.nodes) {
-      this.node.set(nodeData.name, new RainlinkNode(this, nodeData, clientId));
-    }
+  addNode(node: RainlinkNodeOptions) {
+    this.removeAllListeners();
+    const newNode = new RainlinkNode(this, node, this.id!);
+    this.node.set(node.name, newNode);
+    return newNode;
   }
 }

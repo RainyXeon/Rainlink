@@ -22,3 +22,19 @@ export enum RainlinkConnectState {
   Disconnected,
   Closed,
 }
+
+export enum VoiceState {
+  SESSION_READY,
+  SESSION_ID_MISSING,
+  SESSION_ENDPOINT_MISSING,
+  SESSION_FAILED_UPDATE,
+}
+
+export enum VoiceConnectState {
+  CONNECTING,
+  NEARLY,
+  CONNECTED,
+  RECONNECTING,
+  DISCONNECTING,
+  DISCONNECTED,
+}

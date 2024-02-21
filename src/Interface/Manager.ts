@@ -1,3 +1,5 @@
+import { Library } from '../Library/Library';
+
 export interface RainlinkNodeOptions {
   name: string;
   host: string;
@@ -14,4 +16,5 @@ export interface RainlinkAdditionalOptions {
 export interface RainlinkOptions {
   nodes: RainlinkNodeOptions[];
   options: RainlinkAdditionalOptions;
+  library: Library;
 }

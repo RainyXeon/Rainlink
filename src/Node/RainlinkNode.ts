@@ -5,7 +5,7 @@ import {
   LavalinkEvents,
   RainlinkConnectState,
   RainlinkEvents,
-} from '../Interface/Events';
+} from '../Interface/Constants';
 import { RainlinkRest } from './RainlinkRest';
 import { metadata } from '../manifest';
 import { setTimeout } from 'node:timers/promises';
@@ -58,7 +58,7 @@ export class RainlinkNode {
     this.rest = new RainlinkRest(manager, node);
   }
 
-  connect(): WebSocket {
+  public connect(): WebSocket {
     const header = {
       Authorization: this.node.auth,
       'User-Id': this.clientId,
@@ -88,7 +88,7 @@ export class RainlinkNode {
     this.state = RainlinkConnectState.Connected;
     this.manager.emit(
       RainlinkEvents.Debug,
-      `Node ${this.node.name} connected! URL: ${this.wsUrl}`,
+      `[Rainlink]: Node ${this.node.name} connected! URL: ${this.wsUrl}`,
     );
     this.manager.emit(RainlinkEvents.NodeConnect, this);
   }
@@ -106,7 +106,7 @@ export class RainlinkNode {
   protected wsErrorEvent(logs: Error) {
     this.manager.emit(
       RainlinkEvents.Debug,
-      `Node ${this.node.name} errored! URL: ${this.wsUrl}`,
+      `[Rainlink]: Node ${this.node.name} errored! URL: ${this.wsUrl}`,
     );
     this.manager.emit(RainlinkEvents.NodeError, this, logs);
   }
@@ -116,7 +116,7 @@ export class RainlinkNode {
     this.state = RainlinkConnectState.Disconnected;
     this.manager.emit(
       RainlinkEvents.Debug,
-      `Node ${this.node.name} disconnected! URL: ${this.wsUrl}`,
+      `[Rainlink]: Node ${this.node.name} disconnected! URL: ${this.wsUrl}`,
     );
     this.manager.emit(RainlinkEvents.NodeDisconnect, this, code, reason);
     if (
@@ -125,7 +125,7 @@ export class RainlinkNode {
     ) {
       await setTimeout(this.manager.options.options.retryTimeout);
       this.retryCounter = this.retryCounter + 1;
-      this.ws = this.connect();
+      this.reconnect();
       return;
     }
     this.nodeClosed();
@@ -136,7 +136,7 @@ export class RainlinkNode {
     this.manager.emit(RainlinkEvents.NodeClosed, this);
     this.manager.emit(
       RainlinkEvents.Debug,
-      `Node ${this.node.name} closed! URL: ${this.wsUrl}`,
+      `[Rainlink]: Node ${this.node.name} closed! URL: ${this.wsUrl}`,
     );
     this.manager.node.delete(this.node.name);
   }
@@ -144,5 +144,9 @@ export class RainlinkNode {
   public disconnect() {
     this.sudoDisconnect = true;
     this.ws.close();
+  }
+
+  public reconnect() {
+    this.ws = this.connect();
   }
 }
