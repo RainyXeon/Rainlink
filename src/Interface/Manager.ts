@@ -1,11 +1,17 @@
 export interface RainlinkNodeOptions {
-    name: string
-    host: string
-    port: number
-    auth: string
-    secure: boolean
+  name: string;
+  host: string;
+  port: number;
+  auth: string;
+  secure: boolean;
+}
+
+export interface RainlinkAdditionalOptions {
+  retryTimeout: number;
+  retryCount: number;
 }
 
 export interface RainlinkOptions {
-    nodes: RainlinkNodeOptions[]
+  nodes: RainlinkNodeOptions[];
+  options: RainlinkAdditionalOptions;
 }

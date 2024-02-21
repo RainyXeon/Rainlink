@@ -1,6 +1,6 @@
 {
   "name": "rainlink",
-  "version": "1.0.0",
+  "version": "0.0.1",
   "description": "A lavalink wrapper with backward compatible and rich features",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
@@ -21,7 +21,8 @@
     "typescript": "^5.3.3"
   },
   "dependencies": {
-    "discord.js": "^14.14.1",
+    "delay": "^6.0.0",
+    "discord.js": "^14.12.1",
     "undici": "^6.6.2",
     "ws": "^8.16.0"
   }
