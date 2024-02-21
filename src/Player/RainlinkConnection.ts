@@ -1,3 +1,6 @@
+// Get from: https://github.com/shipgirlproject/Shoukaku/blob/396aa531096eda327ade0f473f9807576e9ae9df/src/guild/Connection.ts
+// Special thanks to shipgirlproject team!
+
 import { EventEmitter } from 'events';
 import {
   RainlinkEvents,
@@ -6,7 +9,6 @@ import {
 } from '../Interface/Constants';
 import { RainlinkManager } from '../Manager/RainlinkManager';
 import { VoiceChannelOptions } from '../Interface/Player';
-import { Options } from './../../node_modules/prettier/index.d';
 
 /**
  * Represents the payload from a serverUpdate event

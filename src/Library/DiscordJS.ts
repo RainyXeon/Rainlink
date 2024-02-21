@@ -1,3 +1,6 @@
+// Get from: https://github.com/shipgirlproject/Shoukaku/blob/396aa531096eda327ade0f473f9807576e9ae9df/src/connectors/libs/DiscordJS.ts
+// Special thanks to shipgirlproject team!
+
 import { AbstractLibrary } from './AbstractLibrary';
 import { RainlinkNodeOptions } from '../Interface/Manager';
 
