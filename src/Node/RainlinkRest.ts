@@ -1,101 +1,34 @@
 // Modded from: https://github.com/shipgirlproject/Shoukaku/blob/396aa531096eda327ade0f473f9807576e9ae9df/src/connectors/Connector.ts
 // Special thanks to shipgirlproject team!
 
-import undici from 'undici';
 import { RainlinkNodeOptions } from '../Interface/Manager';
-import { RainlinkManager } from '../Manager/RainlinkManager';
+import { Rainlink } from '../Rainlink';
 import { metadata } from '../manifest';
-import { RainlinkEvents } from '../Interface/Constants';
-import { FilterOptions } from '../Interface/Player';
+import { LavalinkLoadType, RainlinkEvents } from '../Interface/Constants';
 import { RainlinkNode } from './RainlinkNode';
-import { UndiciRequestOptions } from '../Interface/UndiciRequestOptions';
-
-export interface RainlinkFetcherOptions {
-  endpoint: string;
-  params?: string | Record<string, string>;
-  useSessionId: boolean;
-  requestOptions: UndiciRequestOptions;
-}
-
-export interface LavalinkPlayer {
-  guildId: string;
-  track?: RawTrack;
-  volume: number;
-  paused: boolean;
-  voice: LavalinkPlayerVoice;
-  filters: FilterOptions;
-}
-
-export interface RawTrack {
-  encoded: string;
-  info: {
-    identifier: string;
-    isSeekable: boolean;
-    author: string;
-    length: number;
-    isStream: boolean;
-    position: number;
-    title: string;
-    uri?: string;
-    artworkUrl?: string;
-    isrc?: string;
-    sourceName: string;
-  };
-  pluginInfo: unknown;
-}
-
-export interface LavalinkPlayerVoice {
-  token: string;
-  endpoint: string;
-  sessionId: string;
-  connected?: boolean;
-  ping?: number;
-}
-
-export interface LavalinkPlayerVoiceOptions
-  extends Omit<LavalinkPlayerVoice, 'connected' | 'ping'> {}
-
-export interface LavalinkPlayer {
-  guildId: string;
-  track?: RawTrack;
-  volume: number;
-  paused: boolean;
-  voice: LavalinkPlayerVoice;
-  filters: FilterOptions;
-}
-
-export interface UpdatePlayerOptions {
-  encodedTrack?: string | null;
-  identifier?: string;
-  position?: number;
-  endTime?: number;
-  volume?: number;
-  paused?: boolean;
-  filters?: FilterOptions;
-  voice?: LavalinkPlayerVoiceOptions;
-}
-
-export interface UpdatePlayerInfo {
-  guildId: string;
-  playerOptions: UpdatePlayerOptions;
-  noReplace?: boolean;
-}
+import {
+  LavalinkPlayer,
+  LavalinkResponse,
+  RainlinkFetcherOptions,
+  UpdatePlayerInfo,
+} from '../Interface/Rest';
+import axios from 'axios';
 
 export class RainlinkRest {
-  protected undici: typeof undici;
-  public manager: RainlinkManager;
+  protected axios: typeof axios;
+  public manager: Rainlink;
   public node: RainlinkNodeOptions;
   public url: string;
   public nodeManager: RainlinkNode;
   protected sessionId: string | null;
 
   constructor(
-    manager: RainlinkManager,
+    manager: Rainlink,
     node: RainlinkNodeOptions,
     nodeManager: RainlinkNode,
   ) {
     this.manager = manager;
-    this.undici = undici;
+    this.axios = axios;
     this.node = node;
     this.nodeManager = nodeManager;
     this.sessionId = this.nodeManager.sessionId;
@@ -113,24 +46,36 @@ export class RainlinkRest {
     if (options.params)
       url.search = new URLSearchParams(options.params).toString();
 
-    const headers = {
+    const lavalinkHeaders = {
       Authorization: this.node.auth,
       ...options.requestOptions.headers,
     };
 
-    const res = await undici.request(url, { headers });
-    if (res.statusCode == 204) {
+    options.requestOptions.headers = lavalinkHeaders;
+
+    const res = await axios({
+      url: url.toString(),
+      ...options.requestOptions,
+    });
+
+    // const res = await undici.request(url, options.requestOptions typeof undici.Dispatcher.);
+    if (res.status == 204) {
       this.debug('Player now destroyed');
       return undefined;
     }
-    if (res.statusCode !== 200) {
+    if (res.status !== 200) {
       this.debug(
         'Something went wrong with lavalink server.' +
-          `Status code: ${res.statusCode}`,
+          `Status code: ${res.status}`,
       );
       return undefined;
     }
-    return res.body.json() as D;
+
+    const finalData = String(res.data);
+
+    return this.testJSON(finalData)
+      ? (JSON.parse(res.data) as D)
+      : (res.data as D);
   }
 
   /**
@@ -154,7 +99,7 @@ export class RainlinkRest {
    * @param data SessionId from Discord
    * @returns Promise that resolves to a Lavalink player
    */
-  public updatePlayer(
+  public async updatePlayer(
     data: UpdatePlayerInfo,
   ): Promise<LavalinkPlayer | undefined> {
     const options: RainlinkFetcherOptions = {
@@ -165,7 +110,7 @@ export class RainlinkRest {
         method: 'PATCH',
       },
     };
-    return this.fetcher<LavalinkPlayer>(options);
+    return await this.fetcher<LavalinkPlayer>(options);
   }
 
   public destroyPlayer(guildId: string) {
@@ -182,5 +127,37 @@ export class RainlinkRest {
 
   private debug(logs: string) {
     this.manager.emit(RainlinkEvents.Debug, `[Rainlink Rest] ${logs}`);
+  }
+
+  public async resolver(data: string): Promise<LavalinkResponse> {
+    const options: RainlinkFetcherOptions = {
+      endpoint: `/loadtracks`,
+      params: { identifier: data },
+      requestOptions: {
+        headers: { 'Content-Type': 'application/json' },
+        method: 'GET',
+      },
+    };
+
+    const resData = await this.fetcher<LavalinkResponse>(options);
+
+    if (!resData) {
+      return {
+        loadType: LavalinkLoadType.EMPTY,
+        data: {},
+      };
+    } else return resData;
+  }
+
+  protected testJSON(text: string) {
+    if (typeof text !== 'string') {
+      return false;
+    }
+    try {
+      JSON.parse(text);
+      return true;
+    } catch (error) {
+      return false;
+    }
   }
 }

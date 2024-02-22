@@ -1,11 +1,11 @@
 import { RainlinkConnectState } from '../Interface/Constants';
 import { RainlinkNodeOptions } from '../Interface/Manager';
 import { RainlinkNode } from '../Node/RainlinkNode';
-import { RainlinkManager } from './RainlinkManager';
+import { Rainlink } from '../Rainlink';
 
 export class RainlinkNodeManager extends Map<string, RainlinkNode> {
-  manager: RainlinkManager;
-  constructor(manager: RainlinkManager) {
+  manager: Rainlink;
+  constructor(manager: Rainlink) {
     super();
     this.manager = manager;
   }

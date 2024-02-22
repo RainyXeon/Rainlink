@@ -1,18 +1,18 @@
-import { RainlinkNodeOptions } from '../Interface/Manager';
 import { VoiceChannelOptions } from '../Interface/Player';
-import { RainlinkManager } from '../Manager/RainlinkManager';
+import { Rainlink } from '../Rainlink';
 import { RainlinkNode } from '../Node/RainlinkNode';
+import { RainlinkQueue } from '../Utilities/RainlinkQueue';
 import { RainlinkConnection } from './RainlinkConnection';
-import { metadata } from './../manifest';
 
 export class RainlinkPlayer {
-  manager: RainlinkManager;
-  voiceOptions: VoiceChannelOptions;
-  node: RainlinkNode;
-  guildId: string;
+  public manager: Rainlink;
+  public voiceOptions: VoiceChannelOptions;
+  public node: RainlinkNode;
+  public guildId: string;
+  public queue: RainlinkQueue;
 
   constructor(
-    manager: RainlinkManager,
+    manager: Rainlink,
     voiceOptions: VoiceChannelOptions,
     node: RainlinkNode,
   ) {
@@ -20,6 +20,7 @@ export class RainlinkPlayer {
     this.voiceOptions = voiceOptions;
     this.node = node;
     this.guildId = this.voiceOptions.guildId;
+    this.queue = new RainlinkQueue();
   }
 
   /**

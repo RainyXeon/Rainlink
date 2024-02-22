@@ -1,6 +1,6 @@
 import { RawData, WebSocket } from 'ws';
 import { RainlinkNodeOptions } from '../Interface/Manager';
-import { RainlinkManager } from '../Manager/RainlinkManager';
+import { Rainlink } from '../Rainlink';
 import {
   LavalinkEvents,
   RainlinkConnectState,
@@ -10,30 +10,8 @@ import { RainlinkRest } from './RainlinkRest';
 import { metadata } from '../manifest';
 import { setTimeout } from 'node:timers/promises';
 
-export interface NodeStats {
-  players: number;
-  playingPlayers: number;
-  memory: {
-    reservable: number;
-    used: number;
-    free: number;
-    allocated: number;
-  };
-  frameStats: {
-    sent: number;
-    deficit: number;
-    nulled: number;
-  };
-  cpu: {
-    cores: number;
-    systemLoad: number;
-    lavalinkLoad: number;
-  };
-  uptime: number;
-}
-
 export class RainlinkNode {
-  public manager: RainlinkManager;
+  public manager: Rainlink;
   public node: RainlinkNodeOptions;
   private wsUrl: string;
   public rest: RainlinkRest;
@@ -44,7 +22,7 @@ export class RainlinkNode {
   private ws?: WebSocket;
   private sudoDisconnect = false;
 
-  constructor(manager: RainlinkManager, node: RainlinkNodeOptions) {
+  constructor(manager: Rainlink, node: RainlinkNodeOptions) {
     this.manager = manager;
     this.node = node;
     this.wsUrl = `${node.secure ? 'wss' : 'ws'}://${node.host}:${node.port}/v${metadata.lavalink}/websocket`;

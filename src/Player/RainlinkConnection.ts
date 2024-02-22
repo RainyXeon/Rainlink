@@ -7,33 +7,15 @@ import {
   VoiceConnectState,
   VoiceState,
 } from '../Interface/Constants';
-import { RainlinkManager } from '../Manager/RainlinkManager';
+import { Rainlink } from '../Rainlink';
 import { VoiceChannelOptions } from '../Interface/Player';
-
-/**
- * Represents the payload from a serverUpdate event
- */
-export interface ServerUpdate {
-  token: string;
-  guild_id: string;
-  endpoint: string;
-}
-
-/**
- * Represents the partial payload from a stateUpdate event
- */
-export interface StateUpdatePartial {
-  channel_id?: string;
-  session_id?: string;
-  self_deaf: boolean;
-  self_mute: boolean;
-}
+import { ServerUpdate, StateUpdatePartial } from '../Interface/Connection';
 
 export class RainlinkConnection extends EventEmitter {
   /**
    * The manager where this connection is on
    */
-  public manager: RainlinkManager;
+  public manager: Rainlink;
   /**
    * ID of Guild that contains the connected voice channel
    */
@@ -89,7 +71,7 @@ export class RainlinkConnection extends EventEmitter {
    * @param options.mute Optional boolean value to specify whether to mute the current bot user
    * @param options.getNode Optional move function for moving players around
    */
-  constructor(manager: RainlinkManager, options: VoiceChannelOptions) {
+  constructor(manager: Rainlink, options: VoiceChannelOptions) {
     super();
     this.manager = manager;
     this.guildId = options.guildId;

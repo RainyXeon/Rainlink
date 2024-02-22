@@ -38,3 +38,17 @@ export enum VoiceConnectState {
   DISCONNECTING,
   DISCONNECTED,
 }
+
+export enum LavalinkLoadType {
+  TRACK = 'track',
+  PLAYLIST = 'playlist',
+  SEARCH = 'search',
+  EMPTY = 'empty',
+  ERROR = 'error',
+}
+
+export const SourceIDs = [
+  { name: 'youtube', id: 'yt' },
+  { name: 'youtubeMusic', id: 'ytm' },
+  { name: 'soundcloud', id: 'sc' },
+];

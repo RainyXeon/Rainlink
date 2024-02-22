@@ -2,21 +2,13 @@ import { VoiceState } from '../Interface/Constants';
 import { VoiceChannelOptions } from '../Interface/Player';
 import { RainlinkConnection } from '../Player/RainlinkConnection';
 import { RainlinkPlayer } from '../Player/RainlinkPlayer';
-import { RainlinkManager } from './RainlinkManager';
-
-export interface RainlinkPlayerManagerOptions {
-  connections: Map<string, RainlinkConnection>;
-  manager: RainlinkManager;
-}
+import { Rainlink } from '../Rainlink';
 
 export class RainlinkPlayerManager extends Map<string, RainlinkPlayer> {
   private connections: Map<string, RainlinkConnection>;
-  private manager: RainlinkManager;
+  private manager: Rainlink;
 
-  constructor(
-    manager: RainlinkManager,
-    connections: Map<string, RainlinkConnection>,
-  ) {
+  constructor(manager: Rainlink, connections: Map<string, RainlinkConnection>) {
     super();
     this.connections = connections;
     this.manager = manager;
