@@ -40,7 +40,7 @@ export declare interface Rainlink {
 export interface RainlinkSearchOptions {
   requester: unknown;
   nodeName?: string;
-  engines?: string;
+  engine?: string;
 }
 
 export class Rainlink extends EventEmitter {
@@ -114,7 +114,7 @@ export class Rainlink extends EventEmitter {
    * Search a specific track.
    * @returns RainlinkSearchResult
    */
-  async search(query: string, options: RainlinkSearchOptions) {
+  async search(query: string, options?: RainlinkSearchOptions) {
     const node = options?.nodeName
       ? this.nodes.get(options.nodeName) ??
         (await this.nodes.getLeastUsedNode())
@@ -122,8 +122,8 @@ export class Rainlink extends EventEmitter {
 
     if (!node) throw new Error('No node is available');
 
-    const source = options.engines
-      ? this.searchEngines.get(options.engines)
+    const source = options?.engine
+      ? this.searchEngines.get(options.engine)
       : this.searchEngines.get(
           this.options.options.defaultSearchEngine
             ? this.options.options.defaultSearchEngine
