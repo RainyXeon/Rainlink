@@ -6,6 +6,7 @@ import {
 import { Rainlink, RainlinkSearchOptions } from '../../Rainlink';
 import { RainlinkTrack } from '../../Utilities/RainlinkTrack';
 import { SourceRainlinkPlugin } from '../SourceRainlinkPlugin';
+import { RainlinkPluginType } from '../../Interface/Constants';
 
 const API_URL = 'https://api.deezer.com/';
 const REGEX =
@@ -29,6 +30,10 @@ export class RainlinkPlugin extends SourceRainlinkPlugin {
 
   public sourceName(): string {
     return 'deezer';
+  }
+
+  public type(): RainlinkPluginType {
+    return RainlinkPluginType.SourceResolver;
   }
 
   constructor() {
@@ -73,6 +78,15 @@ export class RainlinkPlugin extends SourceRainlinkPlugin {
       query = String(res.headers.location);
     }
 
+    const preSearch = await this._search!(query, {
+      bypassPlugin: true,
+      engine: this.sourceName(),
+      nodeName: options?.nodeName,
+      requester: options?.requester,
+    });
+
+    if (preSearch.tracks.length !== 0) return preSearch;
+
     const [, type, id] = REGEX.exec(query) || [];
 
     if (type in this.methods) {
@@ -91,7 +105,7 @@ export class RainlinkPlugin extends SourceRainlinkPlugin {
       } catch (e) {
         return this.buildSearch(undefined, [], RainlinkSearchResultType.SEARCH);
       }
-    } else if (options?.engine === 'deezer' && !isUrl) {
+    } else if (options?.engine === this.sourceName() && !isUrl) {
       const result = await this.searchTrack(query, options?.requester);
 
       return this.buildSearch(
@@ -99,9 +113,8 @@ export class RainlinkPlugin extends SourceRainlinkPlugin {
         result.tracks,
         RainlinkSearchResultType.SEARCH,
       );
-    }
-
-    return this._search(query, options);
+    } else
+      return this.buildSearch(undefined, [], RainlinkSearchResultType.SEARCH);
   }
 
   private async searchTrack(

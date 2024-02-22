@@ -1,4 +1,5 @@
 import { AbstractLibrary } from '../Library/AbstractLibrary';
+import { RainlinkPlugin } from '../Plugin/RainlinkPlugin';
 import { RainlinkTrack } from '../Utilities/RainlinkTrack';
 
 export interface RainlinkNodeOptions {
@@ -20,6 +21,7 @@ export interface RainlinkOptions {
   nodes: RainlinkNodeOptions[];
   options: RainlinkAdditionalOptions;
   library: AbstractLibrary;
+  plugins: RainlinkPlugin[];
 }
 
 export enum RainlinkSearchResultType {

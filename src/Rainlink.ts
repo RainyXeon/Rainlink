@@ -13,11 +13,13 @@ import { RainlinkNodeManager } from './Manager/RainlinkNodeManager';
 import {
   LavalinkLoadType,
   RainlinkEvents,
+  RainlinkPluginType,
   SourceIDs,
 } from './Interface/Constants';
 import { RainlinkTrack } from './Utilities/RainlinkTrack';
 import { RawTrack } from './Interface/Rest';
 import { RainlinkPlayer } from './Player/RainlinkPlayer';
+import { SourceRainlinkPlugin } from './Plugin/SourceRainlinkPlugin';
 
 export declare interface Rainlink {
   on(event: 'debug', listener: (logs: string) => void): this;
@@ -38,9 +40,10 @@ export declare interface Rainlink {
 }
 
 export interface RainlinkSearchOptions {
-  requester: unknown;
+  requester?: unknown;
   nodeName?: string;
   engine?: string;
+  bypassPlugin?: boolean;
 }
 
 export class Rainlink extends EventEmitter {
@@ -71,7 +74,11 @@ export class Rainlink extends EventEmitter {
   /**
    * All search engine
    */
-  protected searchEngines: Map<string, string>;
+  public searchEngines: Map<string, string>;
+  /**
+   * All search plugins (resolver plugins)
+   */
+  public searchPlugins: Map<string, SourceRainlinkPlugin>;
 
   constructor(options: RainlinkOptions) {
     super();
@@ -86,6 +93,24 @@ export class Rainlink extends EventEmitter {
     this.library.listen(this.options.nodes);
     this.players = new RainlinkPlayerManager(this, this.connections);
     this.searchEngines = new Map<string, string>();
+    this.searchPlugins = new Map<string, SourceRainlinkPlugin>();
+    this.initialSearchEngines();
+
+    if (this.options.plugins) {
+      for (const [, plugin] of this.options.plugins.entries()) {
+        if (plugin.constructor.name !== 'RainlinkPlugin')
+          throw new Error('Plugin must be an instance of RainlinkPlugin');
+        plugin.load(this);
+
+        if (plugin.type() == RainlinkPluginType.SourceResolver) {
+          const newPlugin = plugin as SourceRainlinkPlugin;
+          const sourceName = newPlugin.sourceName();
+          const sourceIdentify = newPlugin.sourceIdentify();
+          this.searchEngines.set(sourceName, sourceIdentify);
+          this.searchPlugins.set(sourceName, newPlugin);
+        }
+      }
+    }
   }
 
   protected initialSearchEngines() {
@@ -121,6 +146,14 @@ export class Rainlink extends EventEmitter {
       : await this.nodes.getLeastUsedNode();
 
     if (!node) throw new Error('No node is available');
+
+    let pluginData: RainlinkSearchResult;
+
+    const pluginSearch = this.searchPlugins.get(String(options?.engine));
+    if (pluginSearch && !options?.bypassPlugin) {
+      pluginData = await pluginSearch.searchDirect(query, options);
+      if (pluginData.tracks.length !== 0) return pluginData;
+    }
 
     const source = options?.engine
       ? this.searchEngines.get(options.engine)

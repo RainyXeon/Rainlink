@@ -54,3 +54,8 @@ export const SourceIDs = [
   { name: 'youtubeMusic', id: 'ytm' },
   { name: 'soundcloud', id: 'sc' },
 ];
+
+export enum RainlinkPluginType {
+  Default = 'default',
+  SourceResolver = 'sourceResolver',
+}
