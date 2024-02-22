@@ -58,10 +58,7 @@ export class RainlinkNode {
   protected wsOpenEvent() {
     this.clean(true);
     this.state = RainlinkConnectState.Connected;
-    this.manager.emit(
-      RainlinkEvents.Debug,
-      `[Rainlink]: Node ${this.node.name} connected! URL: ${this.wsUrl}`,
-    );
+    this.debug(`Node ${this.node.name} connected! URL: ${this.wsUrl}`);
     this.manager.emit(RainlinkEvents.NodeConnect, this);
   }
 
@@ -77,20 +74,14 @@ export class RainlinkNode {
   }
 
   protected wsErrorEvent(logs: Error) {
-    this.manager.emit(
-      RainlinkEvents.Debug,
-      `[Rainlink]: Node ${this.node.name} errored! URL: ${this.wsUrl}`,
-    );
+    this.debug(`Node ${this.node.name} errored! URL: ${this.wsUrl}`);
     this.manager.emit(RainlinkEvents.NodeError, this, logs);
   }
 
   protected async wsCloseEvent(code: number, reason: Buffer) {
     this.online = false;
     this.state = RainlinkConnectState.Disconnected;
-    this.manager.emit(
-      RainlinkEvents.Debug,
-      `[Rainlink]: Node ${this.node.name} disconnected! URL: ${this.wsUrl}`,
-    );
+    this.debug(`Node ${this.node.name} disconnected! URL: ${this.wsUrl}`);
     this.manager.emit(RainlinkEvents.NodeDisconnect, this, code, reason);
     if (
       !this.sudoDisconnect &&
@@ -107,10 +98,7 @@ export class RainlinkNode {
 
   protected nodeClosed() {
     this.manager.emit(RainlinkEvents.NodeClosed, this);
-    this.manager.emit(
-      RainlinkEvents.Debug,
-      `[Rainlink]: Node ${this.node.name} closed! URL: ${this.wsUrl}`,
-    );
+    this.debug(`Node ${this.node.name} closed! URL: ${this.wsUrl}`);
   }
 
   public disconnect() {
@@ -128,5 +116,9 @@ export class RainlinkNode {
     this.retryCounter = 0;
     this.online = online;
     this.state = RainlinkConnectState.Closed;
+  }
+
+  private debug(logs: string) {
+    this.manager.emit(RainlinkEvents.Debug, `[Rainlink Node]: ${logs}`);
   }
 }

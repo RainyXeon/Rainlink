@@ -4,6 +4,8 @@ export enum RainlinkEvents {
   NodeDisconnect = 'nodeDisconnect',
   NodeClosed = 'nodeClosed',
   NodeError = 'nodeError',
+  PlayerCreate = 'playerCreate',
+  PlayerDestroy = 'playerCreate',
 }
 
 export enum LavalinkEvents {

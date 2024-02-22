@@ -88,6 +88,7 @@ export class RainlinkRest {
       params: undefined,
       useSessionId: true,
       requestOptions: {
+        headers: { 'Content-Type': 'application/json' },
         method: 'GET',
       },
     };
@@ -107,7 +108,9 @@ export class RainlinkRest {
       params: { noReplace: data.noReplace?.toString() || 'false' },
       useSessionId: true,
       requestOptions: {
+        headers: { 'Content-Type': 'application/json' },
         method: 'PATCH',
+        data: data.playerOptions as Record<string, unknown>,
       },
     };
     return await this.fetcher<LavalinkPlayer>(options);
@@ -119,6 +122,7 @@ export class RainlinkRest {
       params: undefined,
       useSessionId: true,
       requestOptions: {
+        headers: { 'Content-Type': 'application/json' },
         method: 'DELETE',
       },
     };

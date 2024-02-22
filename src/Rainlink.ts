@@ -17,9 +17,11 @@ import {
 } from './Interface/Constants';
 import { RainlinkTrack } from './Utilities/RainlinkTrack';
 import { RawTrack } from './Interface/Rest';
+import { RainlinkPlayer } from './Player/RainlinkPlayer';
 
 export declare interface Rainlink {
   on(event: 'debug', listener: (logs: string) => void): this;
+  // Node events
   on(event: 'nodeConnect', listener: (node: RainlinkNode) => void): this;
   on(
     event: 'nodeDisconnect',
@@ -30,6 +32,9 @@ export declare interface Rainlink {
     event: 'nodeError',
     listener: (node: RainlinkNode, error: Error) => void,
   ): this;
+  // Player events
+  on(event: 'playerCreate', listener: (player: RainlinkPlayer) => void): this;
+  on(event: 'playerDestroy', listener: (player: RainlinkPlayer) => void): this;
 }
 
 export interface RainlinkSearchOptions {
@@ -167,8 +172,7 @@ export class Rainlink extends EventEmitter {
       }
     }
 
-    this.emit(
-      RainlinkEvents.Debug,
+    this.debug(
       `Searched ${query}; Track results: ${normalizedData.tracks.length}`,
     );
 
@@ -191,5 +195,9 @@ export class Rainlink extends EventEmitter {
       tracks,
       type: type ?? RainlinkSearchResultType.SEARCH,
     };
+  }
+
+  private debug(logs: string) {
+    this.emit(RainlinkEvents.Debug, `[Rainlink]: ${logs}`);
   }
 }

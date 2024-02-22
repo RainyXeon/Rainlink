@@ -3,6 +3,7 @@ import { Rainlink } from '../Rainlink';
 import { RainlinkNode } from '../Node/RainlinkNode';
 import { RainlinkQueue } from '../Utilities/RainlinkQueue';
 import { RainlinkConnection } from './RainlinkConnection';
+import { RainlinkEvents } from '../Interface/Constants';
 
 export class RainlinkPlayer {
   public manager: Rainlink;
@@ -53,5 +54,11 @@ export class RainlinkPlayer {
     }
     await this.node.rest.destroyPlayer(this.guildId);
     this.manager.players.delete(this.guildId);
+    this.debug('Player destroyed at ' + this.guildId);
+    this.manager.emit(RainlinkEvents.PlayerDestroy, this);
+  }
+
+  private debug(logs: string) {
+    this.manager.emit(RainlinkEvents.Debug, `[Rainlink Player]: ${logs}`);
   }
 }
