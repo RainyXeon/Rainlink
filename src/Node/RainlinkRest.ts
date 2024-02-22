@@ -1,3 +1,6 @@
+// Modded from: https://github.com/shipgirlproject/Shoukaku/blob/396aa531096eda327ade0f473f9807576e9ae9df/src/connectors/Connector.ts
+// Special thanks to shipgirlproject team!
+
 import undici from 'undici';
 import { RainlinkNodeOptions } from '../Interface/Manager';
 import { RainlinkManager } from '../Manager/RainlinkManager';
@@ -5,11 +8,13 @@ import { metadata } from '../manifest';
 import { RainlinkEvents } from '../Interface/Constants';
 import { FilterOptions } from '../Interface/Player';
 import { RainlinkNode } from './RainlinkNode';
+import { UndiciRequestOptions } from '../Interface/UndiciRequestOptions';
 
 export interface RainlinkFetcherOptions {
   endpoint: string;
-  params?: string;
+  params?: string | Record<string, string>;
   useSessionId: boolean;
+  requestOptions: UndiciRequestOptions;
 }
 
 export interface LavalinkPlayer {
@@ -47,6 +52,35 @@ export interface LavalinkPlayerVoice {
   ping?: number;
 }
 
+export interface LavalinkPlayerVoiceOptions
+  extends Omit<LavalinkPlayerVoice, 'connected' | 'ping'> {}
+
+export interface LavalinkPlayer {
+  guildId: string;
+  track?: RawTrack;
+  volume: number;
+  paused: boolean;
+  voice: LavalinkPlayerVoice;
+  filters: FilterOptions;
+}
+
+export interface UpdatePlayerOptions {
+  encodedTrack?: string | null;
+  identifier?: string;
+  position?: number;
+  endTime?: number;
+  volume?: number;
+  paused?: boolean;
+  filters?: FilterOptions;
+  voice?: LavalinkPlayerVoiceOptions;
+}
+
+export interface UpdatePlayerInfo {
+  guildId: string;
+  playerOptions: UpdatePlayerOptions;
+  noReplace?: boolean;
+}
+
 export class RainlinkRest {
   protected undici: typeof undici;
   public manager: RainlinkManager;
@@ -81,17 +115,22 @@ export class RainlinkRest {
 
     const headers = {
       Authorization: this.node.auth,
+      ...options.requestOptions.headers,
     };
 
-    const res = await undici.fetch(url, { headers });
-    if (res.status !== 200) {
-      this.manager.emit(
-        RainlinkEvents.Debug,
-        '[Rainlink] Something went wrong with lavalink server',
+    const res = await undici.request(url, { headers });
+    if (res.statusCode == 204) {
+      this.debug('Player now destroyed');
+      return undefined;
+    }
+    if (res.statusCode !== 200) {
+      this.debug(
+        'Something went wrong with lavalink server.' +
+          `Status code: ${res.statusCode}`,
       );
       return undefined;
     }
-    return res.json() as D;
+    return res.body.json() as D;
   }
 
   /**
@@ -99,11 +138,49 @@ export class RainlinkRest {
    * @returns Promise that resolves to an array of Lavalink players
    */
   public async getPlayers(): Promise<LavalinkPlayer[]> {
-    const options = {
+    const options: RainlinkFetcherOptions = {
       endpoint: `/sessions/${this.sessionId}/players`,
       params: undefined,
       useSessionId: true,
+      requestOptions: {
+        method: 'GET',
+      },
     };
     return (await this.fetcher<LavalinkPlayer[]>(options)) ?? [];
+  }
+
+  /**
+   * Updates a Lavalink player
+   * @param data SessionId from Discord
+   * @returns Promise that resolves to a Lavalink player
+   */
+  public updatePlayer(
+    data: UpdatePlayerInfo,
+  ): Promise<LavalinkPlayer | undefined> {
+    const options: RainlinkFetcherOptions = {
+      endpoint: `/sessions/${this.sessionId}/players/${data.guildId}`,
+      params: { noReplace: data.noReplace?.toString() || 'false' },
+      useSessionId: true,
+      requestOptions: {
+        method: 'PATCH',
+      },
+    };
+    return this.fetcher<LavalinkPlayer>(options);
+  }
+
+  public destroyPlayer(guildId: string) {
+    const options: RainlinkFetcherOptions = {
+      endpoint: `/sessions/${this.sessionId}/players/${guildId}`,
+      params: undefined,
+      useSessionId: true,
+      requestOptions: {
+        method: 'DELETE',
+      },
+    };
+    return this.fetcher(options);
+  }
+
+  private debug(logs: string) {
+    this.manager.emit(RainlinkEvents.Debug, `[Rainlink Rest] ${logs}`);
   }
 }

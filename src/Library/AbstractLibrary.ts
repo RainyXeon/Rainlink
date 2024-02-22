@@ -15,7 +15,7 @@ export abstract class AbstractLibrary {
 
   protected ready(nodes: RainlinkNodeOptions[]): void {
     this.manager!.id = this.getId();
-    for (const node of nodes) this.manager!.addNode(node);
+    for (const node of nodes) this.manager?.nodes.addNode(node);
   }
 
   public set(manager: RainlinkManager): AbstractLibrary {

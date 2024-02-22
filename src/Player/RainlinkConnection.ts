@@ -1,4 +1,4 @@
-// Get from: https://github.com/shipgirlproject/Shoukaku/blob/396aa531096eda327ade0f473f9807576e9ae9df/src/guild/Connection.ts
+// Modded from: https://github.com/shipgirlproject/Shoukaku/blob/396aa531096eda327ade0f473f9807576e9ae9df/src/guild/Connection.ts
 // Special thanks to shipgirlproject team!
 
 import { EventEmitter } from 'events';
@@ -117,10 +117,7 @@ export class RainlinkConnection extends EventEmitter {
       return;
     this.state = VoiceConnectState.CONNECTING;
     this.sendVoiceUpdate();
-    this.manager.emit(
-      RainlinkEvents.Debug,
-      `[Voice]: Requesting Connection | Guild: ${this.guildId}`,
-    );
+    this.debug(`Requesting Connection | Guild: ${this.guildId}`);
     const controller = new AbortController();
     const timeout = setTimeout(
       () => controller.abort(),
@@ -144,10 +141,7 @@ export class RainlinkConnection extends EventEmitter {
       }
       this.state = VoiceConnectState.CONNECTED;
     } catch (error: any) {
-      this.manager.emit(
-        RainlinkEvents.Debug,
-        `[Voice]: Request Connection Failed | Guild: ${this.guildId}`,
-      );
+      this.debug(`Request Connection Failed | Guild: ${this.guildId}`);
       if (error.name === 'AbortError')
         throw new Error(
           `The voice connection is not established in ${this.manager.options.options.voiceConnectionTimeout}ms`,
@@ -173,17 +167,15 @@ export class RainlinkConnection extends EventEmitter {
       data.endpoint.split('.').shift()?.replace(/[0-9]/g, '') || null;
 
     if (this.region && this.lastRegion !== this.region) {
-      this.manager.emit(
-        RainlinkEvents.Debug,
-        `[Voice]: Voice Region Moved | Old Region: ${this.lastRegion} New Region: ${this.region} Guild: ${this.guildId}`,
+      this.debug(
+        `Voice Region Moved | Old Region: ${this.lastRegion} New Region: ${this.region} Guild: ${this.guildId}`,
       );
     }
 
     this.serverUpdate = data;
     this.emit('connectionUpdate', VoiceState.SESSION_READY);
-    this.manager.emit(
-      RainlinkEvents.Debug,
-      `[Voice]: Server Update Received | Server: ${this.region} Guild: ${this.guildId}`,
+    this.debug(
+      `Server Update Received | Server: ${this.region} Guild: ${this.guildId}`,
     );
   }
 
@@ -197,26 +189,21 @@ export class RainlinkConnection extends EventEmitter {
     this.channelId = channel_id || null;
 
     if (this.channelId && this.lastChannelId !== this.channelId) {
-      this.manager.emit(
-        RainlinkEvents.Debug,
-        `[Voice]: Channel Moved | Old Channel: ${this.channelId} Guild: ${this.guildId}`,
+      this.debug(
+        `Channel Moved | Old Channel: ${this.channelId} Guild: ${this.guildId}`,
       );
     }
 
     if (!this.channelId) {
       this.state = VoiceConnectState.DISCONNECTED;
-      this.manager.emit(
-        RainlinkEvents.Debug,
-        `[Voice]: Channel Disconnected | Guild: ${this.guildId}`,
-      );
+      this.debug(`Channel Disconnected | Guild: ${this.guildId}`);
     }
 
     this.deafened = self_deaf;
     this.muted = self_mute;
     this.sessionId = session_id || null;
-    this.manager.emit(
-      RainlinkEvents.Debug,
-      `[Voice]: State Update Received | Channel: ${this.channelId} Session ID: ${session_id} Guild: ${this.guildId}`,
+    this.debug(
+      `State Update Received | Channel: ${this.channelId} Session ID: ${session_id} Guild: ${this.guildId}`,
     );
   }
 
@@ -240,5 +227,47 @@ export class RainlinkConnection extends EventEmitter {
    */
   private send(data: any): void {
     this.manager.library.sendPacket(this.shardId, { op: 4, d: data }, false);
+  }
+
+  /**
+   * Set the deafen status for the current bot user
+   * @param deaf Boolean value to indicate whether to deafen or undeafen
+   * @defaultValue false
+   */
+  public setDeaf(deaf = false): void {
+    this.deafened = deaf;
+    this.sendVoiceUpdate();
+  }
+
+  /**
+   * Set the mute status for the current bot user
+   * @param mute Boolean value to indicate whether to mute or unmute
+   * @defaultValue false
+   */
+  public setMute(mute = false): void {
+    this.muted = mute;
+    this.sendVoiceUpdate();
+  }
+
+  /**
+   * Disconnect the current bot user from the connected voice channel
+   * @internal
+   */
+  public disconnect(): void {
+    if (this.state === VoiceConnectState.DISCONNECTED) return;
+    this.channelId = null;
+    this.deafened = false;
+    this.muted = false;
+    this.removeAllListeners();
+    this.sendVoiceUpdate();
+    this.state = VoiceConnectState.DISCONNECTED;
+    this.debug(`Connection Destroyed | Guild: ${this.guildId}`);
+  }
+
+  private debug(logs: string) {
+    this.manager.emit(
+      RainlinkEvents.Debug,
+      `[Rainlink Voice Manager]: ${logs}`,
+    );
   }
 }

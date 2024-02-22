@@ -4,8 +4,10 @@ import { RainlinkNode } from '../Node/RainlinkNode';
 import { RainlinkConnection } from '../Player/RainlinkConnection';
 import { AbstractLibrary } from '../Library/AbstractLibrary';
 import { VoiceChannelOptions } from '../Interface/Player';
-import { RainlinkConnectState } from '../Interface/Constants';
+import { RainlinkConnectState, VoiceState } from '../Interface/Constants';
 import { RainlinkPlayer } from '../Player/RainlinkPlayer';
+import { RainlinkPlayerManager } from './RainlinkPlayerManager';
+import { RainlinkNodeManager } from './RainlinkNodeManager';
 
 export declare interface RainlinkManager {
   on(event: 'debug', listener: (logs: string) => void): this;
@@ -33,7 +35,7 @@ export class RainlinkManager extends EventEmitter {
   /**
    * Lavalink server that has been configured
    */
-  public nodes: Map<string, RainlinkNode>;
+  public nodes: RainlinkNodeManager;
   /**
    * Rainlink options
    */
@@ -45,7 +47,7 @@ export class RainlinkManager extends EventEmitter {
   /**
    * Player maps
    */
-  public players: Map<string, RainlinkPlayer>;
+  public players: RainlinkPlayerManager;
 
   constructor(options: RainlinkOptions) {
     super();
@@ -56,54 +58,24 @@ export class RainlinkManager extends EventEmitter {
     this.library = options.library.set(this);
     this.options = options;
     this.connections = new Map();
-    this.nodes = new Map<string, RainlinkNode>();
+    this.nodes = new RainlinkNodeManager(this);
     this.library.listen(this.options.nodes);
-    this.players = new Map<string, RainlinkPlayer>();
-  }
-
-  addNode(node: RainlinkNodeOptions) {
-    const newNode = new RainlinkNode(this, node);
-    newNode.connect();
-    this.nodes.set(node.name, newNode);
-    return newNode;
-  }
-
-  async create(options: VoiceChannelOptions) {
-    if (this.connections.has(options.guildId))
-      throw new Error('This guild already have an existing connection');
-    const connection = new RainlinkConnection(this, options);
-    this.connections.set(connection.guildId, connection);
-    try {
-      await connection.connect();
-    } catch (error) {
-      this.connections.delete(options.guildId);
-      throw error;
-    }
+    this.players = new RainlinkPlayerManager(this, this.connections);
   }
 
   /**
-   * Get a least used node.
-   * @returns Node
+   * Create a new player.
+   * @returns RainlinkNode
    */
-  public async getLeastUsedNode(): Promise<RainlinkNode> {
-    const nodes: RainlinkNode[] = [...this.nodes.values()];
+  async create(options: VoiceChannelOptions) {
+    this.players.create(options);
+  }
 
-    const onlineNodes = nodes.filter(
-      node => node.state === RainlinkConnectState.Connected,
-    );
-    if (!onlineNodes.length) throw new Error('No nodes are online');
-
-    // .filter((x) => x.manager.node.name === node.node.name)
-
-    const temp = await Promise.all(
-      onlineNodes.map(async node => ({
-        node,
-        players: (await node.rest.getPlayers())
-          .filter(x => this.players.get(x.guildId))
-          .map(x => this.players.get(x.guildId)!).length,
-      })),
-    );
-
-    return temp.reduce((a, b) => (a.players < b.players ? a : b)).node;
+  /**
+   * Destroy a specific player.
+   * @returns RainlinkNode
+   */
+  async destroy(guildId: string) {
+    this.players.destroy(guildId);
   }
 }
