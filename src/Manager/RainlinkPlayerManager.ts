@@ -1,14 +1,17 @@
 import { RainlinkEvents, VoiceState } from '../Interface/Constants';
 import { VoiceChannelOptions } from '../Interface/Player';
-import { RainlinkConnection } from '../Player/RainlinkConnection';
+import { RainlinkVoiceManager } from './RainlinkVoiceManager';
 import { RainlinkPlayer } from '../Player/RainlinkPlayer';
 import { Rainlink } from '../Rainlink';
 
 export class RainlinkPlayerManager extends Map<string, RainlinkPlayer> {
-  private connections: Map<string, RainlinkConnection>;
+  private connections: Map<string, RainlinkVoiceManager>;
   private manager: Rainlink;
 
-  constructor(manager: Rainlink, connections: Map<string, RainlinkConnection>) {
+  constructor(
+    manager: Rainlink,
+    connections: Map<string, RainlinkVoiceManager>,
+  ) {
     super();
     this.connections = connections;
     this.manager = manager;
@@ -17,7 +20,7 @@ export class RainlinkPlayerManager extends Map<string, RainlinkPlayer> {
   async create(options: VoiceChannelOptions) {
     if (this.connections.has(options.guildId))
       throw new Error('This guild already have an existing connection');
-    const connection = new RainlinkConnection(this.manager, options);
+    const connection = new RainlinkVoiceManager(this.manager, options);
     this.connections.set(connection.guildId, connection);
     try {
       await connection.connect();

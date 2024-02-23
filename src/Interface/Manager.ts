@@ -1,6 +1,6 @@
 import { AbstractLibrary } from '../Library/AbstractLibrary';
 import { RainlinkPlugin } from '../Plugin/RainlinkPlugin';
-import { RainlinkTrack } from '../Utilities/RainlinkTrack';
+import { RainlinkTrack } from '../Player/RainlinkTrack';
 
 export interface RainlinkNodeOptions {
   name: string;

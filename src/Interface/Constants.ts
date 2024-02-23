@@ -6,11 +6,18 @@ export enum RainlinkEvents {
   NodeError = 'nodeError',
   PlayerCreate = 'playerCreate',
   PlayerDestroy = 'playerCreate',
+  QueueUpdate = 'queueUpdate',
+  PlayerResolveError = 'playerResolveError',
+  PlayerEmpty = 'playerEmpty',
 }
 
 export enum LavalinkEvents {
   Ready = 'ready',
   Status = 'stats',
+  Event = 'event',
+}
+
+export enum LavalinkPlayerEvents {
   PlayerUpdate = 'playerUpdate',
   TrackStartEvent = 'TrackStartEvent',
   TrackEndEvent = 'TrackEndEvent',
@@ -58,4 +65,13 @@ export const SourceIDs = [
 export enum RainlinkPluginType {
   Default = 'default',
   SourceResolver = 'sourceResolver',
+}
+
+export enum RainlinkPlayerState {
+  CONNECTING,
+  CONNECTED,
+  DISCONNECTING,
+  DISCONNECTED,
+  DESTROYING,
+  DESTROYED,
 }

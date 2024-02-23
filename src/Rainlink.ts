@@ -6,7 +6,7 @@ import {
 } from './Interface/Manager';
 import { EventEmitter } from 'events';
 import { RainlinkNode } from './Node/RainlinkNode';
-import { RainlinkConnection } from './Player/RainlinkConnection';
+import { RainlinkVoiceManager } from './Manager/RainlinkVoiceManager';
 import { AbstractLibrary } from './Library/AbstractLibrary';
 import { VoiceChannelOptions } from './Interface/Player';
 import { RainlinkPlayerManager } from './Manager/RainlinkPlayerManager';
@@ -17,10 +17,11 @@ import {
   RainlinkPluginType,
   SourceIDs,
 } from './Interface/Constants';
-import { RainlinkTrack } from './Utilities/RainlinkTrack';
+import { RainlinkTrack } from './Player/RainlinkTrack';
 import { RawTrack } from './Interface/Rest';
 import { RainlinkPlayer } from './Player/RainlinkPlayer';
 import { SourceRainlinkPlugin } from './Plugin/SourceRainlinkPlugin';
+import { RainlinkQueue } from './Player/RainlinkQueue';
 
 export declare interface Rainlink {
   on(event: 'debug', listener: (logs: string) => void): this;
@@ -38,6 +39,19 @@ export declare interface Rainlink {
   // Player events
   on(event: 'playerCreate', listener: (player: RainlinkPlayer) => void): this;
   on(event: 'playerDestroy', listener: (player: RainlinkPlayer) => void): this;
+  on(
+    event: 'playerResolveError',
+    listener: (
+      player: RainlinkPlayer,
+      track: RainlinkTrack,
+      message: string,
+    ) => void,
+  ): this;
+  on(event: 'playerEmpty', listener: (player: RainlinkPlayer) => void): this;
+  on(
+    event: 'queueUpdate',
+    listener: (player: RainlinkPlayer, queue: RainlinkQueue) => void,
+  ): this;
 }
 
 export class Rainlink extends EventEmitter {
@@ -48,7 +62,7 @@ export class Rainlink extends EventEmitter {
   /**
    * Voice connections being handled
    */
-  public readonly connections: Map<string, RainlinkConnection>;
+  public readonly connections: Map<string, RainlinkVoiceManager>;
   /**
    * Lavalink server that has been configured
    */

@@ -11,7 +11,7 @@ import { Rainlink } from '../Rainlink';
 import { VoiceChannelOptions } from '../Interface/Player';
 import { ServerUpdate, StateUpdatePartial } from '../Interface/Connection';
 
-export class RainlinkConnection extends EventEmitter {
+export class RainlinkVoiceManager extends EventEmitter {
   /**
    * The manager where this connection is on
    */
@@ -106,9 +106,13 @@ export class RainlinkConnection extends EventEmitter {
       this.manager.options.options.voiceConnectionTimeout,
     );
     try {
-      const [status] = await RainlinkConnection.once(this, 'connectionUpdate', {
-        signal: controller.signal,
-      });
+      const [status] = await RainlinkVoiceManager.once(
+        this,
+        'connectionUpdate',
+        {
+          signal: controller.signal,
+        },
+      );
       if (status !== VoiceState.SESSION_READY) {
         switch (status) {
           case VoiceState.SESSION_ID_MISSING:

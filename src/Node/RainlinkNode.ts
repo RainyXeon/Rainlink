@@ -3,12 +3,14 @@ import { RainlinkNodeOptions } from '../Interface/Manager';
 import { Rainlink } from '../Rainlink';
 import {
   LavalinkEvents,
+  LavalinkPlayerEvents,
   RainlinkConnectState,
   RainlinkEvents,
 } from '../Interface/Constants';
 import { RainlinkRest } from './RainlinkRest';
 import { metadata } from '../manifest';
 import { setTimeout } from 'node:timers/promises';
+import { RainlinkWebsocket } from './RainlinkWebsocket';
 
 export class RainlinkNode {
   public manager: Rainlink;
@@ -21,6 +23,7 @@ export class RainlinkNode {
   public state: RainlinkConnectState = RainlinkConnectState.Closed;
   private ws?: WebSocket;
   private sudoDisconnect = false;
+  private wsEvent: RainlinkWebsocket;
 
   constructor(manager: Rainlink, node: RainlinkNodeOptions) {
     this.manager = manager;
@@ -28,6 +31,7 @@ export class RainlinkNode {
     this.wsUrl = `${node.secure ? 'wss' : 'ws'}://${node.host}:${node.port}/v${metadata.lavalink}/websocket`;
     this.rest = new RainlinkRest(manager, node, this);
     this.sessionId = null;
+    this.wsEvent = new RainlinkWebsocket(manager);
   }
 
   public connect(): WebSocket {
@@ -68,6 +72,10 @@ export class RainlinkNode {
       case LavalinkEvents.Ready: {
         this.sessionId = wsData.sessionId;
         this.rest = new RainlinkRest(this.manager, this.node, this);
+        break;
+      }
+      case LavalinkEvents.Event: {
+        this.wsEvent.initial(data);
         break;
       }
     }

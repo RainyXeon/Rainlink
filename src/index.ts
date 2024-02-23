@@ -5,7 +5,7 @@ import Plugin from './Plugin';
 // Export main class
 export * from './Rainlink';
 // Export player class
-export * from './Player/RainlinkConnection';
+export * from './Manager/RainlinkVoiceManager';
 export * from './Player/RainlinkPlayer';
 // Export node class
 export * from './Node/RainlinkNode';

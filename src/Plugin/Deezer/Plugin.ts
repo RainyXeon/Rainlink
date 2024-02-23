@@ -5,7 +5,7 @@ import {
   RainlinkSearchResultType,
 } from '../../Interface/Manager';
 import { Rainlink } from '../../Rainlink';
-import { RainlinkTrack } from '../../Utilities/RainlinkTrack';
+import { RainlinkTrack } from '../../Player/RainlinkTrack';
 import { SourceRainlinkPlugin } from '../SourceRainlinkPlugin';
 import { RainlinkEvents, RainlinkPluginType } from '../../Interface/Constants';
 
@@ -224,7 +224,7 @@ export class RainlinkPlugin extends SourceRainlinkPlugin {
           artworkUrl: dezzerTrack.album ? dezzerTrack.album.cover : '',
         },
         pluginInfo: {
-          name: 'kazagumo.mod@deezer',
+          name: 'rainlink@deezer',
         },
       },
       requester,

@@ -67,3 +67,22 @@ export interface ChannelMix {
 export interface LowPass {
   smoothing?: number;
 }
+
+export interface PlayOptions {
+  noReplace?: boolean;
+  pause?: boolean;
+  startTime?: number;
+  endTime?: number;
+  replaceCurrent?: boolean;
+}
+
+export interface PlayEncodedOptions {
+  encoded: string;
+  options?: {
+    noReplace?: boolean;
+    pause?: boolean;
+    startTime?: number;
+    endTime?: number;
+    volume?: number;
+  };
+}
