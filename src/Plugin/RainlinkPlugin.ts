@@ -3,9 +3,7 @@ import { Rainlink } from '../Rainlink';
 
 export class RainlinkPlugin {
   public type(): RainlinkPluginType {
-    throw new Error(
-      'Plugin must implement type() and return "sourceResolver" or "default"',
-    );
+    throw new Error('Plugin must implement type() and return "sourceResolver" or "default"');
   }
 
   public load(manager: Rainlink): void {

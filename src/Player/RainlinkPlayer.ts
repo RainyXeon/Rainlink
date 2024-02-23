@@ -1,13 +1,9 @@
-import {
-  PlayEncodedOptions,
-  PlayOptions,
-  VoiceChannelOptions,
-} from '../Interface/Player';
+import { PlayEncodedOptions, PlayOptions, VoiceChannelOptions } from '../Interface/Player';
 import { Rainlink } from '../Rainlink';
 import { RainlinkNode } from '../Node/RainlinkNode';
 import { RainlinkQueue } from './RainlinkQueue';
 import { RainlinkVoiceManager } from '../Manager/RainlinkVoiceManager';
-import { RainlinkEvents, RainlinkPlayerState } from '../Interface/Constants';
+import { RainlinkEvents, RainlinkLoopMode, RainlinkPlayerState } from '../Interface/Constants';
 import { RainlinkTrack } from './RainlinkTrack';
 import { UpdatePlayerOptions } from '../Interface/Rest';
 
@@ -22,16 +18,13 @@ export class RainlinkPlayer {
   public position: number;
   public volume: number;
   public playing: boolean;
+  public loop: RainlinkLoopMode;
   /**
    * Get the current state of the player
    */
   public state: RainlinkPlayerState = RainlinkPlayerState.CONNECTING;
 
-  constructor(
-    manager: Rainlink,
-    voiceOptions: VoiceChannelOptions,
-    node: RainlinkNode,
-  ) {
+  constructor(manager: Rainlink, voiceOptions: VoiceChannelOptions, node: RainlinkNode) {
     this.manager = manager;
     this.voiceOptions = voiceOptions;
     this.node = node;
@@ -42,15 +35,14 @@ export class RainlinkPlayer {
     this.position = 0;
     this.volume = 100;
     this.playing = false;
+    this.loop = RainlinkLoopMode.NONE;
   }
 
   /**
    * Sends server update to lavalink
    * @internal
    */
-  public async sendServerUpdate(
-    connection: RainlinkVoiceManager,
-  ): Promise<void> {
+  public async sendServerUpdate(connection: RainlinkVoiceManager): Promise<void> {
     const playerUpdate = {
       guildId: this.guildId,
       playerOptions: {
@@ -86,25 +78,18 @@ export class RainlinkPlayer {
    * @param options Play options
    * @returns KazagumoPlayer
    */
-  public async play(
-    track?: RainlinkTrack,
-    options?: PlayOptions,
-  ): Promise<RainlinkPlayer> {
-    if (this.state === RainlinkPlayerState.DESTROYED)
-      throw new Error('Player is already destroyed');
+  public async play(track?: RainlinkTrack, options?: PlayOptions): Promise<RainlinkPlayer> {
+    if (this.state === RainlinkPlayerState.DESTROYED) throw new Error('Player is already destroyed');
 
-    if (track && !(track instanceof RainlinkTrack))
-      throw new Error('track must be a KazagumoTrack');
+    if (track && !(track instanceof RainlinkTrack)) throw new Error('track must be a KazagumoTrack');
 
-    if (!track && !this.queue.totalSize)
-      throw new Error('No track is available to play');
+    if (!track && !this.queue.totalSize) throw new Error('No track is available to play');
 
     if (!options || typeof options.replaceCurrent !== 'boolean')
       options = { ...options, replaceCurrent: false };
 
     if (track) {
-      if (!options.replaceCurrent && this.queue.current)
-        this.queue.unshift(this.queue.current);
+      if (!options.replaceCurrent && this.queue.current) this.queue.unshift(this.queue.current);
       this.queue.current = track;
     } else if (!this.queue.current) this.queue.current = this.queue.shift();
 
@@ -114,28 +99,16 @@ export class RainlinkPlayer {
 
     let errorMessage: string | undefined;
 
-    const resolveResult = await current
-      .resolver(this.manager)
-      .catch((e: any) => {
-        errorMessage = e.message;
-        return null;
-      });
+    const resolveResult = await current.resolver(this.manager).catch((e: any) => {
+      errorMessage = e.message;
+      return null;
+    });
 
     if (!resolveResult) {
-      this.manager.emit(
-        RainlinkEvents.PlayerResolveError,
-        this,
-        current,
-        errorMessage,
-      );
-      this.manager.emit(
-        RainlinkEvents.Debug,
-        `Player ${this.guildId} resolve error: ${errorMessage}`,
-      );
+      this.manager.emit(RainlinkEvents.PlayerResolveError, this, current, errorMessage);
+      this.manager.emit(RainlinkEvents.Debug, `Player ${this.guildId} resolve error: ${errorMessage}`);
       this.queue.current = null;
-      this.queue.size
-        ? await this.play()
-        : this.manager.emit(RainlinkEvents.PlayerEmpty, this);
+      this.queue.size ? await this.play() : this.manager.emit(RainlinkEvents.PlayerEmpty, this);
       return this;
     }
 
@@ -145,6 +118,11 @@ export class RainlinkPlayer {
 
     this.playTrackEncoded(playOptions);
 
+    return this;
+  }
+
+  public setLoop(mode: RainlinkLoopMode) {
+    this.loop = mode;
     return this;
   }
 
@@ -167,10 +145,6 @@ export class RainlinkPlayer {
       noReplace: playable.options?.noReplace ?? false,
       playerOptions,
     });
-  }
-
-  setPlaying(mode: boolean) {
-    this.playing = mode;
   }
 
   private debug(logs: string) {

@@ -28,9 +28,7 @@ export class RainlinkNodeManager extends Map<string, RainlinkNode> {
   public async getLeastUsedNode(): Promise<RainlinkNode> {
     const nodes: RainlinkNode[] = [...this.values()];
 
-    const onlineNodes = nodes.filter(
-      node => node.state === RainlinkConnectState.Connected,
-    );
+    const onlineNodes = nodes.filter(node => node.state === RainlinkConnectState.Connected);
     if (!onlineNodes.length) throw new Error('No nodes are online');
 
     // .filter((x) => x.manager.node.name === node.node.name)

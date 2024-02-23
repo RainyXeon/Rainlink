@@ -11,12 +11,7 @@ import { AbstractLibrary } from './Library/AbstractLibrary';
 import { VoiceChannelOptions } from './Interface/Player';
 import { RainlinkPlayerManager } from './Manager/RainlinkPlayerManager';
 import { RainlinkNodeManager } from './Manager/RainlinkNodeManager';
-import {
-  LavalinkLoadType,
-  RainlinkEvents,
-  RainlinkPluginType,
-  SourceIDs,
-} from './Interface/Constants';
+import { LavalinkLoadType, RainlinkEvents, RainlinkPluginType, SourceIDs } from './Interface/Constants';
 import { RainlinkTrack } from './Player/RainlinkTrack';
 import { RawTrack } from './Interface/Rest';
 import { RainlinkPlayer } from './Player/RainlinkPlayer';
@@ -27,31 +22,21 @@ export declare interface Rainlink {
   on(event: 'debug', listener: (logs: string) => void): this;
   // Node events
   on(event: 'nodeConnect', listener: (node: RainlinkNode) => void): this;
-  on(
-    event: 'nodeDisconnect',
-    listener: (node: RainlinkNode, code: number, reason: Buffer) => void,
-  ): this;
+  on(event: 'nodeDisconnect', listener: (node: RainlinkNode, code: number, reason: Buffer) => void): this;
   on(event: 'nodeClosed', listener: (node: RainlinkNode) => void): this;
-  on(
-    event: 'nodeError',
-    listener: (node: RainlinkNode, error: Error) => void,
-  ): this;
+  on(event: 'nodeError', listener: (node: RainlinkNode, error: Error) => void): this;
+
   // Player events
-  on(event: 'playerCreate', listener: (player: RainlinkPlayer) => void): this;
+  on(event: 'playerCreate', listener: (player: RainlinkPlayer, track: RainlinkTrack) => void): this;
+  on(event: 'playerEnd', listener: (player: RainlinkPlayer) => void): this;
+  on(event: 'playerStart', listener: (player: RainlinkPlayer, track: RainlinkTrack) => void): this;
   on(event: 'playerDestroy', listener: (player: RainlinkPlayer) => void): this;
   on(
     event: 'playerResolveError',
-    listener: (
-      player: RainlinkPlayer,
-      track: RainlinkTrack,
-      message: string,
-    ) => void,
+    listener: (player: RainlinkPlayer, track: RainlinkTrack, message: string) => void,
   ): this;
   on(event: 'playerEmpty', listener: (player: RainlinkPlayer) => void): this;
-  on(
-    event: 'queueUpdate',
-    listener: (player: RainlinkPlayer, queue: RainlinkQueue) => void,
-  ): this;
+  on(event: 'queueUpdate', listener: (player: RainlinkPlayer, queue: RainlinkQueue) => void): this;
 }
 
 export class Rainlink extends EventEmitter {
@@ -91,9 +76,7 @@ export class Rainlink extends EventEmitter {
   constructor(options: RainlinkOptions) {
     super();
     if (!options.library)
-      throw new Error(
-        'Please set an new lib to connect, example: \nlibrary: new Library.DiscordJS(client) ',
-      );
+      throw new Error('Please set an new lib to connect, example: \nlibrary: new Library.DiscordJS(client) ');
     this.library = options.library.set(this);
     this.options = options;
     this.connections = new Map();
@@ -149,8 +132,7 @@ export class Rainlink extends EventEmitter {
    */
   async search(query: string, options?: RainlinkSearchOptions) {
     const node = options?.nodeName
-      ? this.nodes.get(options.nodeName) ??
-        (await this.nodes.getLeastUsedNode())
+      ? this.nodes.get(options.nodeName) ?? (await this.nodes.getLeastUsedNode())
       : await this.nodes.getLeastUsedNode();
 
     if (!node) throw new Error('No node is available');
@@ -171,17 +153,11 @@ export class Rainlink extends EventEmitter {
     const source = options?.engine
       ? this.searchEngines.get(options.engine)
       : this.searchEngines.get(
-          this.options.options.defaultSearchEngine
-            ? this.options.options.defaultSearchEngine
-            : 'youtube',
+          this.options.options.defaultSearchEngine ? this.options.options.defaultSearchEngine : 'youtube',
         );
 
     const finalQuery =
-      isDirectSearch !== null
-        ? isDirectSearch[1]
-        : !isUrl
-          ? `${source}search:${query}`
-          : query;
+      isDirectSearch !== null ? isDirectSearch[1] : !isUrl ? `${source}search:${query}` : query;
 
     const result = await node.rest.resolver(finalQuery).catch(_ => null);
     if (!result || result.loadType === LavalinkLoadType.EMPTY) {
@@ -222,15 +198,11 @@ export class Rainlink extends EventEmitter {
       }
     }
 
-    this.debug(
-      `Searched ${query}; Track results: ${normalizedData.tracks.length}`,
-    );
+    this.debug(`Searched ${query}; Track results: ${normalizedData.tracks.length}`);
 
     return this.buildSearch(
       normalizedData.playlistName ?? undefined,
-      normalizedData.tracks.map(
-        track => new RainlinkTrack(track, options?.requester),
-      ),
+      normalizedData.tracks.map(track => new RainlinkTrack(track, options?.requester)),
       loadType,
     );
   }

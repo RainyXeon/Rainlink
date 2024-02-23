@@ -50,13 +50,9 @@ export class RainlinkNode {
     ws.on('open', () => {
       this.wsOpenEvent();
     });
-    ws.on('message', (data: RawData, isBin: boolean) =>
-      this.wsMessageEvent(data, isBin),
-    );
+    ws.on('message', (data: RawData, isBin: boolean) => this.wsMessageEvent(data, isBin));
     ws.on('error', err => this.wsErrorEvent(err));
-    ws.on('close', (code: number, reason: Buffer) =>
-      this.wsCloseEvent(code, reason),
-    );
+    ws.on('close', (code: number, reason: Buffer) => this.wsCloseEvent(code, reason));
   }
 
   protected wsOpenEvent() {
@@ -91,10 +87,7 @@ export class RainlinkNode {
     this.state = RainlinkConnectState.Disconnected;
     this.debug(`Node ${this.node.name} disconnected! URL: ${this.wsUrl}`);
     this.manager.emit(RainlinkEvents.NodeDisconnect, this, code, reason);
-    if (
-      !this.sudoDisconnect &&
-      this.retryCounter !== this.manager.options.options.retryCount
-    ) {
+    if (!this.sudoDisconnect && this.retryCounter !== this.manager.options.options.retryCount) {
       await setTimeout(this.manager.options.options.retryTimeout);
       this.retryCounter = this.retryCounter + 1;
       this.reconnect();

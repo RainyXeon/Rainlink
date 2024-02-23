@@ -33,14 +33,8 @@ const credentials = {
 export class RainlinkPlugin extends SourceRainlinkPlugin {
   public options: AppleOptions;
   private manager: Rainlink | null;
-  private _search?: (
-    query: string,
-    options?: RainlinkSearchOptions,
-  ) => Promise<RainlinkSearchResult>;
-  private readonly methods: Record<
-    string,
-    (id: string, requester: unknown) => Promise<Result>
-  >;
+  private _search?: (query: string, options?: RainlinkSearchOptions) => Promise<RainlinkSearchResult>;
+  private readonly methods: Record<string, (id: string, requester: unknown) => Promise<Result>>;
   private credentials: HeaderType;
   private fetchURL: string;
   private baseURL: string;
@@ -71,12 +65,8 @@ export class RainlinkPlugin extends SourceRainlinkPlugin {
     this.options = appleOptions;
     this.manager = null;
     this._search = undefined;
-    this.countryCode = this.options?.countryCode
-      ? this.options?.countryCode
-      : 'us';
-    this.imageHeight = this.options?.imageHeight
-      ? this.options?.imageHeight
-      : 900;
+    this.countryCode = this.options?.countryCode ? this.options?.countryCode : 'us';
+    this.imageHeight = this.options?.imageHeight ? this.options?.imageHeight : 900;
     this.imageWidth = this.options?.imageWidth ? this.options?.imageWidth : 600;
     this.baseURL = 'https://api.music.apple.com/v1/';
     this.fetchURL = `https://amp-api.music.apple.com/v1/catalog/${this.countryCode}`;
@@ -92,10 +82,7 @@ export class RainlinkPlugin extends SourceRainlinkPlugin {
     manager.search = this.search.bind(this);
   }
 
-  async search(
-    query: string,
-    options?: RainlinkSearchOptions,
-  ): Promise<RainlinkSearchResult> {
+  async search(query: string, options?: RainlinkSearchOptions): Promise<RainlinkSearchResult> {
     const res = await this.searchDirect(query, options);
     if (res.tracks.length == 0) return this._search!(query, options);
     else return res;
@@ -109,8 +96,7 @@ export class RainlinkPlugin extends SourceRainlinkPlugin {
     let id: string;
     let isTrack: boolean = false;
 
-    if (!this.manager || !this._search)
-      throw new Error('rainlink-apple is not loaded yet.');
+    if (!this.manager || !this._search) throw new Error('rainlink-apple is not loaded yet.');
 
     if (!query) throw new Error('Query is required');
 
@@ -120,9 +106,7 @@ export class RainlinkPlugin extends SourceRainlinkPlugin {
     this.debug('Start search from plugin');
     this.debug('Searching from lavalink (pre search)');
 
-    const preSearchQuery = isUrl
-      ? query
-      : `${this.sourceIdentify()}search:${query}`;
+    const preSearchQuery = isUrl ? query : `${this.sourceIdentify()}search:${query}`;
 
     const preSearch = await this._search!(`directSearch=${preSearchQuery}`, {
       engine: this.sourceName(),
@@ -153,9 +137,7 @@ export class RainlinkPlugin extends SourceRainlinkPlugin {
         if (isTrack) _function = this.methods.track;
         const result: Result = await _function(id, options?.requester);
 
-        const loadType = isTrack
-          ? RainlinkSearchResultType.TRACK
-          : RainlinkSearchResultType.PLAYLIST;
+        const loadType = isTrack ? RainlinkSearchResultType.TRACK : RainlinkSearchResultType.PLAYLIST;
         const playlistName = result.name ?? undefined;
 
         const tracks = result.tracks.filter(this.filterNullOrUndefined);
@@ -166,13 +148,8 @@ export class RainlinkPlugin extends SourceRainlinkPlugin {
     } else if (options?.engine === 'apple' && !isUrl) {
       const result = await this.searchTrack(query, options?.requester);
 
-      return this.buildSearch(
-        undefined,
-        result.tracks,
-        RainlinkSearchResultType.SEARCH,
-      );
-    } else
-      return this.buildSearch(undefined, [], RainlinkSearchResultType.SEARCH);
+      return this.buildSearch(undefined, result.tracks, RainlinkSearchResultType.SEARCH);
+    } else return this.buildSearch(undefined, [], RainlinkSearchResultType.SEARCH);
   }
 
   public async getData(params: string) {
@@ -189,22 +166,15 @@ export class RainlinkPlugin extends SourceRainlinkPlugin {
     return req.data;
   }
 
-  private async searchTrack(
-    query: string,
-    requester: unknown,
-  ): Promise<Result> {
+  private async searchTrack(query: string, requester: unknown): Promise<Result> {
     try {
       const res = await this.getSearchData(
-        `/search?types=songs&term=${query
-          .replace(/ /g, '+')
-          .toLocaleLowerCase()}`,
+        `/search?types=songs&term=${query.replace(/ /g, '+').toLocaleLowerCase()}`,
       ).catch(e => {
         throw new Error(e);
       });
       return {
-        tracks: res.results.songs.data.map((track: Track) =>
-          this.buildRainlinkTrack(track, requester),
-        ),
+        tracks: res.results.songs.data.map((track: Track) => this.buildRainlinkTrack(track, requester)),
       };
     } catch (e: any) {
       throw new Error(e);
@@ -224,11 +194,9 @@ export class RainlinkPlugin extends SourceRainlinkPlugin {
 
   private async getArtist(id: string, requester: unknown): Promise<Result> {
     try {
-      const track = await this.getData(`/artists/${id}/view/top-songs`).catch(
-        e => {
-          throw new Error(e);
-        },
-      );
+      const track = await this.getData(`/artists/${id}/view/top-songs`).catch(e => {
+        throw new Error(e);
+      });
       return { tracks: [this.buildRainlinkTrack(track[0], requester)] };
     } catch (e: any) {
       throw new Error(e);
@@ -294,9 +262,7 @@ export class RainlinkPlugin extends SourceRainlinkPlugin {
           sourceName: 'apple',
           identifier: appleTrack.id,
           isSeekable: true,
-          author: appleTrack.attributes.artistName
-            ? appleTrack.attributes.artistName
-            : 'Unknown',
+          author: appleTrack.attributes.artistName ? appleTrack.attributes.artistName : 'Unknown',
           length: appleTrack.attributes.durationInMillis,
           isStream: false,
           position: 0,
@@ -313,12 +279,7 @@ export class RainlinkPlugin extends SourceRainlinkPlugin {
   }
 
   private debug(logs: string) {
-    this.manager
-      ? this.manager.emit(
-          RainlinkEvents.Debug,
-          `[Rainlink Apple Plugin]: ${logs}`,
-        )
-      : true;
+    this.manager ? this.manager.emit(RainlinkEvents.Debug, `[Rainlink Apple Plugin]: ${logs}`) : true;
   }
 }
 

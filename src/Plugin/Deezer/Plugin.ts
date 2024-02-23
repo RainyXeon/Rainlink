@@ -10,20 +10,13 @@ import { SourceRainlinkPlugin } from '../SourceRainlinkPlugin';
 import { RainlinkEvents, RainlinkPluginType } from '../../Interface/Constants';
 
 const API_URL = 'https://api.deezer.com/';
-const REGEX =
-  /^https?:\/\/(?:www\.)?deezer\.com\/[a-z]+\/(track|album|playlist)\/(\d+)$/;
+const REGEX = /^https?:\/\/(?:www\.)?deezer\.com\/[a-z]+\/(track|album|playlist)\/(\d+)$/;
 const SHORT_REGEX = /^https:\/\/deezer\.page\.link\/[a-zA-Z0-9]{12}$/;
 
 export class RainlinkPlugin extends SourceRainlinkPlugin {
   private manager: Rainlink | null;
-  private _search?: (
-    query: string,
-    options?: RainlinkSearchOptions,
-  ) => Promise<RainlinkSearchResult>;
-  private readonly methods: Record<
-    string,
-    (id: string, requester: unknown) => Promise<Result>
-  >;
+  private _search?: (query: string, options?: RainlinkSearchOptions) => Promise<RainlinkSearchResult>;
+  private readonly methods: Record<string, (id: string, requester: unknown) => Promise<Result>>;
 
   public sourceIdentify(): string {
     return 'dz';
@@ -54,10 +47,7 @@ export class RainlinkPlugin extends SourceRainlinkPlugin {
     manager.search = this.search.bind(this);
   }
 
-  async search(
-    query: string,
-    options?: RainlinkSearchOptions,
-  ): Promise<RainlinkSearchResult> {
+  async search(query: string, options?: RainlinkSearchOptions): Promise<RainlinkSearchResult> {
     const res = await this.searchDirect(query, options);
     if (res.tracks.length == 0) return this._search!(query, options);
     else return res;
@@ -67,8 +57,7 @@ export class RainlinkPlugin extends SourceRainlinkPlugin {
     query: string,
     options?: RainlinkSearchOptions | undefined,
   ): Promise<RainlinkSearchResult> {
-    if (!this.manager || !this._search)
-      throw new Error('rainlink-deezer is not loaded yet.');
+    if (!this.manager || !this._search) throw new Error('rainlink-deezer is not loaded yet.');
 
     if (!query) throw new Error('Query is required');
 
@@ -84,9 +73,7 @@ export class RainlinkPlugin extends SourceRainlinkPlugin {
     this.debug('Start search from plugin');
     this.debug('Searching from lavalink (pre search)');
 
-    const preSearchQuery = isUrl
-      ? query
-      : `${this.sourceIdentify()}search:${query}`;
+    const preSearchQuery = isUrl ? query : `${this.sourceIdentify()}search:${query}`;
 
     const preSearch = await this._search!(`directSearch=${preSearchQuery}`, {
       engine: this.sourceName(),
@@ -108,9 +95,7 @@ export class RainlinkPlugin extends SourceRainlinkPlugin {
         const result: Result = await _function(id, options?.requester);
 
         const loadType =
-          type === 'track'
-            ? RainlinkSearchResultType.TRACK
-            : RainlinkSearchResultType.PLAYLIST;
+          type === 'track' ? RainlinkSearchResultType.TRACK : RainlinkSearchResultType.PLAYLIST;
         const playlistName = result.name ?? undefined;
 
         const tracks = result.tracks.filter(this.filterNullOrUndefined);
@@ -121,29 +106,17 @@ export class RainlinkPlugin extends SourceRainlinkPlugin {
     } else if (options?.engine === this.sourceName() && !isUrl) {
       const result = await this.searchTrack(query, options?.requester);
 
-      return this.buildSearch(
-        undefined,
-        result.tracks,
-        RainlinkSearchResultType.SEARCH,
-      );
-    } else
-      return this.buildSearch(undefined, [], RainlinkSearchResultType.SEARCH);
+      return this.buildSearch(undefined, result.tracks, RainlinkSearchResultType.SEARCH);
+    } else return this.buildSearch(undefined, [], RainlinkSearchResultType.SEARCH);
   }
 
-  private async searchTrack(
-    query: string,
-    requester: unknown,
-  ): Promise<Result> {
+  private async searchTrack(query: string, requester: unknown): Promise<Result> {
     try {
-      const request = await axios.get(
-        `${API_URL}/search/track?q=${decodeURIComponent(query)}`,
-      );
+      const request = await axios.get(`${API_URL}/search/track?q=${decodeURIComponent(query)}`);
 
       const res = request.data as SearchResult;
       return {
-        tracks: res.data.map(track =>
-          this.buildRainlinkTrack(track, requester),
-        ),
+        tracks: res.data.map(track => this.buildRainlinkTrack(track, requester)),
       };
     } catch (e: any) {
       throw new Error(e);
@@ -232,12 +205,7 @@ export class RainlinkPlugin extends SourceRainlinkPlugin {
   }
 
   private debug(logs: string) {
-    this.manager
-      ? this.manager.emit(
-          RainlinkEvents.Debug,
-          `[Rainlink Deezer Plugin]: ${logs}`,
-        )
-      : true;
+    this.manager ? this.manager.emit(RainlinkEvents.Debug, `[Rainlink Deezer Plugin]: ${logs}`) : true;
   }
 }
 

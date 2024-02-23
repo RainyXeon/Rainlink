@@ -22,11 +22,7 @@ export class RainlinkRest {
   public nodeManager: RainlinkNode;
   protected sessionId: string | null;
 
-  constructor(
-    manager: Rainlink,
-    node: RainlinkNodeOptions,
-    nodeManager: RainlinkNode,
-  ) {
+  constructor(manager: Rainlink, node: RainlinkNodeOptions, nodeManager: RainlinkNode) {
     this.manager = manager;
     this.axios = axios;
     this.node = node;
@@ -35,16 +31,11 @@ export class RainlinkRest {
     this.url = `${node.secure ? 'https://' : 'http://'}${node.host}:${node.port}/v${metadata.lavalink}`;
   }
 
-  async fetcher<D = any>(
-    options: RainlinkFetcherOptions,
-  ): Promise<D | undefined> {
+  async fetcher<D = any>(options: RainlinkFetcherOptions): Promise<D | undefined> {
     if (options.useSessionId && this.sessionId == null)
-      throw new Error(
-        'sessionId not initalized! Please wait for lavalink get connected!',
-      );
+      throw new Error('sessionId not initalized! Please wait for lavalink get connected!');
     const url = new URL(`${this.url}${options.endpoint}`);
-    if (options.params)
-      url.search = new URLSearchParams(options.params).toString();
+    if (options.params) url.search = new URLSearchParams(options.params).toString();
 
     const lavalinkHeaders = {
       Authorization: this.node.auth,
@@ -64,18 +55,13 @@ export class RainlinkRest {
       return undefined;
     }
     if (res.status !== 200) {
-      this.debug(
-        'Something went wrong with lavalink server.' +
-          `Status code: ${res.status}`,
-      );
+      this.debug('Something went wrong with lavalink server.' + `Status code: ${res.status}`);
       return undefined;
     }
 
     const finalData = String(res.data);
 
-    return this.testJSON(finalData)
-      ? (JSON.parse(res.data) as D)
-      : (res.data as D);
+    return this.testJSON(finalData) ? (JSON.parse(res.data) as D) : (res.data as D);
   }
 
   /**
@@ -100,9 +86,7 @@ export class RainlinkRest {
    * @param data SessionId from Discord
    * @returns Promise that resolves to a Lavalink player
    */
-  public async updatePlayer(
-    data: UpdatePlayerInfo,
-  ): Promise<LavalinkPlayer | undefined> {
+  public async updatePlayer(data: UpdatePlayerInfo): Promise<LavalinkPlayer | undefined> {
     const options: RainlinkFetcherOptions = {
       endpoint: `/sessions/${this.sessionId}/players/${data.guildId}`,
       params: { noReplace: data.noReplace?.toString() || 'false' },

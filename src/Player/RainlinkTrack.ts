@@ -66,10 +66,7 @@ export class RainlinkTrack {
    * @param options Resolve options
    * @returns Promise<KazagumoTrack>
    */
-  public async resolver(
-    manager: Rainlink,
-    options?: ResolveOptions,
-  ): Promise<RainlinkTrack> {
+  public async resolver(manager: Rainlink, options?: ResolveOptions): Promise<RainlinkTrack> {
     const { overwrite } = options ? options : { overwrite: false };
 
     if (this.isPlayable) return this;
@@ -132,14 +129,8 @@ export class RainlinkTrack {
       const author = [this.author, `${this.author} - Topic`];
       const officialTrack = rawTracks.find(
         track =>
-          author.some(name =>
-            new RegExp(`^${this.escapeRegExp(name)}$`, 'i').test(
-              track.info.author,
-            ),
-          ) ||
-          new RegExp(`^${this.escapeRegExp(this.title)}$`, 'i').test(
-            track.info.title,
-          ),
+          author.some(name => new RegExp(`^${this.escapeRegExp(name)}$`, 'i').test(track.info.author)) ||
+          new RegExp(`^${this.escapeRegExp(this.title)}$`, 'i').test(track.info.title),
       );
       if (officialTrack) return officialTrack;
     }

@@ -9,6 +9,8 @@ export enum RainlinkEvents {
   QueueUpdate = 'queueUpdate',
   PlayerResolveError = 'playerResolveError',
   PlayerEmpty = 'playerEmpty',
+  PlayerStart = 'playerStart',
+  PlayerEnd = 'playerEnd',
 }
 
 export enum LavalinkEvents {
@@ -74,4 +76,10 @@ export enum RainlinkPlayerState {
   DISCONNECTED,
   DESTROYING,
   DESTROYED,
+}
+
+export enum RainlinkLoopMode {
+  SONG = 'song',
+  QUEUE = 'queue',
+  NONE = 'none',
 }

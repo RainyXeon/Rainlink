@@ -4,7 +4,7 @@
     "endOfLine": "lf",
     "bracketSameLine": false,
     "jsxSingleQuote": false,
-    "printWidth": 80,
+    "printWidth": 110,
     "proseWrap": "preserve",
     "quoteProps": "as-needed",
     "semi": true,

@@ -8,10 +8,7 @@ export class RainlinkPlayerManager extends Map<string, RainlinkPlayer> {
   private connections: Map<string, RainlinkVoiceManager>;
   private manager: Rainlink;
 
-  constructor(
-    manager: Rainlink,
-    connections: Map<string, RainlinkVoiceManager>,
-  ) {
+  constructor(manager: Rainlink, connections: Map<string, RainlinkVoiceManager>) {
     super();
     this.connections = connections;
     this.manager = manager;

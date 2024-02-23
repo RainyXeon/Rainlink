@@ -2,11 +2,7 @@
 // Special thanks to shipgirlproject team!
 
 import { EventEmitter } from 'events';
-import {
-  RainlinkEvents,
-  VoiceConnectState,
-  VoiceState,
-} from '../Interface/Constants';
+import { RainlinkEvents, VoiceConnectState, VoiceState } from '../Interface/Constants';
 import { Rainlink } from '../Rainlink';
 import { VoiceChannelOptions } from '../Interface/Player';
 import { ServerUpdate, StateUpdatePartial } from '../Interface/Connection';
@@ -92,37 +88,22 @@ export class RainlinkVoiceManager extends EventEmitter {
    * @internal
    */
   public async connect(): Promise<void> {
-    if (
-      this.state === VoiceConnectState.CONNECTING ||
-      this.state === VoiceConnectState.CONNECTED
-    )
-      return;
+    if (this.state === VoiceConnectState.CONNECTING || this.state === VoiceConnectState.CONNECTED) return;
     this.state = VoiceConnectState.CONNECTING;
     this.sendVoiceUpdate();
     this.debug(`Requesting Connection | Guild: ${this.guildId}`);
     const controller = new AbortController();
-    const timeout = setTimeout(
-      () => controller.abort(),
-      this.manager.options.options.voiceConnectionTimeout,
-    );
+    const timeout = setTimeout(() => controller.abort(), this.manager.options.options.voiceConnectionTimeout);
     try {
-      const [status] = await RainlinkVoiceManager.once(
-        this,
-        'connectionUpdate',
-        {
-          signal: controller.signal,
-        },
-      );
+      const [status] = await RainlinkVoiceManager.once(this, 'connectionUpdate', {
+        signal: controller.signal,
+      });
       if (status !== VoiceState.SESSION_READY) {
         switch (status) {
           case VoiceState.SESSION_ID_MISSING:
-            throw new Error(
-              'The voice connection is not established due to missing session id',
-            );
+            throw new Error('The voice connection is not established due to missing session id');
           case VoiceState.SESSION_ENDPOINT_MISSING:
-            throw new Error(
-              'The voice connection is not established due to missing connection endpoint',
-            );
+            throw new Error('The voice connection is not established due to missing connection endpoint');
         }
       }
       this.state = VoiceConnectState.CONNECTED;
@@ -149,8 +130,7 @@ export class RainlinkVoiceManager extends EventEmitter {
     }
 
     this.lastRegion = this.region?.repeat(1) || null;
-    this.region =
-      data.endpoint.split('.').shift()?.replace(/[0-9]/g, '') || null;
+    this.region = data.endpoint.split('.').shift()?.replace(/[0-9]/g, '') || null;
 
     if (this.region && this.lastRegion !== this.region) {
       this.debug(
@@ -160,24 +140,15 @@ export class RainlinkVoiceManager extends EventEmitter {
 
     this.serverUpdate = data;
     this.emit('connectionUpdate', VoiceState.SESSION_READY);
-    this.debug(
-      `Server Update Received | Server: ${this.region} Guild: ${this.guildId}`,
-    );
+    this.debug(`Server Update Received | Server: ${this.region} Guild: ${this.guildId}`);
   }
 
-  public setStateUpdate({
-    session_id,
-    channel_id,
-    self_deaf,
-    self_mute,
-  }: StateUpdatePartial): void {
+  public setStateUpdate({ session_id, channel_id, self_deaf, self_mute }: StateUpdatePartial): void {
     this.lastChannelId = this.channelId?.repeat(1) || null;
     this.channelId = channel_id || null;
 
     if (this.channelId && this.lastChannelId !== this.channelId) {
-      this.debug(
-        `Channel Moved | Old Channel: ${this.channelId} Guild: ${this.guildId}`,
-      );
+      this.debug(`Channel Moved | Old Channel: ${this.channelId} Guild: ${this.guildId}`);
     }
 
     if (!this.channelId) {
@@ -251,9 +222,6 @@ export class RainlinkVoiceManager extends EventEmitter {
   }
 
   private debug(logs: string) {
-    this.manager.emit(
-      RainlinkEvents.Debug,
-      `[Rainlink Voice Manager]: ${logs}`,
-    );
+    this.manager.emit(RainlinkEvents.Debug, `[Rainlink Voice Manager]: ${logs}`);
   }
 }

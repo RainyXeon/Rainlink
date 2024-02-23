@@ -46,8 +46,7 @@ export class RainlinkQueue extends Array<RainlinkTrack> {
   public add(track: RainlinkTrack | RainlinkTrack[]): RainlinkQueue {
     if (Array.isArray(track) && track.some(t => !(t instanceof RainlinkTrack)))
       throw new Error('Track must be an instance of RainlinkTrack');
-    if (!Array.isArray(track) && !(track instanceof RainlinkTrack))
-      track = [track];
+    if (!Array.isArray(track) && !(track instanceof RainlinkTrack)) track = [track];
 
     if (!this.current) {
       if (Array.isArray(track)) this.current = track.shift();
