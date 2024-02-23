@@ -15,6 +15,7 @@ export interface RainlinkAdditionalOptions {
   retryCount: number;
   voiceConnectionTimeout: number;
   defaultSearchEngine?: string;
+  searchFallback?: boolean;
 }
 
 export interface RainlinkOptions {
@@ -34,4 +35,10 @@ export interface RainlinkSearchResult {
   type: RainlinkSearchResultType;
   playlistName?: string;
   tracks: RainlinkTrack[];
+}
+
+export interface RainlinkSearchOptions {
+  requester?: unknown;
+  nodeName?: string;
+  engine?: string;
 }

@@ -1,5 +1,7 @@
-import { RainlinkSearchResult } from '../Interface/Manager';
-import { RainlinkSearchOptions } from '../Rainlink';
+import {
+  RainlinkSearchOptions,
+  RainlinkSearchResult,
+} from '../Interface/Manager';
 import { RainlinkPlugin } from './RainlinkPlugin';
 
 export class SourceRainlinkPlugin extends RainlinkPlugin {

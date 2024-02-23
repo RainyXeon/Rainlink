@@ -1,5 +1,6 @@
 import {
   RainlinkOptions,
+  RainlinkSearchOptions,
   RainlinkSearchResult,
   RainlinkSearchResultType,
 } from './Interface/Manager';
@@ -37,13 +38,6 @@ export declare interface Rainlink {
   // Player events
   on(event: 'playerCreate', listener: (player: RainlinkPlayer) => void): this;
   on(event: 'playerDestroy', listener: (player: RainlinkPlayer) => void): this;
-}
-
-export interface RainlinkSearchOptions {
-  requester?: unknown;
-  nodeName?: string;
-  engine?: string;
-  bypassPlugin?: boolean;
 }
 
 export class Rainlink extends EventEmitter {
@@ -149,8 +143,13 @@ export class Rainlink extends EventEmitter {
 
     let pluginData: RainlinkSearchResult;
 
+    const directSearchRegex = /directSearch=(.*)/;
+    const isDirectSearch = directSearchRegex.exec(query);
+    const isUrl = /^https?:\/\/.*/.test(query);
+
     const pluginSearch = this.searchPlugins.get(String(options?.engine));
-    if (pluginSearch && !options?.bypassPlugin) {
+
+    if (pluginSearch && isDirectSearch == null) {
       pluginData = await pluginSearch.searchDirect(query, options);
       if (pluginData.tracks.length !== 0) return pluginData;
     }
@@ -163,13 +162,17 @@ export class Rainlink extends EventEmitter {
             : 'youtube',
         );
 
-    const isUrl = /^https?:\/\/.*/.test(query);
-
-    const finalQuery = !isUrl ? `${source}search:${query}` : query;
+    const finalQuery =
+      isDirectSearch !== null
+        ? isDirectSearch[1]
+        : !isUrl
+          ? `${source}search:${query}`
+          : query;
 
     const result = await node.rest.resolver(finalQuery).catch(_ => null);
-    if (!result || result.loadType === LavalinkLoadType.EMPTY)
+    if (!result || result.loadType === LavalinkLoadType.EMPTY) {
       return this.buildSearch(undefined, [], RainlinkSearchResultType.SEARCH);
+    }
 
     let loadType: RainlinkSearchResultType;
     let normalizedData: {

@@ -1,12 +1,13 @@
 import axios from 'axios';
 import {
+  RainlinkSearchOptions,
   RainlinkSearchResult,
   RainlinkSearchResultType,
 } from '../../Interface/Manager';
-import { Rainlink, RainlinkSearchOptions } from '../../Rainlink';
+import { Rainlink } from '../../Rainlink';
 import { RainlinkTrack } from '../../Utilities/RainlinkTrack';
 import { SourceRainlinkPlugin } from '../SourceRainlinkPlugin';
-import { RainlinkPluginType } from '../../Interface/Constants';
+import { RainlinkEvents, RainlinkPluginType } from '../../Interface/Constants';
 
 const API_URL = 'https://api.deezer.com/';
 const REGEX =
@@ -78,14 +79,26 @@ export class RainlinkPlugin extends SourceRainlinkPlugin {
       query = String(res.headers.location);
     }
 
-    const preSearch = await this._search!(query, {
-      bypassPlugin: true,
+    //---- You can implement this for search from lavalink first ----
+
+    this.debug('Start search from plugin');
+    this.debug('Searching from lavalink (pre search)');
+
+    const preSearchQuery = isUrl
+      ? query
+      : `${this.sourceIdentify()}search:${query}`;
+
+    const preSearch = await this._search!(`directSearch=${preSearchQuery}`, {
       engine: this.sourceName(),
       nodeName: options?.nodeName,
       requester: options?.requester,
     });
 
     if (preSearch.tracks.length !== 0) return preSearch;
+
+    this.debug('Searching from lavalink failed, now search directly from api');
+
+    //---- You can implement this for search from lavalink first ----
 
     const [, type, id] = REGEX.exec(query) || [];
 
@@ -216,6 +229,15 @@ export class RainlinkPlugin extends SourceRainlinkPlugin {
       },
       requester,
     );
+  }
+
+  private debug(logs: string) {
+    this.manager
+      ? this.manager.emit(
+          RainlinkEvents.Debug,
+          `[Rainlink Deezer Plugin]: ${logs}`,
+        )
+      : true;
   }
 }
 

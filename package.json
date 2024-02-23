@@ -3,7 +3,7 @@
   "version": "0.0.1",
   "description": "A lavalink wrapper with backward compatible and rich features",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "build": "npx prettier -w ./src && npx tsc --build --verbose"
   },
   "main": "dist/index.js",
   "module": "dist/index.mjs",
