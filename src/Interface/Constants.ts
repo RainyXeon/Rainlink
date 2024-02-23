@@ -11,21 +11,10 @@ export enum RainlinkEvents {
   PlayerEmpty = 'playerEmpty',
   PlayerStart = 'playerStart',
   PlayerEnd = 'playerEnd',
-}
-
-export enum LavalinkEvents {
-  Ready = 'ready',
-  Status = 'stats',
-  Event = 'event',
-}
-
-export enum LavalinkPlayerEvents {
+  PlayerException = 'playerException',
+  PlayerStuck = 'playerStuck',
   PlayerUpdate = 'playerUpdate',
-  TrackStartEvent = 'TrackStartEvent',
-  TrackEndEvent = 'TrackEndEvent',
-  TrackExceptionEvent = 'TrackExceptionEvent',
-  TrackStuckEvent = 'TrackStuckEvent',
-  WebSocketClosedEvent = 'WebSocketClosedEvent',
+  PlayerWebsocketClosed = 'playerWebsocketClosed',
 }
 
 export enum RainlinkConnectState {

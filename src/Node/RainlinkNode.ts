@@ -1,16 +1,12 @@
 import { RawData, WebSocket } from 'ws';
 import { RainlinkNodeOptions } from '../Interface/Manager';
 import { Rainlink } from '../Rainlink';
-import {
-  LavalinkEvents,
-  LavalinkPlayerEvents,
-  RainlinkConnectState,
-  RainlinkEvents,
-} from '../Interface/Constants';
+import { RainlinkConnectState, RainlinkEvents } from '../Interface/Constants';
 import { RainlinkRest } from './RainlinkRest';
 import { metadata } from '../manifest';
 import { setTimeout } from 'node:timers/promises';
 import { RainlinkWebsocket } from './RainlinkWebsocket';
+import { LavalinkEventsEnum } from '../Interface/LavalinkEvents';
 
 export class RainlinkNode {
   public manager: Rainlink;
@@ -65,12 +61,16 @@ export class RainlinkNode {
   protected wsMessageEvent(data: RawData, isBin: boolean) {
     const wsData = JSON.parse(data.toString());
     switch (wsData.op) {
-      case LavalinkEvents.Ready: {
+      case LavalinkEventsEnum.Ready: {
         this.sessionId = wsData.sessionId;
         this.rest = new RainlinkRest(this.manager, this.node, this);
         break;
       }
-      case LavalinkEvents.Event: {
+      case LavalinkEventsEnum.Event: {
+        this.wsEvent.initial(data);
+        break;
+      }
+      case LavalinkEventsEnum.PlayerUpdate: {
         this.wsEvent.initial(data);
         break;
       }

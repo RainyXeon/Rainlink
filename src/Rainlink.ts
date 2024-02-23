@@ -17,6 +17,12 @@ import { RawTrack } from './Interface/Rest';
 import { RainlinkPlayer } from './Player/RainlinkPlayer';
 import { SourceRainlinkPlugin } from './Plugin/SourceRainlinkPlugin';
 import { RainlinkQueue } from './Player/RainlinkQueue';
+import {
+  PlayerUpdate,
+  TrackExceptionEvent,
+  TrackStuckEvent,
+  WebSocketClosedEvent,
+} from './Interface/LavalinkEvents';
 
 export declare interface Rainlink {
   on(event: 'debug', listener: (logs: string) => void): this;
@@ -26,7 +32,7 @@ export declare interface Rainlink {
   on(event: 'nodeClosed', listener: (node: RainlinkNode) => void): this;
   on(event: 'nodeError', listener: (node: RainlinkNode, error: Error) => void): this;
 
-  // Player events
+  // Lavalink + rainlink player events
   on(event: 'playerCreate', listener: (player: RainlinkPlayer, track: RainlinkTrack) => void): this;
   on(event: 'playerEnd', listener: (player: RainlinkPlayer) => void): this;
   on(event: 'playerStart', listener: (player: RainlinkPlayer, track: RainlinkTrack) => void): this;
@@ -36,6 +42,15 @@ export declare interface Rainlink {
     listener: (player: RainlinkPlayer, track: RainlinkTrack, message: string) => void,
   ): this;
   on(event: 'playerEmpty', listener: (player: RainlinkPlayer) => void): this;
+  on(event: 'playerException', listener: (player: RainlinkPlayer, data: TrackExceptionEvent) => void): this;
+  on(event: 'playerUpdate', listener: (player: RainlinkPlayer, data: PlayerUpdate) => void): this;
+  on(event: 'playerStuck', listener: (player: RainlinkPlayer, data: TrackStuckEvent) => void): this;
+  on(
+    event: 'playerWebsocketClosed',
+    listener: (player: RainlinkPlayer, data: WebSocketClosedEvent) => void,
+  ): this;
+
+  // Lavalink + rainlink queue events
   on(event: 'queueUpdate', listener: (player: RainlinkPlayer, queue: RainlinkQueue) => void): this;
 }
 

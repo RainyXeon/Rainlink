@@ -1,4 +1,13 @@
 import { RainlinkEvents, RainlinkLoopMode, RainlinkPlayerState } from '../Interface/Constants';
+import {
+  LavalinkEventsEnum,
+  PlayerUpdate,
+  TrackEndEvent,
+  TrackExceptionEvent,
+  TrackStartEvent,
+  TrackStuckEvent,
+  WebSocketClosedEvent,
+} from '../Interface/LavalinkEvents';
 import { Rainlink } from '../Rainlink';
 
 export class RainlinkWebsocket {
@@ -17,12 +26,14 @@ export class RainlinkWebsocket {
   }
 
   public initial(data: Record<string, any>) {
+    if (data.op == LavalinkEventsEnum.PlayerUpdate) return this.PlayerUpdate(data);
     const _function = this.methods[data.type];
     if (_function !== undefined) _function(data);
   }
 
   TrackStartEvent(data: Record<string, any>) {
-    const player = this.manager.players.get(data.guildId);
+    const newData = data as TrackStartEvent;
+    const player = this.manager.players.get(newData.guildId);
     if (player) {
       player.playing = true;
       this.manager.emit(RainlinkEvents.PlayerStart, player, player.queue.current);
@@ -31,14 +42,15 @@ export class RainlinkWebsocket {
   }
 
   TrackEndEvent(data: Record<string, any>) {
-    const player = this.manager.players.get(data.guildId);
+    const newData = data as TrackEndEvent;
+    const player = this.manager.players.get(newData.guildId);
     if (player) {
       // This event emits STOPPED reason when destroying, so return to prevent double emit
       if (player.state === RainlinkPlayerState.DESTROYING || player.state === RainlinkPlayerState.DESTROYED)
         return this.debug(`Player ${player.guildId} destroyed from end event`);
 
-      if (data.reason === 'replaced') return this.manager.emit(RainlinkEvents.PlayerEnd, player);
-      if (['loadFailed', 'cleanup'].includes(data.reason)) {
+      if (newData.reason === 'replaced') return this.manager.emit(RainlinkEvents.PlayerEnd, player);
+      if (['loadFailed', 'cleanup'].includes(newData.reason)) {
         if (player.queue.current) player.queue.previous.push(player.queue.current);
         player.playing = false;
         if (!player.queue.length) return this.manager.emit(RainlinkEvents.PlayerEmpty, player);
@@ -67,11 +79,46 @@ export class RainlinkWebsocket {
     return;
   }
 
-  TrackExceptionEvent(data: Record<string, any>) {}
+  TrackExceptionEvent(data: Record<string, any>) {
+    const newData = data as TrackExceptionEvent;
+    const player = this.manager.players.get(data.guildId);
+    if (player) {
+      this.manager.emit(RainlinkEvents.PlayerException, player, data.exception);
+      this.debug(`Player got exception at guild ${newData.guildId}`);
+    }
+    return;
+  }
 
-  TrackStuckEvent(data: Record<string, any>) {}
+  TrackStuckEvent(data: Record<string, any>) {
+    const newData = data as TrackStuckEvent;
+    const player = this.manager.players.get(newData.guildId);
+    if (player) {
+      this.manager.emit(RainlinkEvents.PlayerStuck, player, newData);
+      this.debug(`Player stucked at guild ${newData.guildId}`);
+    }
+    return;
+  }
 
-  WebSocketClosedEvent(data: Record<string, any>) {}
+  WebSocketClosedEvent(data: Record<string, any>) {
+    const newData = data as WebSocketClosedEvent;
+    const player = this.manager.players.get(newData.guildId);
+    if (player) {
+      this.manager.emit(RainlinkEvents.PlayerWebsocketClosed, player, newData);
+      this.debug(`Websocket closed at guild ${newData.guildId}`);
+    }
+    return;
+  }
+
+  PlayerUpdate(data: Record<string, any>) {
+    const newData = data as PlayerUpdate;
+    const player = this.manager.players.get(newData.guildId);
+    if (player) {
+      player.position = Number(newData.state.position);
+      this.debug(`Player updated, position: ${data.state.position}`);
+      this.manager.emit(RainlinkEvents.PlayerUpdate, player, newData);
+    }
+    return;
+  }
 
   private debug(logs: string) {
     this.manager.emit(RainlinkEvents.Debug, `[Rainlink Player Events]: ${logs}`);

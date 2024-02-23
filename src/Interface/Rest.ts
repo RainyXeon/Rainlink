@@ -1,6 +1,7 @@
 import { AxiosRequestConfig } from 'axios';
 import { FilterOptions } from './Player';
 import { LavalinkLoadType } from './Constants';
+import { Exception } from './LavalinkEvents';
 
 export interface RainlinkFetcherOptions {
   endpoint: string;
@@ -72,12 +73,6 @@ export interface UpdatePlayerInfo {
   noReplace?: boolean;
 }
 
-export interface Exception {
-  message: string;
-  severity: Severity;
-  cause: string;
-}
-
 export interface TrackResult {
   loadType: LavalinkLoadType.TRACK;
   data: RawTrack;
@@ -114,5 +109,3 @@ export interface Playlist {
 }
 
 export type LavalinkResponse = TrackResult | PlaylistResult | SearchResult | EmptyResult | ErrorResult;
-
-export type Severity = 'common' | 'suspicious' | 'fault';

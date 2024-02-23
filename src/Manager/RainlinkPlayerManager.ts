@@ -14,7 +14,7 @@ export class RainlinkPlayerManager extends Map<string, RainlinkPlayer> {
     this.manager = manager;
   }
 
-  async create(options: VoiceChannelOptions) {
+  async create(options: VoiceChannelOptions): Promise<RainlinkPlayer> {
     if (this.connections.has(options.guildId))
       throw new Error('This guild already have an existing connection');
     const connection = new RainlinkVoiceManager(this.manager, options);
