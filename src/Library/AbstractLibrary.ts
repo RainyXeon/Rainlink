@@ -32,7 +32,7 @@ export abstract class AbstractLibrary {
   protected raw(packet: any): void {
     if (!AllowedPackets.includes(packet.t)) return;
     const guildId = packet.d.guild_id;
-    const connection = this.manager!.connections.get(guildId);
+    const connection = this.manager!.voiceManagers.get(guildId);
     if (!connection) return;
     if (packet.t === 'VOICE_SERVER_UPDATE') return connection.setServerUpdate(packet.d);
     const userId = packet.d.user_id;
