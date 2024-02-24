@@ -1,4 +1,4 @@
-import { RainlinkEvents, VoiceState } from '../Interface/Constants';
+import { RainlinkEvents, RainlinkPlayerState, VoiceState } from '../Interface/Constants';
 import { VoiceChannelOptions } from '../Interface/Player';
 import { RainlinkVoiceManager } from './RainlinkVoiceManager';
 import { RainlinkPlayer } from '../Player/RainlinkPlayer';
@@ -36,6 +36,7 @@ export class RainlinkPlayerManager extends Map<string, RainlinkPlayer> {
       await player.sendServerUpdate(connection);
       connection.on('connectionUpdate', onUpdate);
       this.set(player.guildId, player);
+      player.state = RainlinkPlayerState.CONNECTED;
       this.debug('Player created at ' + options.guildId);
       this.manager.emit(RainlinkEvents.PlayerCreate, this);
       return player;

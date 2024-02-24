@@ -59,11 +59,8 @@ export enum RainlinkPluginType {
 }
 
 export enum RainlinkPlayerState {
-  CONNECTING,
   CONNECTED,
-  DISCONNECTING,
   DISCONNECTED,
-  DESTROYING,
   DESTROYED,
 }
 

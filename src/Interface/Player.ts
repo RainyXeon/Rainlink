@@ -1,7 +1,8 @@
 export interface VoiceChannelOptions {
   guildId: string;
   shardId: number;
-  channelId: string;
+  voiceId: string;
+  textId: string;
   deaf?: boolean;
   mute?: boolean;
 }

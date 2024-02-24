@@ -71,7 +71,7 @@ export class RainlinkVoiceManager extends EventEmitter {
     super();
     this.manager = manager;
     this.guildId = options.guildId;
-    this.channelId = options.channelId;
+    this.channelId = options.voiceId;
     this.shardId = options.shardId;
     this.muted = options.mute ?? false;
     this.deafened = options.deaf ?? false;
