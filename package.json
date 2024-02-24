@@ -3,7 +3,10 @@
   "version": "0.0.1",
   "description": "A lavalink wrapper with backward compatible and rich features",
   "scripts": {
-    "build": "npx prettier -w ./src && npx tsc --build --verbose"
+    "build": "npx tsc --build --verbose",
+    "prettier": "npx prettier -w ./src",
+    "build:doc": "typedoc --out docs/ --exclude '**/+(test|node_modules)/**/*.ts' --entryPointStrategy expand src/.",
+    "build:full": "npm run prettier && npm run build && npm run build:full"
   },
   "main": "dist/index.js",
   "module": "dist/index.mjs",
@@ -26,6 +29,7 @@
     "axios": "^1.6.7",
     "delay": "^6.0.0",
     "discord.js": "^14.12.1",
+    "typedoc": "^0.25.8",
     "undici": "^6.6.2",
     "ws": "^8.16.0"
   }

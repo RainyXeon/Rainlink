@@ -2,6 +2,9 @@ import { AbstractLibrary } from '../Library/AbstractLibrary';
 import { RainlinkPlugin } from '../Plugin/RainlinkPlugin';
 import { RainlinkTrack } from '../Player/RainlinkTrack';
 
+/**
+ * Rainlink node option interface
+ */
 export interface RainlinkNodeOptions {
   name: string;
   host: string;
@@ -10,12 +13,15 @@ export interface RainlinkNodeOptions {
   secure: boolean;
 }
 
+/**
+ * Some rainlink config option
+ */
 export interface RainlinkAdditionalOptions {
   retryTimeout: number;
   retryCount: number;
   voiceConnectionTimeout: number;
   defaultSearchEngine?: string;
-  searchFallback?: boolean;
+  defaultVolume?: number;
 }
 
 export interface RainlinkOptions {

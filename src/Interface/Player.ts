@@ -3,6 +3,8 @@ export interface VoiceChannelOptions {
   shardId: number;
   voiceId: string;
   textId: string;
+  volume?: number;
+  nodeName?: string;
   deaf?: boolean;
   mute?: boolean;
 }

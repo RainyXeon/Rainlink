@@ -3,30 +3,43 @@ import { RainlinkSearchResult } from '../Interface/Manager';
 import { RawTrack } from '../Interface/Rest';
 import { ResolveOptions } from '../Interface/Track';
 import { Rainlink } from '../Rainlink';
-import { RainlinkPlayer } from './RainlinkPlayer';
 
 export class RainlinkTrack {
+  /** Encoded string from lavalink */
   encoded: string;
+  /** Identifier string from lavalink */
   identifier: string;
+  /** Whenever track is seekable or not */
   isSeekable: boolean;
+  /** Track's author */
   author: string;
+  /** Track's duration */
   duration: number;
+  /** Whenever track is stream able or not */
   isStream: boolean;
+  /** Track's position */
   position: number;
+  /** Track's title */
   title: string;
+  /** Track's URL */
   uri?: string;
+  /** Track's artwork URL */
   artworkUrl?: string;
+  /** Track's isrc */
   isrc?: string;
+  /** Track's source name */
   source: string;
+  /** Data from lavalink plugin */
   pluginInfo: unknown;
+  /** Track's requester */
   requester: unknown;
+  /** Track's realUri (youtube fall back) */
   realUri?: string;
 
   constructor(
     protected options: RawTrack,
     requester: unknown,
   ) {
-    // Initial data
     this.encoded = options.encoded;
     this.identifier = options.info.identifier;
     this.isSeekable = options.info.isSeekable;
@@ -95,7 +108,7 @@ export class RainlinkTrack {
     return this;
   }
 
-  public async getTrack(manager: Rainlink): Promise<RawTrack> {
+  protected async getTrack(manager: Rainlink): Promise<RawTrack> {
     const defaultSearchEngine = manager.options.options.defaultSearchEngine;
 
     const source = manager.searchEngines.get(defaultSearchEngine || 'youtube');
@@ -146,7 +159,7 @@ export class RainlinkTrack {
     return rawTracks[0];
   }
 
-  private escapeRegExp(string: string) {
+  protected escapeRegExp(string: string) {
     return string.replace(/[/\-\\^$*+?.()|[\]{}]/g, '\\$&');
   }
 }

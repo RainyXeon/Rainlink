@@ -5,44 +5,45 @@ import { RainlinkPlayer } from '../Player/RainlinkPlayer';
 import { Rainlink } from '../Rainlink';
 
 export class RainlinkPlayerManager extends Map<string, RainlinkPlayer> {
-  private connections: Map<string, RainlinkVoiceManager>;
+  private voiceManagers: Map<string, RainlinkVoiceManager>;
   private manager: Rainlink;
 
   constructor(manager: Rainlink, connections: Map<string, RainlinkVoiceManager>) {
     super();
-    this.connections = connections;
+    this.voiceManagers = connections;
     this.manager = manager;
   }
 
   async create(options: VoiceChannelOptions): Promise<RainlinkPlayer> {
-    if (this.connections.has(options.guildId))
+    if (this.voiceManagers.has(options.guildId))
       throw new Error('This guild already have an existing connection');
-    const connection = new RainlinkVoiceManager(this.manager, options);
-    this.connections.set(connection.guildId, connection);
+    const voiceManager = new RainlinkVoiceManager(this.manager, options);
+    this.voiceManagers.set(voiceManager.guildId, voiceManager);
     try {
-      await connection.connect();
+      await voiceManager.connect();
     } catch (error) {
-      this.connections.delete(options.guildId);
+      this.voiceManagers.delete(options.guildId);
       throw error;
     }
     try {
-      const node = await this.manager.nodes.getLeastUsedNode();
+      const getCustomNode = this.manager.nodes.get(String(options.nodeName ? options.nodeName : ''));
+      const node = getCustomNode ? getCustomNode : await this.manager.nodes.getLeastUsedNode();
       if (!node) throw new Error("Can't find any nodes to connect on");
-      const player = new RainlinkPlayer(this.manager, options, node);
+      const player = new RainlinkPlayer(this.manager, options, node, voiceManager);
       const onUpdate = (state: VoiceState) => {
         if (state !== VoiceState.SESSION_READY) return;
-        player.sendServerUpdate(connection);
+        player.sendServerUpdate(voiceManager);
       };
-      await player.sendServerUpdate(connection);
-      connection.on('connectionUpdate', onUpdate);
+      await player.sendServerUpdate(voiceManager);
+      voiceManager.on('connectionUpdate', onUpdate);
       this.set(player.guildId, player);
       player.state = RainlinkPlayerState.CONNECTED;
       this.debug('Player created at ' + options.guildId);
       this.manager.emit(RainlinkEvents.PlayerCreate, this);
       return player;
     } catch (error) {
-      connection.disconnect();
-      this.connections.delete(options.guildId);
+      voiceManager.disconnect();
+      this.voiceManagers.delete(options.guildId);
       throw error;
     }
   }

@@ -3,9 +3,15 @@ import { Rainlink } from '../Rainlink';
 import { RainlinkNode } from '../Node/RainlinkNode';
 import { RainlinkQueue } from './RainlinkQueue';
 import { RainlinkVoiceManager } from '../Manager/RainlinkVoiceManager';
-import { RainlinkEvents, RainlinkLoopMode, RainlinkPlayerState } from '../Interface/Constants';
+import {
+  RainlinkEvents,
+  RainlinkFilterData,
+  RainlinkLoopMode,
+  RainlinkPlayerState,
+} from '../Interface/Constants';
 import { RainlinkTrack } from './RainlinkTrack';
 import { UpdatePlayerInfo, UpdatePlayerOptions } from '../Interface/Rest';
+import { Snowflake } from 'discord.js';
 
 export class RainlinkPlayer {
   /**
@@ -64,8 +70,25 @@ export class RainlinkPlayer {
    * Get the current state of the player
    */
   public state: RainlinkPlayerState;
+  /**
+   * Whether the player is deafened or not
+   */
+  public deafened: boolean;
+  /**
+   * Whether the player is muted or not
+   */
+  public muted: boolean;
+  /**
+   * Player's voice manager
+   */
+  public voiceManager: RainlinkVoiceManager;
 
-  constructor(manager: Rainlink, voiceOptions: VoiceChannelOptions, node: RainlinkNode) {
+  constructor(
+    manager: Rainlink,
+    voiceOptions: VoiceChannelOptions,
+    node: RainlinkNode,
+    voiceManager: RainlinkVoiceManager,
+  ) {
     this.manager = manager;
     this.voiceOptions = voiceOptions;
     this.node = node;
@@ -76,24 +99,28 @@ export class RainlinkPlayer {
     this.data = new Map<string, any>();
     this.paused = false;
     this.position = 0;
-    this.volume = 100;
+    this.volume = this.manager.options.options.defaultVolume ?? 100;
     this.playing = false;
     this.loop = RainlinkLoopMode.NONE;
     this.state = RainlinkPlayerState.DESTROYED;
+    this.deafened = voiceManager.deafened;
+    this.muted = voiceManager.muted;
+    this.voiceManager = voiceManager;
+    if (voiceOptions.volume && voiceOptions.volume !== 100) this.volume = voiceOptions.volume;
   }
 
   /**
    * Sends server update to lavalink
    * @internal
    */
-  public async sendServerUpdate(connection: RainlinkVoiceManager): Promise<void> {
+  public async sendServerUpdate(voiceManager: RainlinkVoiceManager): Promise<void> {
     const playerUpdate = {
       guildId: this.guildId,
       playerOptions: {
         voice: {
-          token: connection.serverUpdate!.token,
-          endpoint: connection.serverUpdate!.endpoint,
-          sessionId: connection.sessionId!,
+          token: voiceManager.serverUpdate!.token,
+          endpoint: voiceManager.serverUpdate!.endpoint,
+          sessionId: voiceManager.sessionId!,
         },
       },
     };
@@ -105,10 +132,10 @@ export class RainlinkPlayer {
    * @internal
    */
   public async destroy(): Promise<void> {
-    const connection = this.manager.connections.get(this.guildId);
-    if (connection) {
-      connection.disconnect();
-      this.manager.connections.delete(this.guildId);
+    const voiceManager = this.manager.voiceManagers.get(this.guildId);
+    if (voiceManager) {
+      voiceManager.disconnect();
+      this.manager.voiceManagers.delete(this.guildId);
     }
     await this.node.rest.destroyPlayer(this.guildId);
     this.manager.players.delete(this.guildId);
@@ -272,6 +299,122 @@ export class RainlinkPlayer {
       },
     });
     this.volume = volume;
+    return this;
+  }
+
+  /**
+   * Set player to mute or unmute
+   * @param enable Enable or not
+   * @returns RainlinkPlayer
+   */
+  public setMute(enable: boolean): RainlinkPlayer {
+    this.checkDestroyed();
+    if (enable == this.muted) return this;
+    this.voiceManager.setDeaf(enable);
+    return this;
+  }
+
+  /**
+   * Set player to deaf or undeaf
+   * @param enable Enable or not
+   * @returns RainlinkPlayer
+   */
+  public setDeaf(enable: boolean): RainlinkPlayer {
+    this.checkDestroyed();
+    if (enable == this.deafened) return this;
+    this.voiceManager.setDeaf(enable);
+    return this;
+  }
+
+  /**
+   * Disconnect from the voice channel
+   * @returns RainlinkPlayer
+   */
+  public disconnect(): RainlinkPlayer {
+    this.checkDestroyed();
+    this.voiceManager.disconnect();
+    this.pause(true);
+    this.state = RainlinkPlayerState.DISCONNECTED;
+    this.debug(`Player disconnected; Guild id: ${this.guildId}`);
+    return this;
+  }
+
+  /**
+   * Connect from the voice channel
+   * @returns RainlinkPlayer
+   */
+  public async connect(): Promise<RainlinkPlayer> {
+    this.checkDestroyed();
+    if (this.state === RainlinkPlayerState.CONNECTED || !!this.voiceId)
+      throw new Error('Player is already connected');
+    await this.voiceManager.connect();
+    this.state = RainlinkPlayerState.CONNECTED;
+    this.debug(`Player ${this.guildId} connected`);
+    return this;
+  }
+
+  /**
+   * Set text channel
+   * @param textId Text channel ID
+   * @returns KazagumoPlayer
+   */
+  public setTextChannel(textId: Snowflake): RainlinkPlayer {
+    this.checkDestroyed();
+    this.textId = textId;
+    return this;
+  }
+
+  /**
+   * Set voice channel and move the player to the voice channel
+   * @param voiceId Voice channel ID
+   * @returns KazagumoPlayer
+   */
+  public setVoiceChannel(voiceId: Snowflake): RainlinkPlayer {
+    this.checkDestroyed();
+    this.voiceId = voiceId;
+
+    const voiceManager = this.manager.voiceManagers.get(this.guildId);
+
+    if (voiceManager) {
+      voiceManager.disconnect();
+      this.manager.voiceManagers.delete(this.guildId);
+    }
+
+    const newVoiceManager = new RainlinkVoiceManager(this.manager, {
+      guildId: this.guildId,
+      voiceId: voiceId,
+      textId: this.textId,
+      shardId: this.voiceOptions.shardId,
+      mute: this.muted,
+      deaf: this.deafened,
+    });
+
+    this.voiceManager = newVoiceManager;
+
+    this.debug(`Player ${this.guildId} moved to voice channel ${voiceId}`);
+
+    return this;
+  }
+
+  /**
+   * Set a filter that prebuilt in rainlink
+   * @param textId Text channel ID
+   * @returns KazagumoPlayer
+   */
+  public async setFilter(filter: string): Promise<RainlinkPlayer> {
+    this.checkDestroyed();
+
+    const filterData = RainlinkFilterData[filter as keyof typeof RainlinkFilterData];
+
+    if (!filterData) throw new Error('Filter not found');
+
+    await this.send({
+      guildId: this.guildId,
+      playerOptions: {
+        filters: filterData,
+      },
+    });
+
     return this;
   }
 

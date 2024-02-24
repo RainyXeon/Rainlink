@@ -4,7 +4,9 @@ import { RainlinkPlayer } from './RainlinkPlayer';
 import { RainlinkTrack } from './RainlinkTrack';
 
 export class RainlinkQueue extends Array<RainlinkTrack> {
+  /** Rainlink manager */
   manager: Rainlink;
+  /** Rainlink player */
   player: RainlinkPlayer;
 
   constructor(manager: Rainlink, player: RainlinkPlayer) {

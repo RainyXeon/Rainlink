@@ -19,7 +19,7 @@ export class RainlinkVoiceManager extends EventEmitter {
   /**
    * ID of the connected voice channel
    */
-  public channelId: string | null;
+  public voiceId: string | null;
   /**
    * ID of the Shard that contains the guild that contains the connected voice channel
    */
@@ -33,9 +33,9 @@ export class RainlinkVoiceManager extends EventEmitter {
    */
   public deafened: boolean;
   /**
-   * ID of the last channelId connected to
+   * ID of the last voiceId connected to
    */
-  public lastChannelId: string | null;
+  public lastvoiceId: string | null;
   /**
    * ID of current session
    */
@@ -62,7 +62,7 @@ export class RainlinkVoiceManager extends EventEmitter {
    * @param options The options to pass in connection creation
    * @param options.guildId GuildId in which voice channel to connect to is located
    * @param options.shardId ShardId in which the guild exists
-   * @param options.channelId ChannelId of voice channel to connect to
+   * @param options.voiceId voiceId of voice channel to connect to
    * @param options.deaf Optional boolean value to specify whether to deafen the current bot user
    * @param options.mute Optional boolean value to specify whether to mute the current bot user
    * @param options.getNode Optional move function for moving players around
@@ -71,11 +71,11 @@ export class RainlinkVoiceManager extends EventEmitter {
     super();
     this.manager = manager;
     this.guildId = options.guildId;
-    this.channelId = options.voiceId;
+    this.voiceId = options.voiceId;
     this.shardId = options.shardId;
     this.muted = options.mute ?? false;
     this.deafened = options.deaf ?? false;
-    this.lastChannelId = null;
+    this.lastvoiceId = null;
     this.sessionId = null;
     this.region = null;
     this.lastRegion = null;
@@ -144,14 +144,14 @@ export class RainlinkVoiceManager extends EventEmitter {
   }
 
   public setStateUpdate({ session_id, channel_id, self_deaf, self_mute }: StateUpdatePartial): void {
-    this.lastChannelId = this.channelId?.repeat(1) || null;
-    this.channelId = channel_id || null;
+    this.lastvoiceId = this.voiceId?.repeat(1) || null;
+    this.voiceId = channel_id || null;
 
-    if (this.channelId && this.lastChannelId !== this.channelId) {
-      this.debug(`Channel Moved | Old Channel: ${this.channelId} Guild: ${this.guildId}`);
+    if (this.voiceId && this.lastvoiceId !== this.voiceId) {
+      this.debug(`Channel Moved | Old Channel: ${this.voiceId} Guild: ${this.guildId}`);
     }
 
-    if (!this.channelId) {
+    if (!this.voiceId) {
       this.state = VoiceConnectState.DISCONNECTED;
       this.debug(`Channel Disconnected | Guild: ${this.guildId}`);
     }
@@ -160,7 +160,7 @@ export class RainlinkVoiceManager extends EventEmitter {
     this.muted = self_mute;
     this.sessionId = session_id || null;
     this.debug(
-      `State Update Received | Channel: ${this.channelId} Session ID: ${session_id} Guild: ${this.guildId}`,
+      `State Update Received | Channel: ${this.voiceId} Session ID: ${session_id} Guild: ${this.guildId}`,
     );
   }
 
@@ -171,7 +171,7 @@ export class RainlinkVoiceManager extends EventEmitter {
   private sendVoiceUpdate() {
     this.send({
       guild_id: this.guildId,
-      channel_id: this.channelId,
+      channel_id: this.voiceId,
       self_deaf: this.deafened,
       self_mute: this.muted,
     });
@@ -212,7 +212,7 @@ export class RainlinkVoiceManager extends EventEmitter {
    */
   public disconnect(): void {
     if (this.state === VoiceConnectState.DISCONNECTED) return;
-    this.channelId = null;
+    this.voiceId = null;
     this.deafened = false;
     this.muted = false;
     this.removeAllListeners();

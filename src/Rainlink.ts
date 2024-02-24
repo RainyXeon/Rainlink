@@ -25,33 +25,145 @@ import {
 } from './Interface/LavalinkEvents';
 
 export declare interface Rainlink {
+  /* tslint:disable:unified-signatures */
+  // ------------------------- ON EVENT ------------------------- //
+  /**
+   * Emitted when rainlink have a debug log.
+   * @event Kazagumo#playerCreate
+   */
   on(event: 'debug', listener: (logs: string) => void): this;
-  // Node events
+  /**
+   * Emitted when a lavalink server is connected.
+   * @event Kazagumo#playerCreate
+   */
   on(event: 'nodeConnect', listener: (node: RainlinkNode) => void): this;
+  /**
+   * Emitted when a lavalink server is disconnected.
+   * @event Kazagumo#playerCreate
+   */
   on(event: 'nodeDisconnect', listener: (node: RainlinkNode, code: number, reason: Buffer) => void): this;
+  /**
+   * Emitted when a lavalink server is closed.
+   * @event Kazagumo#playerCreate
+   */
   on(event: 'nodeClosed', listener: (node: RainlinkNode) => void): this;
+  /**
+   * Emitted when a lavalink server is errored.
+   * @event Kazagumo#playerCreate
+   */
   on(event: 'nodeError', listener: (node: RainlinkNode, error: Error) => void): this;
-
-  // Lavalink + rainlink player events
+  /**
+   * Emitted when a player is created.
+   * @event Kazagumo#playerCreate
+   */
   on(event: 'playerCreate', listener: (player: RainlinkPlayer, track: RainlinkTrack) => void): this;
+  /**
+   * Emitted when a track is going to end.
+   * @event Kazagumo#playerEnd
+   */
   on(event: 'playerEnd', listener: (player: RainlinkPlayer) => void): this;
+  /**
+   * Emitted when a track is going to play.
+   * @event Kazagumo#playerStart
+   */
   on(event: 'playerStart', listener: (player: RainlinkPlayer, track: RainlinkTrack) => void): this;
+  /**
+   * Emitted when a player is going to destroyed.
+   * @event Kazagumo#playerDestroy
+   */
   on(event: 'playerDestroy', listener: (player: RainlinkPlayer) => void): this;
+  /**
+   * Emitted when a track is failed to resolve using fallback search engine.
+   * @event Kazagumo#playerResolveError
+   */
   on(
     event: 'playerResolveError',
     listener: (player: RainlinkPlayer, track: RainlinkTrack, message: string) => void,
   ): this;
+  /**
+   * Emitted when a player have an empty queue.
+   * @event Kazagumo#playerEmpty
+   */
   on(event: 'playerEmpty', listener: (player: RainlinkPlayer) => void): this;
+  /**
+   * Emitted when a player have an exception.
+   * @event Kazagumo#playerException
+   */
   on(event: 'playerException', listener: (player: RainlinkPlayer, data: TrackExceptionEvent) => void): this;
+  /**
+   * Emitted when a player updated info.
+   * @event Kazagumo#playerUpdate
+   */
   on(event: 'playerUpdate', listener: (player: RainlinkPlayer, data: PlayerUpdate) => void): this;
+  /**
+   * Emitted when a track stucked.
+   * @event Kazagumo#playerStuck
+   */
   on(event: 'playerStuck', listener: (player: RainlinkPlayer, data: TrackStuckEvent) => void): this;
+  /**
+   * Emitted when a player's websocket closed.
+   * @event Kazagumo#playerWebsocketClosed
+   */
   on(
     event: 'playerWebsocketClosed',
     listener: (player: RainlinkPlayer, data: WebSocketClosedEvent) => void,
   ): this;
-
-  // Lavalink + rainlink queue events
+  /**
+   * Emitted when a queue updated.
+   * @event Kazagumo#queueUpdate
+   */
   on(event: 'queueUpdate', listener: (player: RainlinkPlayer, queue: RainlinkQueue) => void): this;
+  // ------------------------- ON EVENT ------------------------- //
+
+  // ------------------------- ONCE EVENT ------------------------- //
+  once(event: 'debug', listener: (logs: string) => void): this;
+  once(event: 'nodeConnect', listener: (node: RainlinkNode) => void): this;
+  once(event: 'nodeDisconnect', listener: (node: RainlinkNode, code: number, reason: Buffer) => void): this;
+  once(event: 'nodeClosed', listener: (node: RainlinkNode) => void): this;
+  once(event: 'nodeError', listener: (node: RainlinkNode, error: Error) => void): this;
+  once(event: 'playerCreate', listener: (player: RainlinkPlayer, track: RainlinkTrack) => void): this;
+  once(event: 'playerEnd', listener: (player: RainlinkPlayer) => void): this;
+  once(event: 'playerStart', listener: (player: RainlinkPlayer, track: RainlinkTrack) => void): this;
+  once(event: 'playerDestroy', listener: (player: RainlinkPlayer) => void): this;
+  once(
+    event: 'playerResolveError',
+    listener: (player: RainlinkPlayer, track: RainlinkTrack, message: string) => void,
+  ): this;
+  once(event: 'playerEmpty', listener: (player: RainlinkPlayer) => void): this;
+  once(event: 'playerException', listener: (player: RainlinkPlayer, data: TrackExceptionEvent) => void): this;
+  once(event: 'playerUpdate', listener: (player: RainlinkPlayer, data: PlayerUpdate) => void): this;
+  once(event: 'playerStuck', listener: (player: RainlinkPlayer, data: TrackStuckEvent) => void): this;
+  once(
+    event: 'playerWebsocketClosed',
+    listener: (player: RainlinkPlayer, data: WebSocketClosedEvent) => void,
+  ): this;
+  once(event: 'queueUpdate', listener: (player: RainlinkPlayer, queue: RainlinkQueue) => void): this;
+  // ------------------------- ONCE EVENT ------------------------- //
+
+  // ------------------------- OFF EVENT ------------------------- //
+  off(event: 'debug', listener: (logs: string) => void): this;
+  off(event: 'nodeConnect', listener: (node: RainlinkNode) => void): this;
+  off(event: 'nodeDisconnect', listener: (node: RainlinkNode, code: number, reason: Buffer) => void): this;
+  off(event: 'nodeClosed', listener: (node: RainlinkNode) => void): this;
+  off(event: 'nodeError', listener: (node: RainlinkNode, error: Error) => void): this;
+  off(event: 'playerCreate', listener: (player: RainlinkPlayer, track: RainlinkTrack) => void): this;
+  off(event: 'playerEnd', listener: (player: RainlinkPlayer) => void): this;
+  off(event: 'playerStart', listener: (player: RainlinkPlayer, track: RainlinkTrack) => void): this;
+  off(event: 'playerDestroy', listener: (player: RainlinkPlayer) => void): this;
+  off(
+    event: 'playerResolveError',
+    listener: (player: RainlinkPlayer, track: RainlinkTrack, message: string) => void,
+  ): this;
+  off(event: 'playerEmpty', listener: (player: RainlinkPlayer) => void): this;
+  off(event: 'playerException', listener: (player: RainlinkPlayer, data: TrackExceptionEvent) => void): this;
+  off(event: 'playerUpdate', listener: (player: RainlinkPlayer, data: PlayerUpdate) => void): this;
+  off(event: 'playerStuck', listener: (player: RainlinkPlayer, data: TrackStuckEvent) => void): this;
+  off(
+    event: 'playerWebsocketClosed',
+    listener: (player: RainlinkPlayer, data: WebSocketClosedEvent) => void,
+  ): this;
+  off(event: 'queueUpdate', listener: (player: RainlinkPlayer, queue: RainlinkQueue) => void): this;
+  // ------------------------- OFF EVENT ------------------------- //
 }
 
 export class Rainlink extends EventEmitter {
@@ -60,9 +172,9 @@ export class Rainlink extends EventEmitter {
    */
   public readonly library: AbstractLibrary;
   /**
-   * Voice connections being handled
+   * Voice voice managers being handled
    */
-  public readonly connections: Map<string, RainlinkVoiceManager>;
+  public readonly voiceManagers: Map<string, RainlinkVoiceManager>;
   /**
    * Lavalink server that has been configured
    */
@@ -94,10 +206,10 @@ export class Rainlink extends EventEmitter {
       throw new Error('Please set an new lib to connect, example: \nlibrary: new Library.DiscordJS(client) ');
     this.library = options.library.set(this);
     this.options = options;
-    this.connections = new Map();
+    this.voiceManagers = new Map();
     this.nodes = new RainlinkNodeManager(this);
     this.library.listen(this.options.nodes);
-    this.players = new RainlinkPlayerManager(this, this.connections);
+    this.players = new RainlinkPlayerManager(this, this.voiceManagers);
     this.searchEngines = new Map<string, string>();
     this.searchPlugins = new Map<string, SourceRainlinkPlugin>();
     this.initialSearchEngines();
@@ -222,7 +334,7 @@ export class Rainlink extends EventEmitter {
     );
   }
 
-  private buildSearch(
+  protected buildSearch(
     playlistName?: string,
     tracks: RainlinkTrack[] = [],
     type?: RainlinkSearchResultType,
@@ -234,7 +346,7 @@ export class Rainlink extends EventEmitter {
     };
   }
 
-  private debug(logs: string) {
+  protected debug(logs: string) {
     this.emit(RainlinkEvents.Debug, `[Rainlink]: ${logs}`);
   }
 }
