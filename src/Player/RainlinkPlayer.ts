@@ -99,7 +99,7 @@ export class RainlinkPlayer {
     this.data = new Map<string, any>();
     this.paused = false;
     this.position = 0;
-    this.volume = this.manager.options.options.defaultVolume ?? 100;
+    this.volume = this.manager.rainlinkOptions.options.defaultVolume ?? 100;
     this.playing = false;
     this.loop = RainlinkLoopMode.NONE;
     this.state = RainlinkPlayerState.DESTROYED;

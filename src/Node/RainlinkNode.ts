@@ -7,6 +7,7 @@ import { metadata } from '../manifest';
 import { setTimeout } from 'node:timers/promises';
 import { RainlinkWebsocket } from './RainlinkWebsocket';
 import { LavalinkEventsEnum } from '../Interface/LavalinkEvents';
+import { LavalinkNodeStatsResponse, NodeStats } from '../Interface/Node';
 
 export class RainlinkNode {
   public manager: Rainlink;
@@ -17,6 +18,7 @@ export class RainlinkNode {
   public online: boolean = false;
   private retryCounter = 0;
   public state: RainlinkConnectState = RainlinkConnectState.Closed;
+  public stats: NodeStats;
   private ws?: WebSocket;
   private sudoDisconnect = false;
   private wsEvent: RainlinkWebsocket;
@@ -28,6 +30,27 @@ export class RainlinkNode {
     this.rest = new RainlinkRest(manager, node, this);
     this.sessionId = null;
     this.wsEvent = new RainlinkWebsocket(manager);
+    this.stats = {
+      players: 0,
+      playingPlayers: 0,
+      uptime: 0,
+      memory: {
+        free: 0,
+        used: 0,
+        allocated: 0,
+        reservable: 0,
+      },
+      cpu: {
+        cores: 0,
+        systemLoad: 0,
+        lavalinkLoad: 0,
+      },
+      frameStats: {
+        sent: 0,
+        nulled: 0,
+        deficit: 0,
+      },
+    };
   }
 
   public connect(): WebSocket {
@@ -74,6 +97,10 @@ export class RainlinkNode {
         this.wsEvent.initial(data);
         break;
       }
+      case LavalinkEventsEnum.Status: {
+        this.stats = this.updateStatusData(wsData as LavalinkNodeStatsResponse);
+        break;
+      }
     }
   }
 
@@ -87,8 +114,8 @@ export class RainlinkNode {
     this.state = RainlinkConnectState.Disconnected;
     this.debug(`Node ${this.node.name} disconnected! URL: ${this.wsUrl}`);
     this.manager.emit(RainlinkEvents.NodeDisconnect, this, code, reason);
-    if (!this.sudoDisconnect && this.retryCounter !== this.manager.options.options.retryCount) {
-      await setTimeout(this.manager.options.options.retryTimeout);
+    if (!this.sudoDisconnect && this.retryCounter !== this.manager.rainlinkOptions.options.retryCount) {
+      await setTimeout(this.manager.rainlinkOptions.options.retryTimeout);
       this.retryCounter = this.retryCounter + 1;
       this.reconnect();
       return;
@@ -100,6 +127,30 @@ export class RainlinkNode {
   protected nodeClosed() {
     this.manager.emit(RainlinkEvents.NodeClosed, this);
     this.debug(`Node ${this.node.name} closed! URL: ${this.wsUrl}`);
+  }
+
+  protected updateStatusData(data: LavalinkNodeStatsResponse): NodeStats {
+    return {
+      players: data.players,
+      playingPlayers: data.playingPlayers,
+      uptime: data.uptime,
+      memory: {
+        free: data.memory.free,
+        used: data.memory.used,
+        allocated: data.memory.allocated,
+        reservable: data.memory.reservable,
+      },
+      cpu: {
+        cores: data.cpu.cores,
+        systemLoad: data.cpu.systemLoad,
+        lavalinkLoad: data.cpu.lavalinkLoad,
+      },
+      frameStats: {
+        sent: data.frameStats.sent,
+        nulled: data.frameStats.nulled,
+        deficit: data.frameStats.deficit,
+      },
+    };
   }
 
   public disconnect() {

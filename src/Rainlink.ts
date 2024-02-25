@@ -202,6 +202,7 @@ export class Rainlink extends EventEmitter {
 
   constructor(options: RainlinkOptions) {
     super();
+    this.debug('Start the client.');
     if (!options.library)
       throw new Error('Please set an new lib to connect, example: \nlibrary: new Library.DiscordJS(client) ');
     this.library = options.library.set(this);
@@ -233,6 +234,9 @@ export class Rainlink extends EventEmitter {
           this.searchPlugins.set(sourceName, newPlugin);
         }
       }
+      this.debug(
+        `Registered ${this.rainlinkOptions.plugins.length} plugins, including ${this.searchPlugins.size}`,
+      );
     }
   }
 

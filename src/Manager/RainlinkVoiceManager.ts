@@ -93,7 +93,10 @@ export class RainlinkVoiceManager extends EventEmitter {
     this.sendVoiceUpdate();
     this.debug(`Requesting Connection | Guild: ${this.guildId}`);
     const controller = new AbortController();
-    const timeout = setTimeout(() => controller.abort(), this.manager.options.options.voiceConnectionTimeout);
+    const timeout = setTimeout(
+      () => controller.abort(),
+      this.manager.rainlinkOptions.options.voiceConnectionTimeout,
+    );
     try {
       const [status] = await RainlinkVoiceManager.once(this, 'connectionUpdate', {
         signal: controller.signal,
@@ -111,7 +114,7 @@ export class RainlinkVoiceManager extends EventEmitter {
       this.debug(`Request Connection Failed | Guild: ${this.guildId}`);
       if (error.name === 'AbortError')
         throw new Error(
-          `The voice connection is not established in ${this.manager.options.options.voiceConnectionTimeout}ms`,
+          `The voice connection is not established in ${this.manager.rainlinkOptions.options.voiceConnectionTimeout}ms`,
         );
       throw error;
     } finally {
@@ -119,6 +122,10 @@ export class RainlinkVoiceManager extends EventEmitter {
     }
   }
 
+  /**
+   * Sets the server update data for this connection
+   * @internal
+   */
   public setServerUpdate(data: ServerUpdate): void {
     if (!data.endpoint) {
       this.emit('connectionUpdate', VoiceState.SESSION_ENDPOINT_MISSING);
@@ -143,6 +150,15 @@ export class RainlinkVoiceManager extends EventEmitter {
     this.debug(`Server Update Received | Server: ${this.region} Guild: ${this.guildId}`);
   }
 
+  /**
+   * Update Session ID, Channel ID, Deafen status and Mute status of this instance
+   *
+   * @param options.session_id ID of this session
+   * @param options.channel_id ID of currently connected voice channel
+   * @param options.self_deaf Boolean that indicates if the current bot user is deafened or not
+   * @param options.self_mute Boolean that indicates if the current bot user is muted or not
+   * @internal
+   */
   public setStateUpdate({ session_id, channel_id, self_deaf, self_mute }: StateUpdatePartial): void {
     this.lastvoiceId = this.voiceId?.repeat(1) || null;
     this.voiceId = channel_id || null;
