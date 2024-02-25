@@ -102,24 +102,6 @@ export class RainlinkPlugin extends SourceRainlinkPlugin {
 
     const isUrl = /^https?:\/\//.test(query);
 
-    //---- You can implement this for search from lavalink first ----
-    this.debug('Start search from plugin');
-    this.debug('Searching from lavalink (pre search)');
-
-    const preSearchQuery = isUrl ? query : `${this.sourceIdentify()}search:${query}`;
-
-    const preSearch = await this._search!(`directSearch=${preSearchQuery}`, {
-      engine: this.sourceName(),
-      nodeName: options?.nodeName,
-      requester: options?.requester,
-    });
-
-    if (preSearch.tracks.length !== 0) return preSearch;
-
-    this.debug('Searching from lavalink failed, now search directly from api');
-
-    //---- You can implement this for search from lavalink first ----
-
     if (!REGEX_SONG_ONLY.exec(query) || REGEX_SONG_ONLY.exec(query) == null) {
       const extract = REGEX.exec(query) || [];
       id = extract![4];
@@ -133,6 +115,7 @@ export class RainlinkPlugin extends SourceRainlinkPlugin {
 
     if (type in this.methods) {
       try {
+        this.debug(`Start search from ${this.sourceName()} plugin`);
         let _function = this.methods[type];
         if (isTrack) _function = this.methods.track;
         const result: Result = await _function(id, options?.requester);

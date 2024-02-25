@@ -22,6 +22,7 @@ export interface RainlinkAdditionalOptions {
   voiceConnectionTimeout: number;
   defaultSearchEngine?: string;
   defaultVolume?: number;
+  searchFallback?: boolean;
 }
 
 export interface RainlinkOptions {

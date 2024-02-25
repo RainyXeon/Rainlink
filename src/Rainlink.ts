@@ -182,7 +182,7 @@ export class Rainlink extends EventEmitter {
   /**
    * Rainlink options
    */
-  public options: RainlinkOptions;
+  public rainlinkOptions: RainlinkOptions;
   /**
    * Bot id
    */
@@ -205,17 +205,22 @@ export class Rainlink extends EventEmitter {
     if (!options.library)
       throw new Error('Please set an new lib to connect, example: \nlibrary: new Library.DiscordJS(client) ');
     this.library = options.library.set(this);
-    this.options = options;
+    this.rainlinkOptions = options;
     this.voiceManagers = new Map();
     this.nodes = new RainlinkNodeManager(this);
-    this.library.listen(this.options.nodes);
+    this.library.listen(this.rainlinkOptions.nodes);
     this.players = new RainlinkPlayerManager(this, this.voiceManagers);
     this.searchEngines = new Map<string, string>();
     this.searchPlugins = new Map<string, SourceRainlinkPlugin>();
     this.initialSearchEngines();
+    if (
+      !this.rainlinkOptions.options.defaultSearchEngine ||
+      this.rainlinkOptions.options.defaultSearchEngine.length == 0
+    )
+      this.rainlinkOptions.options.defaultSearchEngine == 'youtube';
 
-    if (this.options.plugins) {
-      for (const [, plugin] of this.options.plugins.entries()) {
+    if (this.rainlinkOptions.plugins) {
+      for (const [, plugin] of this.rainlinkOptions.plugins.entries()) {
         if (plugin.constructor.name !== 'RainlinkPlugin')
           throw new Error('Plugin must be an instance of RainlinkPlugin');
         plugin.load(this);
@@ -280,7 +285,9 @@ export class Rainlink extends EventEmitter {
     const source = options?.engine
       ? this.searchEngines.get(options.engine)
       : this.searchEngines.get(
-          this.options.options.defaultSearchEngine ? this.options.options.defaultSearchEngine : 'youtube',
+          this.rainlinkOptions.options.defaultSearchEngine
+            ? this.rainlinkOptions.options.defaultSearchEngine
+            : 'youtube',
         );
 
     const finalQuery =
