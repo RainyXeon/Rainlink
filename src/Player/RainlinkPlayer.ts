@@ -398,7 +398,7 @@ export class RainlinkPlayer {
 
   /**
    * Set a filter that prebuilt in rainlink
-   * @param textId Text channel ID
+   * @param filter The filter name
    * @returns KazagumoPlayer
    */
   public async setFilter(filter: string): Promise<RainlinkPlayer> {
@@ -428,6 +428,7 @@ export class RainlinkPlayer {
     return this;
   }
 
+  /** @ignore */
   protected async playTrackEncoded(playable: PlayEncodedOptions): Promise<void> {
     const playerOptions: UpdatePlayerOptions = {
       encodedTrack: playable.encoded,
@@ -449,10 +450,12 @@ export class RainlinkPlayer {
     });
   }
 
+  /** @ignore */
   protected checkDestroyed(): void {
     if (this.state == RainlinkPlayerState.DESTROYED) throw new Error('Player is already destroyed');
   }
 
+  /** @ignore */
   private debug(logs: string): void {
     this.manager.emit(RainlinkEvents.Debug, `[Rainlink Player]: ${logs}`);
   }

@@ -5,8 +5,10 @@ import { RainlinkPlayer } from '../Player/RainlinkPlayer';
 import { Rainlink } from '../Rainlink';
 
 export class RainlinkPlayerManager extends Map<string, RainlinkPlayer> {
-  private voiceManagers: Map<string, RainlinkVoiceManager>;
-  private manager: Rainlink;
+  /** The map of all voice manager that being handled */
+  public voiceManagers: Map<string, RainlinkVoiceManager>;
+  /** The rainlink manager */
+  public manager: Rainlink;
 
   constructor(manager: Rainlink, connections: Map<string, RainlinkVoiceManager>) {
     super();
@@ -14,6 +16,11 @@ export class RainlinkPlayerManager extends Map<string, RainlinkPlayer> {
     this.manager = manager;
   }
 
+  /**
+   * Create a player
+   * @returns RainlinkPlayer
+   * @internal
+   */
   async create(options: VoiceChannelOptions): Promise<RainlinkPlayer> {
     if (this.voiceManagers.has(options.guildId))
       throw new Error('This guild already have an existing connection');
@@ -49,8 +56,7 @@ export class RainlinkPlayerManager extends Map<string, RainlinkPlayer> {
   }
 
   /**
-   * Leaves a voice channel
-   * @param guildId The id of the guild you want to delete
+   * Destroy a player
    * @returns The destroyed / disconnected player or undefined if none
    * @internal
    */
@@ -59,6 +65,7 @@ export class RainlinkPlayerManager extends Map<string, RainlinkPlayer> {
     if (player) player.destroy();
   }
 
+  /** @ignore */
   private debug(logs: string) {
     this.manager.emit(RainlinkEvents.Debug, `[Rainlink Player]: ${logs}`);
   }

@@ -15,11 +15,17 @@ import {
 import axios from 'axios';
 
 export class RainlinkRest {
+  /** @ignore */
   protected axios: typeof axios;
+  /** The rainlink manager */
   public manager: Rainlink;
-  public node: RainlinkNodeOptions;
-  public url: string;
+  /** @ignore */
+  protected node: RainlinkNodeOptions;
+  /** @ignore */
+  protected url: string;
+  /** The node manager (RainlinkNode class) */
   public nodeManager: RainlinkNode;
+  /** @ignore */
   protected sessionId: string | null;
 
   constructor(manager: Rainlink, node: RainlinkNodeOptions, nodeManager: RainlinkNode) {
@@ -31,7 +37,8 @@ export class RainlinkRest {
     this.url = `${node.secure ? 'https://' : 'http://'}${node.host}:${node.port}/v${metadata.lavalink}`;
   }
 
-  async fetcher<D = any>(options: RainlinkFetcherOptions): Promise<D | undefined> {
+  /** @ignore */
+  private async fetcher<D = any>(options: RainlinkFetcherOptions): Promise<D | undefined> {
     if (options.useSessionId && this.sessionId == null)
       throw new Error('sessionId not initalized! Please wait for lavalink get connected!');
     const url = new URL(`${this.url}${options.endpoint}`);
@@ -83,7 +90,6 @@ export class RainlinkRest {
 
   /**
    * Updates a Lavalink player
-   * @param data SessionId from Discord
    * @returns Promise that resolves to a Lavalink player
    */
   public async updatePlayer(data: UpdatePlayerInfo): Promise<LavalinkPlayer | undefined> {
@@ -100,6 +106,10 @@ export class RainlinkRest {
     return await this.fetcher<LavalinkPlayer>(options);
   }
 
+  /**
+   * Destroy a Lavalink player
+   * @returns Promise that resolves to a Lavalink player
+   */
   public destroyPlayer(guildId: string) {
     const options: RainlinkFetcherOptions = {
       endpoint: `/sessions/${this.sessionId}/players/${guildId}`,
@@ -113,10 +123,15 @@ export class RainlinkRest {
     return this.fetcher(options);
   }
 
+  /** @ignore */
   private debug(logs: string) {
     this.manager.emit(RainlinkEvents.Debug, `[Rainlink Rest] ${logs}`);
   }
 
+  /**
+   * A track resolver function to get track from lavalink
+   * @returns LavalinkResponse
+   */
   public async resolver(data: string): Promise<LavalinkResponse> {
     const options: RainlinkFetcherOptions = {
       endpoint: `/loadtracks`,
@@ -137,6 +152,7 @@ export class RainlinkRest {
     } else return resData;
   }
 
+  /** @ignore */
   protected testJSON(text: string) {
     if (typeof text !== 'string') {
       return false;

@@ -10,17 +10,29 @@ import { LavalinkEventsEnum } from '../Interface/LavalinkEvents';
 import { LavalinkNodeStatsResponse, NodeStats } from '../Interface/Node';
 
 export class RainlinkNode {
+  /** The rainlink manager */
   public manager: Rainlink;
+  /** The rainlink node options */
   public node: RainlinkNodeOptions;
+  /** @ignore */
   private wsUrl: string;
+  /** The rainlink rest manager */
   public rest: RainlinkRest;
+  /** The lavalink server season id to resume */
   public sessionId: string | null;
+  /** The lavalink server online status */
   public online: boolean = false;
+  /** @ignore */
   private retryCounter = 0;
+  /** The lavalink server connect state */
   public state: RainlinkConnectState = RainlinkConnectState.Closed;
+  /** The lavalink server all status */
   public stats: NodeStats;
+  /** @ignore */
   private ws?: WebSocket;
+  /** @ignore */
   private sudoDisconnect = false;
+  /** @ignore */
   private wsEvent: RainlinkWebsocket;
 
   constructor(manager: Rainlink, node: RainlinkNodeOptions) {
@@ -53,6 +65,7 @@ export class RainlinkNode {
     };
   }
 
+  /** Connect this lavalink server */
   public connect(): WebSocket {
     const header = {
       Authorization: this.node.auth,
@@ -65,6 +78,7 @@ export class RainlinkNode {
     return newWsClient;
   }
 
+  /** @ignore */
   protected setupEvent(ws: WebSocket) {
     ws.on('open', () => {
       this.wsOpenEvent();
@@ -74,6 +88,7 @@ export class RainlinkNode {
     ws.on('close', (code: number, reason: Buffer) => this.wsCloseEvent(code, reason));
   }
 
+  /** @ignore */
   protected wsOpenEvent() {
     this.clean(true);
     this.state = RainlinkConnectState.Connected;
@@ -81,6 +96,7 @@ export class RainlinkNode {
     this.manager.emit(RainlinkEvents.NodeConnect, this);
   }
 
+  /** @ignore */
   protected wsMessageEvent(data: RawData, isBin: boolean) {
     const wsData = JSON.parse(data.toString());
     switch (wsData.op) {
@@ -104,11 +120,13 @@ export class RainlinkNode {
     }
   }
 
+  /** @ignore */
   protected wsErrorEvent(logs: Error) {
     this.debug(`Node ${this.node.name} errored! URL: ${this.wsUrl}`);
     this.manager.emit(RainlinkEvents.NodeError, this, logs);
   }
 
+  /** @ignore */
   protected async wsCloseEvent(code: number, reason: Buffer) {
     this.online = false;
     this.state = RainlinkConnectState.Disconnected;
@@ -124,11 +142,14 @@ export class RainlinkNode {
     return;
   }
 
+  /** @ignore */
   protected nodeClosed() {
     this.manager.emit(RainlinkEvents.NodeClosed, this);
     this.debug(`Node ${this.node.name} closed! URL: ${this.wsUrl}`);
+    this.clean();
   }
 
+  /** @ignore */
   protected updateStatusData(data: LavalinkNodeStatsResponse): NodeStats {
     return {
       players: data.players,
@@ -153,16 +174,19 @@ export class RainlinkNode {
     };
   }
 
+  /** Disconnect this lavalink server */
   public disconnect() {
     this.sudoDisconnect = true;
     this.ws?.close();
   }
 
+  /** Reconnect back to this lavalink server */
   public reconnect() {
     this.clean();
     this.ws = this.connect();
   }
 
+  /** Clean all the lavalink server state and set to default value */
   public clean(online: boolean = false) {
     this.sudoDisconnect = false;
     this.retryCounter = 0;
@@ -170,6 +194,7 @@ export class RainlinkNode {
     this.state = RainlinkConnectState.Closed;
   }
 
+  /** @ignore */
   private debug(logs: string) {
     this.manager.emit(RainlinkEvents.Debug, `[Rainlink Node]: ${logs}`);
   }

@@ -57,16 +57,6 @@ export class RainlinkVoiceManager extends EventEmitter {
    */
   public state: VoiceConnectState;
 
-  /**
-   * @param manager The manager of this connection
-   * @param options The options to pass in connection creation
-   * @param options.guildId GuildId in which voice channel to connect to is located
-   * @param options.shardId ShardId in which the guild exists
-   * @param options.voiceId voiceId of voice channel to connect to
-   * @param options.deaf Optional boolean value to specify whether to deafen the current bot user
-   * @param options.mute Optional boolean value to specify whether to mute the current bot user
-   * @param options.getNode Optional move function for moving players around
-   */
   constructor(manager: Rainlink, options: VoiceChannelOptions) {
     super();
     this.manager = manager;
@@ -152,11 +142,6 @@ export class RainlinkVoiceManager extends EventEmitter {
 
   /**
    * Update Session ID, Channel ID, Deafen status and Mute status of this instance
-   *
-   * @param options.session_id ID of this session
-   * @param options.channel_id ID of currently connected voice channel
-   * @param options.self_deaf Boolean that indicates if the current bot user is deafened or not
-   * @param options.self_mute Boolean that indicates if the current bot user is muted or not
    * @internal
    */
   public setStateUpdate({ session_id, channel_id, self_deaf, self_mute }: StateUpdatePartial): void {
@@ -237,6 +222,7 @@ export class RainlinkVoiceManager extends EventEmitter {
     this.debug(`Connection Destroyed | Guild: ${this.guildId}`);
   }
 
+  /** @ignore */
   private debug(logs: string) {
     this.manager.emit(RainlinkEvents.Debug, `[Rainlink Voice Manager]: ${logs}`);
   }

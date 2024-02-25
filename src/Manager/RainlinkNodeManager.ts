@@ -4,7 +4,9 @@ import { RainlinkNode } from '../Node/RainlinkNode';
 import { Rainlink } from '../Rainlink';
 
 export class RainlinkNodeManager extends Map<string, RainlinkNode> {
+  /** The rainlink manager */
   manager: Rainlink;
+
   constructor(manager: Rainlink) {
     super();
     this.manager = manager;

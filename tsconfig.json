@@ -19,6 +19,9 @@
       "src/Plugin/index.ts",
       "src/Plugin/Deezer/*.ts",
       "src/Library/**/*.ts",
+      "src/index.ts",
+      "src/manifest.ts",
+      "src/Node/RainlinkWebsocket.ts",
     ]
   }
 }

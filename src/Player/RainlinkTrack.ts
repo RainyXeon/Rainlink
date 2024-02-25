@@ -57,6 +57,10 @@ export class RainlinkTrack {
     this.realUri = undefined;
   }
 
+  /**
+   * Whenever track is able to play or not
+   * @returns boolean
+   */
   get isPlayable(): boolean {
     return (
       !!this.encoded &&
@@ -70,8 +74,28 @@ export class RainlinkTrack {
     );
   }
 
+  /**
+   * Get all raw details of the track
+   * @returns RawTrack
+   */
   get raw(): RawTrack {
-    return this.options;
+    return {
+      encoded: this.encoded,
+      info: {
+        identifier: this.identifier,
+        isSeekable: this.isSeekable,
+        author: this.author,
+        length: this.duration,
+        isStream: this.isStream,
+        position: this.position,
+        title: this.title,
+        uri: this.uri,
+        artworkUrl: this.artworkUrl,
+        isrc: this.isrc,
+        sourceName: this.source,
+      },
+      pluginInfo: this.pluginInfo,
+    };
   }
 
   /**
@@ -108,6 +132,7 @@ export class RainlinkTrack {
     return this;
   }
 
+  /** @ignore */
   protected async getTrack(manager: Rainlink): Promise<RawTrack> {
     const node = await manager.nodes.getLeastUsedNode();
 
@@ -140,10 +165,12 @@ export class RainlinkTrack {
     return rawTracks[0];
   }
 
+  /** @ignore */
   protected escapeRegExp(string: string) {
     return string.replace(/[/\-\\^$*+?.()|[\]{}]/g, '\\$&');
   }
 
+  /** @ignore */
   protected async resolverEngine(manager: Rainlink): Promise<RainlinkSearchResult> {
     const defaultSearchEngine = manager.rainlinkOptions.options.defaultSearchEngine;
     const engine = manager.searchEngines.get(this.source || defaultSearchEngine || 'youtube');

@@ -240,6 +240,7 @@ export class Rainlink extends EventEmitter {
     }
   }
 
+  /** @ignore */
   protected initialSearchEngines() {
     for (const data of SourceIDs) {
       this.searchEngines.set(data.name, data.id);
@@ -345,6 +346,7 @@ export class Rainlink extends EventEmitter {
     );
   }
 
+  /** @ignore */
   protected buildSearch(
     playlistName?: string,
     tracks: RainlinkTrack[] = [],
@@ -357,6 +359,7 @@ export class Rainlink extends EventEmitter {
     };
   }
 
+  /** @ignore */
   protected debug(logs: string) {
     this.emit(RainlinkEvents.Debug, `[Rainlink]: ${logs}`);
   }

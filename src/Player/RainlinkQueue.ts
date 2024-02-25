@@ -94,6 +94,7 @@ export class RainlinkQueue extends Array<RainlinkTrack> {
     return this;
   }
 
+  /** @ignore */
   private emitChanges(): void {
     this.manager.emit(RainlinkEvents.QueueUpdate, this.player, this);
   }
