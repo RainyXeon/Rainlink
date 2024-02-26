@@ -1,4 +1,6 @@
 {
+  "plugin": ["typedoc-material-theme"],
+  "themeColor": "#c2e9ff",
   "out": "docs",
   "entryPoints": ["src/Rainlink.ts"],
   "exclude": [
