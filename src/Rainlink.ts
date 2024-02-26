@@ -29,52 +29,52 @@ export declare interface Rainlink {
   // ------------------------- ON EVENT ------------------------- //
   /**
    * Emitted when rainlink have a debug log.
-   * @event Kazagumo#playerCreate
+   * @event Rainlink#playerCreate
    */
   on(event: 'debug', listener: (logs: string) => void): this;
   /**
    * Emitted when a lavalink server is connected.
-   * @event Kazagumo#playerCreate
+   * @event Rainlink#playerCreate
    */
   on(event: 'nodeConnect', listener: (node: RainlinkNode) => void): this;
   /**
    * Emitted when a lavalink server is disconnected.
-   * @event Kazagumo#playerCreate
+   * @event Rainlink#playerCreate
    */
   on(event: 'nodeDisconnect', listener: (node: RainlinkNode, code: number, reason: Buffer) => void): this;
   /**
    * Emitted when a lavalink server is closed.
-   * @event Kazagumo#playerCreate
+   * @event Rainlink#playerCreate
    */
   on(event: 'nodeClosed', listener: (node: RainlinkNode) => void): this;
   /**
    * Emitted when a lavalink server is errored.
-   * @event Kazagumo#playerCreate
+   * @event Rainlink#playerCreate
    */
   on(event: 'nodeError', listener: (node: RainlinkNode, error: Error) => void): this;
   /**
    * Emitted when a player is created.
-   * @event Kazagumo#playerCreate
+   * @event Rainlink#playerCreate
    */
   on(event: 'playerCreate', listener: (player: RainlinkPlayer, track: RainlinkTrack) => void): this;
   /**
    * Emitted when a track is going to end.
-   * @event Kazagumo#playerEnd
+   * @event Rainlink#playerEnd
    */
   on(event: 'playerEnd', listener: (player: RainlinkPlayer) => void): this;
   /**
    * Emitted when a track is going to play.
-   * @event Kazagumo#playerStart
+   * @event Rainlink#playerStart
    */
   on(event: 'playerStart', listener: (player: RainlinkPlayer, track: RainlinkTrack) => void): this;
   /**
    * Emitted when a player is going to destroyed.
-   * @event Kazagumo#playerDestroy
+   * @event Rainlink#playerDestroy
    */
   on(event: 'playerDestroy', listener: (player: RainlinkPlayer) => void): this;
   /**
    * Emitted when a track is failed to resolve using fallback search engine.
-   * @event Kazagumo#playerResolveError
+   * @event Rainlink#playerResolveError
    */
   on(
     event: 'playerResolveError',
@@ -82,27 +82,27 @@ export declare interface Rainlink {
   ): this;
   /**
    * Emitted when a player have an empty queue.
-   * @event Kazagumo#playerEmpty
+   * @event Rainlink#playerEmpty
    */
   on(event: 'playerEmpty', listener: (player: RainlinkPlayer) => void): this;
   /**
    * Emitted when a player have an exception.
-   * @event Kazagumo#playerException
+   * @event Rainlink#playerException
    */
   on(event: 'playerException', listener: (player: RainlinkPlayer, data: TrackExceptionEvent) => void): this;
   /**
    * Emitted when a player updated info.
-   * @event Kazagumo#playerUpdate
+   * @event Rainlink#playerUpdate
    */
   on(event: 'playerUpdate', listener: (player: RainlinkPlayer, data: PlayerUpdate) => void): this;
   /**
    * Emitted when a track stucked.
-   * @event Kazagumo#playerStuck
+   * @event Rainlink#playerStuck
    */
   on(event: 'playerStuck', listener: (player: RainlinkPlayer, data: TrackStuckEvent) => void): this;
   /**
    * Emitted when a player's websocket closed.
-   * @event Kazagumo#playerWebsocketClosed
+   * @event Rainlink#playerWebsocketClosed
    */
   on(
     event: 'playerWebsocketClosed',
@@ -110,7 +110,7 @@ export declare interface Rainlink {
   ): this;
   /**
    * Emitted when a queue updated.
-   * @event Kazagumo#queueUpdate
+   * @event Rainlink#queueUpdate
    */
   on(event: 'queueUpdate', listener: (player: RainlinkPlayer, queue: RainlinkQueue) => void): this;
   // ------------------------- ON EVENT ------------------------- //
