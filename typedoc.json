@@ -1,0 +1,38 @@
+{
+  "out": "docs",
+  "entryPoints": ["src/Rainlink.ts"],
+  "exclude": [
+    "src/Plugin/Apple/*.ts",
+    "src/Plugin/index.ts",
+    "src/Plugin/Deezer/*.ts",
+    "src/Library/**/*.ts",
+    "src/index.ts",
+    "src/manifest.ts",
+    "src/Node/RainlinkWebsocket.ts",
+  ],
+  "kindSortOrder": [
+    "Class",
+    "Reference",
+    "Project",
+    "Module",
+    "Namespace",
+    "Enum",
+    "EnumMember",
+    "Interface",
+    "TypeAlias",
+    "Constructor",
+    "Property",
+    "Variable",
+    "Function",
+    "Accessor",
+    "Method",
+    "Parameter",
+    "TypeParameter",
+    "TypeLiteral",
+    "CallSignature",
+    "ConstructorSignature",
+    "IndexSignature",
+    "GetSignature",
+    "SetSignature"
+]
+}
