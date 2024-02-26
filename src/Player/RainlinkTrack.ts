@@ -176,27 +176,23 @@ export class RainlinkTrack {
     const engine = manager.searchEngines.get(this.source || defaultSearchEngine || 'youtube');
     const searchQuery = [this.author, this.title].filter(x => !!x).join(' - ');
 
-    let prase1: RainlinkSearchResult;
-    let prase2: RainlinkSearchResult;
-    let prase3: RainlinkSearchResult | undefined;
-
-    prase1 = await manager.search(`directSearch=${this.uri}`, {
+    const prase1 = await manager.search(`directSearch=${this.uri}`, {
       requester: this.requester,
     });
+    if (prase1.tracks.length !== 0) return prase1;
 
-    prase2 = await manager.search(`directSearch=${engine}search:${searchQuery}`, {
+    const prase2 = await manager.search(`directSearch=${engine}search:${searchQuery}`, {
       requester: this.requester,
     });
+    if (prase2.tracks.length !== 0) return prase2;
 
     if (manager.rainlinkOptions.options.searchFallback) {
-      prase3 = await manager.search(`directSearch=ytsearch:${searchQuery}`, {
+      const prase3 = await manager.search(`directSearch=ytsearch:${searchQuery}`, {
         requester: this.requester,
       });
+      if (prase3.tracks.length !== 0) return prase3;
     }
 
-    if (prase1.tracks.length !== 0) return prase1;
-    if (prase2.tracks.length !== 0) return prase2;
-    if (prase3 && prase3.tracks.length !== 0) return prase3;
     return {
       type: RainlinkSearchResultType.SEARCH,
       playlistName: undefined,

@@ -30,6 +30,7 @@
     "delay": "^6.0.0",
     "discord.js": "^14.12.1",
     "typedoc": "^0.25.8",
+    "typedoc-material-theme": "^1.0.2",
     "undici": "^6.6.2",
     "ws": "^8.16.0"
   }
