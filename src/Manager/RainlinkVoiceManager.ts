@@ -57,6 +57,11 @@ export class RainlinkVoiceManager extends EventEmitter {
    */
   public state: VoiceConnectState;
 
+  /**
+   * The main class for handling discord voice connections
+   * @param manager The rainlink manager
+   * @param options The options to pass in voice manager creation
+   */
   constructor(manager: Rainlink, options: VoiceChannelOptions) {
     super();
     this.manager = manager;

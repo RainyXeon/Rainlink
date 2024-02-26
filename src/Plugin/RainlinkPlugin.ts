@@ -1,6 +1,7 @@
 import { RainlinkPluginType } from '../Interface/Constants';
 import { Rainlink } from '../Rainlink';
 
+/** The interface class for another rainlink plugin, extend it to use */
 export class RainlinkPlugin {
   /** Type function for diferent type of plugin */
   public type(): RainlinkPluginType {

@@ -7,6 +7,10 @@ export class RainlinkNodeManager extends Map<string, RainlinkNode> {
   /** The rainlink manager */
   manager: Rainlink;
 
+  /**
+   * The main class for handling lavalink servers
+   * @param manager
+   */
   constructor(manager: Rainlink) {
     super();
     this.manager = manager;
@@ -45,5 +49,18 @@ export class RainlinkNodeManager extends Map<string, RainlinkNode> {
     );
 
     return temp.reduce((a, b) => (a.players < b.players ? a : b)).node;
+  }
+
+  /**
+   * Remove a node.
+   * @returns void
+   */
+  removeNode(name: string): void {
+    const node = this.get(name);
+    if (node) {
+      node.disconnect();
+      this.delete(name);
+    }
+    return;
   }
 }

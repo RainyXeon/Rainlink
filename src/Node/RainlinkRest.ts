@@ -28,6 +28,12 @@ export class RainlinkRest {
   /** @ignore */
   protected sessionId: string | null;
 
+  /**
+   * The lavalink rest server handler class
+   * @param manager The rainlink manager
+   * @param node The rainlink node options, from RainlinkNodeOptions interface
+   * @param nodeManager The rainlink's lavalink server handler class
+   */
   constructor(manager: Rainlink, node: RainlinkNodeOptions, nodeManager: RainlinkNode) {
     this.manager = manager;
     this.axios = axios;

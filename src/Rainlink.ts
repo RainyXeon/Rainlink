@@ -29,27 +29,27 @@ export declare interface Rainlink {
   // ------------------------- ON EVENT ------------------------- //
   /**
    * Emitted when rainlink have a debug log.
-   * @event Rainlink#playerCreate
+   * @event Rainlink#debug
    */
   on(event: 'debug', listener: (logs: string) => void): this;
   /**
    * Emitted when a lavalink server is connected.
-   * @event Rainlink#playerCreate
+   * @event Rainlink#nodeConnect
    */
   on(event: 'nodeConnect', listener: (node: RainlinkNode) => void): this;
   /**
    * Emitted when a lavalink server is disconnected.
-   * @event Rainlink#playerCreate
+   * @event Rainlink#nodeDisconnect
    */
   on(event: 'nodeDisconnect', listener: (node: RainlinkNode, code: number, reason: Buffer) => void): this;
   /**
    * Emitted when a lavalink server is closed.
-   * @event Rainlink#playerCreate
+   * @event Rainlink#nodeClosed
    */
   on(event: 'nodeClosed', listener: (node: RainlinkNode) => void): this;
   /**
    * Emitted when a lavalink server is errored.
-   * @event Rainlink#playerCreate
+   * @event Rainlink#nodeError
    */
   on(event: 'nodeError', listener: (node: RainlinkNode, error: Error) => void): this;
   /**
@@ -200,6 +200,11 @@ export class Rainlink extends EventEmitter {
    */
   public searchPlugins: Map<string, SourceRainlinkPlugin>;
 
+  /**
+   * The main class that handle all works in lavalink server
+   * Call this class by using new Rainlink(your_params) to use!
+   * @param options The main ranlink options
+   */
   constructor(options: RainlinkOptions) {
     super();
     this.debug('Start the client.');

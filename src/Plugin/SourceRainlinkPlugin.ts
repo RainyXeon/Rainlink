@@ -1,6 +1,7 @@
 import { RainlinkSearchOptions, RainlinkSearchResult } from '../Interface/Manager';
 import { RainlinkPlugin } from './RainlinkPlugin';
 
+/** The interface class for track resolver plugin, extend it to use */
 export class SourceRainlinkPlugin extends RainlinkPlugin {
   /**
    * sourceName function for source plugin register search engine.

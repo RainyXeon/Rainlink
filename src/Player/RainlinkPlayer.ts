@@ -83,6 +83,13 @@ export class RainlinkPlayer {
    */
   public voiceManager: RainlinkVoiceManager;
 
+  /**
+   * The rainlink player handler class
+   * @param manager The rainlink manager
+   * @param voiceOptions The rainlink voice option, use VoiceChannelOptions interface
+   * @param node The rainlink current use node
+   * @param voiceManager The rainlink current voice manager
+   */
   constructor(
     manager: Rainlink,
     voiceOptions: VoiceChannelOptions,

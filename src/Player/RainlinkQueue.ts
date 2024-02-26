@@ -9,6 +9,11 @@ export class RainlinkQueue extends Array<RainlinkTrack> {
   /** Rainlink player */
   player: RainlinkPlayer;
 
+  /**
+   * The rainlink track queue handler class
+   * @param manager The rainlink manager
+   * @param player The current rainlink player
+   */
   constructor(manager: Rainlink, player: RainlinkPlayer) {
     super();
     this.manager = manager;

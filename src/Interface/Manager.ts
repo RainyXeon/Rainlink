@@ -54,9 +54,9 @@ export interface RainlinkOptions {
  * The type enum of rainlink search function result
  */
 export enum RainlinkSearchResultType {
-  TRACK,
-  PLAYLIST,
-  SEARCH,
+  TRACK = 'TRACK',
+  PLAYLIST = 'PLAYLIST',
+  SEARCH = 'SEARCH',
 }
 
 /**

@@ -35,6 +35,11 @@ export class RainlinkNode {
   /** @ignore */
   private wsEvent: RainlinkWebsocket;
 
+  /**
+   * The lavalink server handler class
+   * @param manager The rainlink manager
+   * @param node The lavalink server options
+   */
   constructor(manager: Rainlink, node: RainlinkNodeOptions) {
     this.manager = manager;
     this.node = node;
@@ -152,24 +157,24 @@ export class RainlinkNode {
   /** @ignore */
   protected updateStatusData(data: LavalinkNodeStatsResponse): NodeStats {
     return {
-      players: data.players,
-      playingPlayers: data.playingPlayers,
-      uptime: data.uptime,
+      players: data.players ?? this.stats.players,
+      playingPlayers: data.playingPlayers ?? this.stats.playingPlayers,
+      uptime: data.uptime ?? this.stats.uptime,
       memory: {
-        free: data.memory.free,
-        used: data.memory.used,
-        allocated: data.memory.allocated,
-        reservable: data.memory.reservable,
+        free: data.memory.free ?? this.stats.memory.free,
+        used: data.memory.used ?? this.stats.memory.used,
+        allocated: data.memory.allocated ?? this.stats.memory.allocated,
+        reservable: data.memory.reservable ?? this.stats.memory.reservable,
       },
       cpu: {
-        cores: data.cpu.cores,
-        systemLoad: data.cpu.systemLoad,
-        lavalinkLoad: data.cpu.lavalinkLoad,
+        cores: data.cpu.cores ?? this.stats.cpu.cores,
+        systemLoad: data.cpu.systemLoad ?? this.stats.cpu.systemLoad,
+        lavalinkLoad: data.cpu.lavalinkLoad ?? this.stats.cpu.lavalinkLoad,
       },
       frameStats: {
-        sent: data.frameStats.sent,
-        nulled: data.frameStats.nulled,
-        deficit: data.frameStats.deficit,
+        sent: data.frameStats.sent ?? this.stats.frameStats.sent,
+        nulled: data.frameStats.nulled ?? this.stats.frameStats.nulled,
+        deficit: data.frameStats.deficit ?? this.stats.frameStats.deficit,
       },
     };
   }

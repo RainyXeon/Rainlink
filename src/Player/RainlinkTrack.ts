@@ -36,6 +36,11 @@ export class RainlinkTrack {
   /** Track's realUri (youtube fall back) */
   realUri?: string;
 
+  /**
+   * The rainlink track class for playing track from lavalink
+   * @param options The raw track resolved from rest, use RawTrack interface
+   * @param requester The requester details of this track
+   */
   constructor(
     protected options: RawTrack,
     requester: unknown,

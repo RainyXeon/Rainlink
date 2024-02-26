@@ -10,9 +10,14 @@ export class RainlinkPlayerManager extends Map<string, RainlinkPlayer> {
   /** The rainlink manager */
   public manager: Rainlink;
 
-  constructor(manager: Rainlink, connections: Map<string, RainlinkVoiceManager>) {
+  /**
+   * The main class for handling lavalink players
+   * @param manager The rainlink manager
+   * @param voiceManagers The rainlink discord voice manager class
+   */
+  constructor(manager: Rainlink, voiceManagers: Map<string, RainlinkVoiceManager>) {
     super();
-    this.voiceManagers = connections;
+    this.voiceManagers = voiceManagers;
     this.manager = manager;
   }
 
