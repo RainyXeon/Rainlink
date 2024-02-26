@@ -27,14 +27,14 @@ const rainlink = new Rainlink({
 
 client.on("ready", () => console.log(client.user.tag + " Ready!"));
 
-rainlink.on('nodeConnect', (node) => console.log(`Lavalink ${name}: Ready!`));
-rainlink.on('nodeError', (node, error) => console.error(`Lavalink ${name}: Error Caught,`, error));
-rainlink.on('nodeClosed', (node, code, reason) => console.warn(`Lavalink ${node.}: Closed, Code ${code}, Reason ${reason || 'No reason'}`));
+rainlink.on('nodeConnect', (node) => console.log(`Lavalink ${node.options.name}: Ready!`));
+rainlink.on('nodeError', (node, error) => console.error(`Lavalink ${node.options.name}: Error Caught,`, error));
+rainlink.on('nodeClosed', (node, code, reason) => console.warn(`Lavalink ${node.options.name}: Closed, Code ${code}, Reason ${reason || 'No reason'}`));
 // rainlink.on('debug', (name, info) => console.debug(`Lavalink ${name}: Debug,`, info));
 rainlink.on('nodeDisconnect', (node, players, moved) => {
     if (moved) return;
     players.map(player => player.connection.disconnect())
-    console.warn(`Lavalink ${name}: Disconnected`);
+    console.warn(`Lavalink ${node.options.name}: Disconnected`);
 });
 
 rainlink.on("playerStart", (player, track) => {

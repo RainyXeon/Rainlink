@@ -54,6 +54,10 @@ export class RainlinkPlugin extends SourceRainlinkPlugin {
     return RainlinkPluginType.SourceResolver;
   }
 
+  public name(): string {
+    return 'rainlink-apple';
+  }
+
   constructor(appleOptions: AppleOptions) {
     super();
     this.methods = {
@@ -242,7 +246,7 @@ export class RainlinkPlugin extends SourceRainlinkPlugin {
       {
         encoded: '',
         info: {
-          sourceName: 'apple',
+          sourceName: this.sourceName(),
           identifier: appleTrack.id,
           isSeekable: true,
           author: appleTrack.attributes.artistName ? appleTrack.attributes.artistName : 'Unknown',

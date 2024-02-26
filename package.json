@@ -30,6 +30,7 @@
     "axios": "^1.6.7",
     "delay": "^6.0.0",
     "discord.js": "^14.12.1",
+    "node-html-parser": "^6.1.12",
     "typedoc": "^0.25.8",
     "undici": "^6.6.2",
     "ws": "^8.16.0"

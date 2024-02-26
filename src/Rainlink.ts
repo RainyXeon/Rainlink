@@ -109,6 +109,14 @@ export declare interface Rainlink {
     listener: (player: RainlinkPlayer, data: WebSocketClosedEvent) => void,
   ): this;
   /**
+   * Emitted when a playuer is moved into another channel. [Require plugin]
+   * @event Rainlink#playerMoved
+   */
+  on(
+    event: 'playerMoved',
+    listener: (player: RainlinkPlayer, oldChannelId: string, newChannelId: string) => void,
+  ): this;
+  /**
    * Emitted when a queue updated.
    * @event Rainlink#queueUpdate
    */
@@ -137,6 +145,10 @@ export declare interface Rainlink {
     event: 'playerWebsocketClosed',
     listener: (player: RainlinkPlayer, data: WebSocketClosedEvent) => void,
   ): this;
+  once(
+    event: 'playerMoved',
+    listener: (player: RainlinkPlayer, oldChannelId: string, newChannelId: string) => void,
+  ): this;
   once(event: 'queueUpdate', listener: (player: RainlinkPlayer, queue: RainlinkQueue) => void): this;
   // ------------------------- ONCE EVENT ------------------------- //
 
@@ -161,6 +173,10 @@ export declare interface Rainlink {
   off(
     event: 'playerWebsocketClosed',
     listener: (player: RainlinkPlayer, data: WebSocketClosedEvent) => void,
+  ): this;
+  off(
+    event: 'playerMoved',
+    listener: (player: RainlinkPlayer, oldChannelId: string, newChannelId: string) => void,
   ): this;
   off(event: 'queueUpdate', listener: (player: RainlinkPlayer, queue: RainlinkQueue) => void): this;
   // ------------------------- OFF EVENT ------------------------- //

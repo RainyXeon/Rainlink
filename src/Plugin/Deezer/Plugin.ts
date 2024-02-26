@@ -30,6 +30,10 @@ export class RainlinkPlugin extends SourceRainlinkPlugin {
     return RainlinkPluginType.SourceResolver;
   }
 
+  public name(): string {
+    return 'rainlink-deezer';
+  }
+
   constructor() {
     super();
     this.methods = {
@@ -167,7 +171,7 @@ export class RainlinkPlugin extends SourceRainlinkPlugin {
       {
         encoded: '',
         info: {
-          sourceName: 'deezer',
+          sourceName: this.sourceName(),
           identifier: dezzerTrack.id,
           isSeekable: true,
           author: dezzerTrack.artist ? dezzerTrack.artist.name : 'Unknown',
