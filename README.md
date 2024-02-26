@@ -24,4 +24,4 @@
 
 **Rainlink:** Whatever! You're welcome to use this, just read my doc carefully
 
-**Rainlink:** After all, I still have to call him master >:(
+**Rainlink:** After all, I still have to call him master >:v
