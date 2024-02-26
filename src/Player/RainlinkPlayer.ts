@@ -12,6 +12,7 @@ import {
 import { RainlinkTrack } from './RainlinkTrack';
 import { UpdatePlayerInfo, UpdatePlayerOptions } from '../Interface/Rest';
 import { Snowflake } from 'discord.js';
+import { RainlinkSearchOptions, RainlinkSearchResult } from '../Interface/Manager';
 
 export class RainlinkPlayer {
   /**
@@ -211,7 +212,18 @@ export class RainlinkPlayer {
   }
 
   /**
+   * Search track directly from player
+   * @param query The track search query link
+   * @param options The track search options
+   * @returns RainlinkSearchResult
+   */
+  public async search(query: string, options?: RainlinkSearchOptions): Promise<RainlinkSearchResult> {
+    return await this.manager.search(query, options);
+  }
+
+  /**
    * Pause the track
+   * @param mode true for pause, false for resume
    * @returns RainlinkPlayer
    */
   public async pause(mode: boolean): Promise<RainlinkPlayer> {
