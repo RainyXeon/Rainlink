@@ -160,22 +160,9 @@ export class RainlinkNode {
       players: data.players ?? this.stats.players,
       playingPlayers: data.playingPlayers ?? this.stats.playingPlayers,
       uptime: data.uptime ?? this.stats.uptime,
-      memory: {
-        free: data.memory.free ?? this.stats.memory.free,
-        used: data.memory.used ?? this.stats.memory.used,
-        allocated: data.memory.allocated ?? this.stats.memory.allocated,
-        reservable: data.memory.reservable ?? this.stats.memory.reservable,
-      },
-      cpu: {
-        cores: data.cpu.cores ?? this.stats.cpu.cores,
-        systemLoad: data.cpu.systemLoad ?? this.stats.cpu.systemLoad,
-        lavalinkLoad: data.cpu.lavalinkLoad ?? this.stats.cpu.lavalinkLoad,
-      },
-      frameStats: {
-        sent: data.frameStats.sent ?? this.stats.frameStats.sent,
-        nulled: data.frameStats.nulled ?? this.stats.frameStats.nulled,
-        deficit: data.frameStats.deficit ?? this.stats.frameStats.deficit,
-      },
+      memory: data.memory ?? this.stats.memory,
+      cpu: data.cpu ?? this.stats.cpu,
+      frameStats: data.frameStats ?? this.stats.frameStats,
     };
   }
 

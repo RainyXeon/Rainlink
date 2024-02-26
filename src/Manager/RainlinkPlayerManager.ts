@@ -67,7 +67,7 @@ export class RainlinkPlayerManager extends Map<string, RainlinkPlayer> {
    */
   public async destroy(guildId: string = ''): Promise<void> {
     const player = this.get(guildId);
-    if (player) player.destroy();
+    if (player) await player.destroy();
   }
 
   /** @ignore */

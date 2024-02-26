@@ -256,15 +256,15 @@ export class Rainlink extends EventEmitter {
    * Create a new player.
    * @returns RainlinkNode
    */
-  async create(options: VoiceChannelOptions) {
-    this.players.create(options);
+  async create(options: VoiceChannelOptions): Promise<RainlinkPlayer> {
+    return await this.players.create(options);
   }
 
   /**
    * Destroy a specific player.
-   * @returns RainlinkNode
+   * @returns void
    */
-  async destroy(guildId: string) {
+  async destroy(guildId: string): Promise<void> {
     this.players.destroy(guildId);
   }
 
@@ -272,7 +272,7 @@ export class Rainlink extends EventEmitter {
    * Search a specific track.
    * @returns RainlinkSearchResult
    */
-  async search(query: string, options?: RainlinkSearchOptions) {
+  async search(query: string, options?: RainlinkSearchOptions): Promise<RainlinkSearchResult> {
     const node = options?.nodeName
       ? this.nodes.get(options.nodeName) ?? (await this.nodes.getLeastUsedNode())
       : await this.nodes.getLeastUsedNode();
