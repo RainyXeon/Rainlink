@@ -20,7 +20,7 @@ export class RainlinkRest {
   /** The rainlink manager */
   public manager: Rainlink;
   /** @ignore */
-  protected node: RainlinkNodeOptions;
+  protected options: RainlinkNodeOptions;
   /** @ignore */
   protected url: string;
   /** The node manager (RainlinkNode class) */
@@ -31,16 +31,16 @@ export class RainlinkRest {
   /**
    * The lavalink rest server handler class
    * @param manager The rainlink manager
-   * @param node The rainlink node options, from RainlinkNodeOptions interface
+   * @param options The rainlink node options, from RainlinkNodeOptions interface
    * @param nodeManager The rainlink's lavalink server handler class
    */
-  constructor(manager: Rainlink, node: RainlinkNodeOptions, nodeManager: RainlinkNode) {
+  constructor(manager: Rainlink, options: RainlinkNodeOptions, nodeManager: RainlinkNode) {
     this.manager = manager;
     this.axios = axios;
-    this.node = node;
+    this.options = options;
     this.nodeManager = nodeManager;
     this.sessionId = this.nodeManager.sessionId;
-    this.url = `${node.secure ? 'https://' : 'http://'}${node.host}:${node.port}/v${metadata.lavalink}`;
+    this.url = `${options.secure ? 'https://' : 'http://'}${options.host}:${options.port}/v${metadata.lavalink}`;
   }
 
   /** @ignore */
@@ -51,7 +51,7 @@ export class RainlinkRest {
     if (options.params) url.search = new URLSearchParams(options.params).toString();
 
     const lavalinkHeaders = {
-      Authorization: this.node.auth,
+      Authorization: this.options.auth,
       ...options.requestOptions.headers,
     };
 

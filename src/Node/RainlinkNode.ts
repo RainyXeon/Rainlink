@@ -13,7 +13,7 @@ export class RainlinkNode {
   /** The rainlink manager */
   public manager: Rainlink;
   /** The rainlink node options */
-  public node: RainlinkNodeOptions;
+  public options: RainlinkNodeOptions;
   /** @ignore */
   private wsUrl: string;
   /** The rainlink rest manager */
@@ -38,13 +38,13 @@ export class RainlinkNode {
   /**
    * The lavalink server handler class
    * @param manager The rainlink manager
-   * @param node The lavalink server options
+   * @param options The lavalink server options
    */
-  constructor(manager: Rainlink, node: RainlinkNodeOptions) {
+  constructor(manager: Rainlink, options: RainlinkNodeOptions) {
     this.manager = manager;
-    this.node = node;
-    this.wsUrl = `${node.secure ? 'wss' : 'ws'}://${node.host}:${node.port}/v${metadata.lavalink}/websocket`;
-    this.rest = new RainlinkRest(manager, node, this);
+    this.options = options;
+    this.wsUrl = `${options.secure ? 'wss' : 'ws'}://${options.host}:${options.port}/v${metadata.lavalink}/websocket`;
+    this.rest = new RainlinkRest(manager, options, this);
     this.sessionId = null;
     this.wsEvent = new RainlinkWebsocket(manager);
     this.stats = {
@@ -73,7 +73,7 @@ export class RainlinkNode {
   /** Connect this lavalink server */
   public connect(): WebSocket {
     const header = {
-      Authorization: this.node.auth,
+      Authorization: this.options.auth,
       'User-Id': this.manager.id,
       'Client-Name': `rainlink@${metadata.version}`,
       'Session-Id': this.sessionId == null ? '' : this.sessionId,
@@ -97,7 +97,7 @@ export class RainlinkNode {
   protected wsOpenEvent() {
     this.clean(true);
     this.state = RainlinkConnectState.Connected;
-    this.debug(`Node ${this.node.name} connected! URL: ${this.wsUrl}`);
+    this.debug(`Node ${this.options.name} connected! URL: ${this.wsUrl}`);
     this.manager.emit(RainlinkEvents.NodeConnect, this);
   }
 
@@ -107,7 +107,7 @@ export class RainlinkNode {
     switch (wsData.op) {
       case LavalinkEventsEnum.Ready: {
         this.sessionId = wsData.sessionId;
-        this.rest = new RainlinkRest(this.manager, this.node, this);
+        this.rest = new RainlinkRest(this.manager, this.options, this);
         break;
       }
       case LavalinkEventsEnum.Event: {
@@ -127,7 +127,7 @@ export class RainlinkNode {
 
   /** @ignore */
   protected wsErrorEvent(logs: Error) {
-    this.debug(`Node ${this.node.name} errored! URL: ${this.wsUrl}`);
+    this.debug(`Node ${this.options.name} errored! URL: ${this.wsUrl}`);
     this.manager.emit(RainlinkEvents.NodeError, this, logs);
   }
 
@@ -135,7 +135,7 @@ export class RainlinkNode {
   protected async wsCloseEvent(code: number, reason: Buffer) {
     this.online = false;
     this.state = RainlinkConnectState.Disconnected;
-    this.debug(`Node ${this.node.name} disconnected! URL: ${this.wsUrl}`);
+    this.debug(`Node ${this.options.name} disconnected! URL: ${this.wsUrl}`);
     this.manager.emit(RainlinkEvents.NodeDisconnect, this, code, reason);
     if (!this.sudoDisconnect && this.retryCounter !== this.manager.rainlinkOptions.options.retryCount) {
       await setTimeout(this.manager.rainlinkOptions.options.retryTimeout);
@@ -150,7 +150,7 @@ export class RainlinkNode {
   /** @ignore */
   protected nodeClosed() {
     this.manager.emit(RainlinkEvents.NodeClosed, this);
-    this.debug(`Node ${this.node.name} closed! URL: ${this.wsUrl}`);
+    this.debug(`Node ${this.options.name} closed! URL: ${this.wsUrl}`);
     this.clean();
   }
 
