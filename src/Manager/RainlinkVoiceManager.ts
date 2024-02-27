@@ -90,7 +90,7 @@ export class RainlinkVoiceManager extends EventEmitter {
     const controller = new AbortController();
     const timeout = setTimeout(
       () => controller.abort(),
-      this.manager.rainlinkOptions.options.voiceConnectionTimeout,
+      this.manager.rainlinkOptions.options!.voiceConnectionTimeout,
     );
     try {
       const [status] = await RainlinkVoiceManager.once(this, 'connectionUpdate', {
@@ -109,7 +109,7 @@ export class RainlinkVoiceManager extends EventEmitter {
       this.debug(`Request Connection Failed | Guild: ${this.guildId}`);
       if (error.name === 'AbortError')
         throw new Error(
-          `The voice connection is not established in ${this.manager.rainlinkOptions.options.voiceConnectionTimeout}ms`,
+          `The voice connection is not established in ${this.manager.rainlinkOptions.options!.voiceConnectionTimeout}ms`,
         );
       throw error;
     } finally {

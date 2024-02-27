@@ -177,7 +177,7 @@ export class RainlinkTrack {
 
   /** @ignore */
   protected async resolverEngine(manager: Rainlink): Promise<RainlinkSearchResult> {
-    const defaultSearchEngine = manager.rainlinkOptions.options.defaultSearchEngine;
+    const defaultSearchEngine = manager.rainlinkOptions.options!.defaultSearchEngine;
     const engine = manager.searchEngines.get(this.source || defaultSearchEngine || 'youtube');
     const searchQuery = [this.author, this.title].filter(x => !!x).join(' - ');
 
@@ -191,7 +191,7 @@ export class RainlinkTrack {
     });
     if (prase2.tracks.length !== 0) return prase2;
 
-    if (manager.rainlinkOptions.options.searchFallback) {
+    if (manager.rainlinkOptions.options!.searchFallback) {
       const prase3 = await manager.search(`directSearch=ytsearch:${searchQuery}`, {
         requester: this.requester,
       });

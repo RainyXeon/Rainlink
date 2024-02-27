@@ -32,8 +32,8 @@ export class RainlinkNodeManager extends Map<string, RainlinkNode> {
    * @returns RainlinkNode
    */
   public async getLeastUsedNode(): Promise<RainlinkNode> {
-    if (this.manager.rainlinkOptions.options.nodeResolver) {
-      const resolverData = await this.manager.rainlinkOptions.options.nodeResolver(this);
+    if (this.manager.rainlinkOptions.options!.nodeResolver) {
+      const resolverData = await this.manager.rainlinkOptions.options!.nodeResolver(this);
       if (resolverData) return resolverData;
     }
     const nodes: RainlinkNode[] = [...this.values()];

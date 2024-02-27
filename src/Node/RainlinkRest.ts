@@ -52,6 +52,7 @@ export class RainlinkRest {
 
     const lavalinkHeaders = {
       Authorization: this.options.auth,
+      'User-Agent': this.manager.rainlinkOptions.options!.userAgent!,
       ...options.requestOptions.headers,
     };
 

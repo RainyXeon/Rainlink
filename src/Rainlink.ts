@@ -230,7 +230,7 @@ export class Rainlink extends EventEmitter {
       throw new Error('Please set an new lib to connect, example: \nlibrary: new Library.DiscordJS(client) ');
     this.library = options.library.set(this);
     this.rainlinkOptions = options;
-    this.rainlinkOptions.options = this.mergeDefaultOptions(this.rainlinkOptions.options);
+    this.rainlinkOptions.options = this.mergeDefaultOptions(this.rainlinkOptions.options ?? {});
     this.voiceManagers = new Map();
     this.nodes = new RainlinkNodeManager(this);
     this.library.listen(this.rainlinkOptions.nodes);
@@ -314,8 +314,8 @@ export class Rainlink extends EventEmitter {
     const source = options?.engine
       ? this.searchEngines.get(options.engine)
       : this.searchEngines.get(
-          this.rainlinkOptions.options.defaultSearchEngine
-            ? this.rainlinkOptions.options.defaultSearchEngine
+          this.rainlinkOptions.options!.defaultSearchEngine
+            ? this.rainlinkOptions.options!.defaultSearchEngine
             : 'youtube',
         );
 
@@ -398,7 +398,7 @@ export class Rainlink extends EventEmitter {
       defaultVolume: data.defaultVolume ?? 100,
       searchFallback: data.searchFallback ?? false,
       resume: data.resume ?? false,
-      userAgent: data.userAgent ?? `${metadata.name}/${metadata.version}`,
+      userAgent: data.userAgent ?? `@bot/${metadata.name}/${metadata.version}`,
       nodeResolver: data.nodeResolver ?? undefined,
       structures: data.structures ?? {
         player: undefined,

@@ -44,7 +44,7 @@ export class RainlinkNode {
     this.manager = manager;
     this.options = options;
     this.wsUrl = `${options.secure ? 'wss' : 'ws'}://${options.host}:${options.port}/v${metadata.lavalink}/websocket`;
-    const customRest = this.manager.rainlinkOptions.options.structures!.rest;
+    const customRest = this.manager.rainlinkOptions.options!.structures!.rest;
     this.rest = customRest
       ? new customRest(manager, options, this)
       : new RainlinkRest(manager, options, this);
@@ -75,14 +75,14 @@ export class RainlinkNode {
 
   /** Connect this lavalink server */
   public connect(): WebSocket {
-    const isResume = this.manager.rainlinkOptions.options.resume;
+    const isResume = this.manager.rainlinkOptions.options!.resume;
     const newWsClient = new WebSocket(this.wsUrl, {
       headers: {
         Authorization: this.options.auth,
         'User-Id': this.manager.id,
         'Client-Name': `rainlink@${metadata.version}`,
         'Session-Id': this.sessionId !== null && !isResume ? this.sessionId : '',
-        'user-agent': this.manager.rainlinkOptions.options.userAgent!,
+        'user-agent': this.manager.rainlinkOptions.options!.userAgent!,
       },
     });
     this.setupEvent(newWsClient);
@@ -143,8 +143,8 @@ export class RainlinkNode {
     this.state = RainlinkConnectState.Disconnected;
     this.debug(`Node ${this.options.name} disconnected! URL: ${this.wsUrl}`);
     this.manager.emit(RainlinkEvents.NodeDisconnect, this, code, reason);
-    if (!this.sudoDisconnect && this.retryCounter !== this.manager.rainlinkOptions.options.retryCount) {
-      await setTimeout(this.manager.rainlinkOptions.options.retryTimeout);
+    if (!this.sudoDisconnect && this.retryCounter !== this.manager.rainlinkOptions.options!.retryCount) {
+      await setTimeout(this.manager.rainlinkOptions.options!.retryTimeout);
       this.retryCounter = this.retryCounter + 1;
       this.reconnect();
       return;
