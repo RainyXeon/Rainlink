@@ -159,7 +159,7 @@ export class RainlinkPlayer {
    * @returns RainlinkPlayer
    */
   public async play(track?: RainlinkTrack, options?: PlayOptions): Promise<RainlinkPlayer> {
-    this.checkDestroyed();
+    if (this.state == RainlinkPlayerState.DESTROYED) throw new Error('Player is already destroyed');
 
     if (track && !(track instanceof RainlinkTrack)) throw new Error('track must be a KazagumoTrack');
 
@@ -227,15 +227,15 @@ export class RainlinkPlayer {
    * @returns RainlinkPlayer
    */
   public async pause(mode: boolean): Promise<RainlinkPlayer> {
-    this.checkDestroyed();
+    if (this.state == RainlinkPlayerState.DESTROYED) throw new Error('Player is already destroyed');
     if (mode == this.paused) return this;
     await this.node.rest.updatePlayer({
       guildId: this.guildId,
       playerOptions: {
-        paused: true,
+        paused: mode,
       },
     });
-    this.paused = true;
+    this.paused = mode;
     return this;
   }
 
@@ -244,7 +244,7 @@ export class RainlinkPlayer {
    * @returns RainlinkPlayer
    */
   public async previous(): Promise<RainlinkPlayer> {
-    this.checkDestroyed();
+    if (this.state == RainlinkPlayerState.DESTROYED) throw new Error('Player is already destroyed');
     const prevoiusData = this.queue.previous;
     const current = this.queue.current;
     const index = prevoiusData.length - 1;
@@ -267,7 +267,7 @@ export class RainlinkPlayer {
    * @returns RainlinkPlayer
    */
   public async skip(): Promise<RainlinkPlayer> {
-    this.checkDestroyed();
+    if (this.state == RainlinkPlayerState.DESTROYED) throw new Error('Player is already destroyed');
     await this.node.rest.updatePlayer({
       guildId: this.guildId,
       playerOptions: {
@@ -283,7 +283,7 @@ export class RainlinkPlayer {
    * @returns RainlinkPlayer
    */
   public async seek(position: number): Promise<RainlinkPlayer> {
-    this.checkDestroyed();
+    if (this.state == RainlinkPlayerState.DESTROYED) throw new Error('Player is already destroyed');
     if (!this.queue.current) throw new Error("Player has no current track in it's queue");
     if (!this.queue.current.isSeekable) throw new Error("The current track isn't seekable");
 
@@ -309,7 +309,7 @@ export class RainlinkPlayer {
    * @returns RainlinkPlayer
    */
   public async setVolume(volume: number): Promise<RainlinkPlayer> {
-    this.checkDestroyed();
+    if (this.state == RainlinkPlayerState.DESTROYED) throw new Error('Player is already destroyed');
     if (isNaN(volume)) throw new Error('volume must be a number');
     await this.node.rest.updatePlayer({
       guildId: this.guildId,
@@ -327,7 +327,7 @@ export class RainlinkPlayer {
    * @returns RainlinkPlayer
    */
   public setMute(enable: boolean): RainlinkPlayer {
-    this.checkDestroyed();
+    if (this.state == RainlinkPlayerState.DESTROYED) throw new Error('Player is already destroyed');
     if (enable == this.muted) return this;
     this.voiceManager.setDeaf(enable);
     return this;
@@ -339,7 +339,7 @@ export class RainlinkPlayer {
    * @returns RainlinkPlayer
    */
   public setDeaf(enable: boolean): RainlinkPlayer {
-    this.checkDestroyed();
+    if (this.state == RainlinkPlayerState.DESTROYED) throw new Error('Player is already destroyed');
     if (enable == this.deafened) return this;
     this.voiceManager.setDeaf(enable);
     return this;
@@ -350,7 +350,7 @@ export class RainlinkPlayer {
    * @returns RainlinkPlayer
    */
   public disconnect(): RainlinkPlayer {
-    this.checkDestroyed();
+    if (this.state == RainlinkPlayerState.DESTROYED) throw new Error('Player is already destroyed');
     this.voiceManager.disconnect();
     this.pause(true);
     this.state = RainlinkPlayerState.DISCONNECTED;
@@ -363,7 +363,7 @@ export class RainlinkPlayer {
    * @returns RainlinkPlayer
    */
   public async connect(): Promise<RainlinkPlayer> {
-    this.checkDestroyed();
+    if (this.state == RainlinkPlayerState.DESTROYED) throw new Error('Player is already destroyed');
     if (this.state === RainlinkPlayerState.CONNECTED || !!this.voiceId)
       throw new Error('Player is already connected');
     await this.voiceManager.connect();
@@ -378,7 +378,7 @@ export class RainlinkPlayer {
    * @returns KazagumoPlayer
    */
   public setTextChannel(textId: Snowflake): RainlinkPlayer {
-    this.checkDestroyed();
+    if (this.state == RainlinkPlayerState.DESTROYED) throw new Error('Player is already destroyed');
     this.textId = textId;
     return this;
   }
@@ -389,7 +389,7 @@ export class RainlinkPlayer {
    * @returns KazagumoPlayer
    */
   public setVoiceChannel(voiceId: Snowflake): RainlinkPlayer {
-    this.checkDestroyed();
+    if (this.state == RainlinkPlayerState.DESTROYED) throw new Error('Player is already destroyed');
     this.voiceId = voiceId;
 
     const voiceManager = this.manager.voiceManagers.get(this.guildId);
@@ -421,7 +421,7 @@ export class RainlinkPlayer {
    * @returns KazagumoPlayer
    */
   public async setFilter(filter: string): Promise<RainlinkPlayer> {
-    this.checkDestroyed();
+    if (this.state == RainlinkPlayerState.DESTROYED) throw new Error('Player is already destroyed');
 
     const filterData = RainlinkFilterData[filter as keyof typeof RainlinkFilterData];
 
@@ -467,11 +467,6 @@ export class RainlinkPlayer {
       noReplace: playable.options?.noReplace ?? false,
       playerOptions,
     });
-  }
-
-  /** @ignore */
-  protected checkDestroyed(): void {
-    if (this.state == RainlinkPlayerState.DESTROYED) throw new Error('Player is already destroyed');
   }
 
   /** @ignore */
