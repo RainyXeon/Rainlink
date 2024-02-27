@@ -44,7 +44,10 @@ export class RainlinkNode {
     this.manager = manager;
     this.options = options;
     this.wsUrl = `${options.secure ? 'wss' : 'ws'}://${options.host}:${options.port}/v${metadata.lavalink}/websocket`;
-    this.rest = new RainlinkRest(manager, options, this);
+    const customRest = this.manager.rainlinkOptions.options.structures!.rest;
+    this.rest = customRest
+      ? new customRest(manager, options, this)
+      : new RainlinkRest(manager, options, this);
     this.sessionId = null;
     this.wsEvent = new RainlinkWebsocket(manager);
     this.stats = {
@@ -72,13 +75,16 @@ export class RainlinkNode {
 
   /** Connect this lavalink server */
   public connect(): WebSocket {
-    const header = {
-      Authorization: this.options.auth,
-      'User-Id': this.manager.id,
-      'Client-Name': `rainlink@${metadata.version}`,
-      'Session-Id': this.sessionId == null ? '' : this.sessionId,
-    };
-    const newWsClient = new WebSocket(this.wsUrl, { headers: header });
+    const isResume = this.manager.rainlinkOptions.options.resume;
+    const newWsClient = new WebSocket(this.wsUrl, {
+      headers: {
+        Authorization: this.options.auth,
+        'User-Id': this.manager.id,
+        'Client-Name': `rainlink@${metadata.version}`,
+        'Session-Id': this.sessionId !== null && !isResume ? this.sessionId : '',
+        'user-agent': this.manager.rainlinkOptions.options.userAgent!,
+      },
+    });
     this.setupEvent(newWsClient);
     return newWsClient;
   }

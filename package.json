@@ -1,6 +1,6 @@
 {
   "name": "rainlink",
-  "version": "0.0.1-alpha",
+  "version": "0.0.2-alpha",
   "description": "Another lavalink wrapper but focus on stability and rich features",
   "scripts": {
     "build": "npx tsc --build --verbose",

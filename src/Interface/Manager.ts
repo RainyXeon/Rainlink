@@ -40,7 +40,7 @@ export interface RainlinkNodeOptions {
  * Some rainlink additional config option
  */
 export interface RainlinkAdditionalOptions {
-  /** Timeout before trying to reconnect */
+  /** Timeout before trying to reconnect (ms) */
   retryTimeout?: number;
   /** Number of times to try and reconnect to Lavalink before giving up */
   retryCount?: number;
@@ -63,8 +63,6 @@ export interface RainlinkAdditionalOptions {
   ) => RainlinkNode | undefined;
   /** Custom structures for rainlink to use */
   structures?: Structures;
-  /** Time to wait for a response from the Lavalink REST API before giving up */
-  restTimeout?: number;
 }
 
 /**

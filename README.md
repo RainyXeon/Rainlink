@@ -1,6 +1,14 @@
+# ⚠️⚠️⚠️ Warning!!
+
+⚠️⚠️ This lavalink wrapper is just in the development stage, you will take full responsibility for any errors or bugs!!
+
 # 🌦️ Rainlink
 
 Another lavalink wrapper but focus on stability and rich features
+
+# Document:
+
+Here: [https://rainlink.netlify.app/](https://rainlink.netlify.app/)
 
 # 💫 Special thanks
 

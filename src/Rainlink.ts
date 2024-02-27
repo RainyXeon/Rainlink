@@ -400,8 +400,10 @@ export class Rainlink extends EventEmitter {
       resume: data.resume ?? false,
       userAgent: data.userAgent ?? `${metadata.name}/${metadata.version}`,
       nodeResolver: data.nodeResolver ?? undefined,
-      structures: data.structures ?? undefined,
-      restTimeout: data.restTimeout ?? 3000,
+      structures: data.structures ?? {
+        player: undefined,
+        rest: undefined,
+      },
     };
   }
 }
