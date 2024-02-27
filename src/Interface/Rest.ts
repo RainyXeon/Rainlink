@@ -56,8 +56,14 @@ export interface LavalinkPlayer {
   filters: FilterOptions;
 }
 
+export interface UpdatePlayerTrack {
+  encoded?: string | null;
+  identifier?: string;
+  userData?: Record<string, any>;
+}
+
 export interface UpdatePlayerOptions {
-  encodedTrack?: string | null;
+  track?: UpdatePlayerTrack;
   identifier?: string;
   position?: number;
   endTime?: number;

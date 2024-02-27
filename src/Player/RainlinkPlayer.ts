@@ -196,6 +196,8 @@ export class RainlinkPlayer {
     if (options) playOptions.options = { ...options, noReplace: false };
     else playOptions.options = { noReplace: false };
 
+    this.playing = true;
+
     this.playTrackEncoded(playOptions);
 
     return this;
@@ -223,19 +225,35 @@ export class RainlinkPlayer {
 
   /**
    * Pause the track
-   * @param mode true for pause, false for resume
    * @returns RainlinkPlayer
    */
-  public async pause(mode: boolean): Promise<RainlinkPlayer> {
+  public async pause(): Promise<RainlinkPlayer> {
     if (this.state == RainlinkPlayerState.DESTROYED) throw new Error('Player is already destroyed');
-    if (mode == this.paused) return this;
+    if (this.paused) return this;
     await this.node.rest.updatePlayer({
       guildId: this.guildId,
       playerOptions: {
-        paused: mode,
+        paused: true,
       },
     });
-    this.paused = mode;
+    this.paused = true;
+    return this;
+  }
+
+  /**
+   * Resume the track
+   * @returns RainlinkPlayer
+   */
+  public async resume(): Promise<RainlinkPlayer> {
+    if (this.state == RainlinkPlayerState.DESTROYED) throw new Error('Player is already destroyed');
+    if (!this.paused) return this;
+    await this.node.rest.updatePlayer({
+      guildId: this.guildId,
+      playerOptions: {
+        paused: false,
+      },
+    });
+    this.paused = false;
     return this;
   }
 
@@ -271,9 +289,25 @@ export class RainlinkPlayer {
     await this.node.rest.updatePlayer({
       guildId: this.guildId,
       playerOptions: {
-        encodedTrack: null,
+        track: {
+          encoded: null,
+        },
       },
     });
+
+    this.playing = false;
+    this.position = 0;
+    if (this.queue.current) this.queue.previous.push(this.queue.current);
+    const currentSong = this.queue.current;
+    this.queue.current = null;
+    if (this.queue.length) this.manager.emit(RainlinkEvents.PlayerEnd, this, currentSong);
+    else if (!this.queue.length) {
+      this.manager.emit(RainlinkEvents.PlayerEmpty, this);
+      return this;
+    }
+
+    this.play();
+    this.paused = false;
     return this;
   }
 
@@ -352,7 +386,7 @@ export class RainlinkPlayer {
   public disconnect(): RainlinkPlayer {
     if (this.state == RainlinkPlayerState.DESTROYED) throw new Error('Player is already destroyed');
     this.voiceManager.disconnect();
-    this.pause(true);
+    this.pause();
     this.state = RainlinkPlayerState.DISCONNECTED;
     this.debug(`Player disconnected; Guild id: ${this.guildId}`);
     return this;
@@ -420,7 +454,7 @@ export class RainlinkPlayer {
    * @param filter The filter name
    * @returns KazagumoPlayer
    */
-  public async setFilter(filter: string): Promise<RainlinkPlayer> {
+  public async setFilter(filter: keyof typeof RainlinkFilterData): Promise<RainlinkPlayer> {
     if (this.state == RainlinkPlayerState.DESTROYED) throw new Error('Player is already destroyed');
 
     const filterData = RainlinkFilterData[filter as keyof typeof RainlinkFilterData];
@@ -450,7 +484,9 @@ export class RainlinkPlayer {
   /** @ignore */
   protected async playTrackEncoded(playable: PlayEncodedOptions): Promise<void> {
     const playerOptions: UpdatePlayerOptions = {
-      encodedTrack: playable.encoded,
+      track: {
+        encoded: playable.encoded,
+      },
     };
     if (playable.options) {
       const { pause, startTime, endTime, volume } = playable.options;
