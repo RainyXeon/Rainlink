@@ -1,12 +1,9 @@
-import { RainlinkEvents } from '../../Interface/Constants';
+import { RainlinkEvents, RainlinkPluginType } from '../../Interface/Constants';
 import { Rainlink } from '../../Rainlink';
 import { RainlinkPlugin as Plugin } from './../RainlinkPlugin';
 
 export class RainlinkPlugin extends Plugin {
-  /**
-   * rainlink instance.
-   */
-  public rainlink: Rainlink | null = null;
+  private rainlink: Rainlink | null = null;
 
   /**
    * Initialize the plugin.
@@ -16,8 +13,12 @@ export class RainlinkPlugin extends Plugin {
     super();
   }
 
-  public name(): string {
-    return 'rainlink-playermove';
+  /**
+   * Type of the plugin
+   * @returns RainlinkPluginType
+   */
+  public type(): RainlinkPluginType {
+    return RainlinkPluginType.Default;
   }
 
   /**

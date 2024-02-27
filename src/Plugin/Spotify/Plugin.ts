@@ -14,6 +14,7 @@ const REGEX =
   /(?:https:\/\/open\.spotify\.com\/|spotify:)(?:.+)?(track|playlist|album|artist)[\/:]([A-Za-z0-9]+)/;
 const SHORT_REGEX = /(?:https:\/\/spotify\.link)\/([A-Za-z0-9]+)/;
 
+/** The rainlink spotify plugin options */
 export interface SpotifyOptions {
   /** The client ID of your Spotify application. */
   clientId: string;
@@ -44,6 +45,10 @@ export class RainlinkPlugin extends SourceRainlinkPlugin {
   private readonly methods: Record<string, (id: string, requester: unknown) => Promise<Result>>;
   private requestManager: RequestManager;
 
+  /**
+   * Initialize the plugin.
+   * @param spotifyOptions Options for run plugin
+   */
   constructor(spotifyOptions: SpotifyOptions) {
     super();
     this.options = spotifyOptions;
@@ -59,29 +64,56 @@ export class RainlinkPlugin extends SourceRainlinkPlugin {
     this._search = null;
   }
 
+  /**
+   * Source identify of the plugin
+   * @returns string
+   */
   public sourceIdentify(): string {
     return 'sp';
   }
 
+  /**
+   * Source name of the plugin
+   * @returns string
+   */
   public sourceName(): string {
     return 'spotify';
   }
 
+  /**
+   * Type of the plugin
+   * @returns RainlinkPluginType
+   */
   public type(): RainlinkPluginType {
     return RainlinkPluginType.SourceResolver;
   }
 
-  public name(): string {
-    return 'rainlink-spotify';
-  }
-
+  /**
+   * load the plugin
+   * @param rainlink The rainlink class
+   */
   public load(rainlink: Rainlink) {
     this.rainlink = rainlink;
     this._search = rainlink.search.bind(rainlink);
     rainlink.search = this.search.bind(this);
   }
 
-  private async search(query: string, options?: RainlinkSearchOptions): Promise<RainlinkSearchResult> {
+  protected async search(query: string, options?: RainlinkSearchOptions): Promise<RainlinkSearchResult> {
+    const res = await this.searchDirect(query, options);
+    if (res.tracks.length == 0) return this._search!(query, options);
+    else return res;
+  }
+
+  /**
+   * Directly search from plugin
+   * @param query URI or track name query
+   * @param options search option like RainlinkSearchOptions
+   * @returns RainlinkSearchResult
+   */
+  public async searchDirect(
+    query: string,
+    options?: RainlinkSearchOptions | undefined,
+  ): Promise<RainlinkSearchResult> {
     if (!this.rainlink || !this._search) throw new Error('rainlink-spotify is not loaded yet.');
 
     if (!query) throw new Error('Query is required');
@@ -113,9 +145,7 @@ export class RainlinkPlugin extends SourceRainlinkPlugin {
       const result = await this.searchTrack(query, options?.requester);
 
       return this.buildSearch(undefined, result.tracks, RainlinkSearchResultType.SEARCH);
-    }
-
-    return this._search(query, options);
+    } else return this.buildSearch(undefined, [], RainlinkSearchResultType.SEARCH);
   }
 
   private buildSearch(
@@ -251,15 +281,16 @@ export class RainlinkPlugin extends SourceRainlinkPlugin {
   }
 }
 
+/** @ignore */
 export interface SearchResult {
   tracks: Tracks;
 }
-
+/** @ignore */
 export interface Result {
   tracks: RainlinkTrack[];
   name?: string;
 }
-
+/** @ignore */
 export interface TrackResult {
   album: Album;
   artists: Artist[];
@@ -281,7 +312,7 @@ export interface TrackResult {
   type: string;
   uri: string;
 }
-
+/** @ignore */
 export interface AlbumResult {
   album_type: string;
   artists: Artist[];
@@ -303,11 +334,11 @@ export interface AlbumResult {
   type: string;
   uri: string;
 }
-
+/** @ignore */
 export interface ArtistResult {
   tracks: Track[];
 }
-
+/** @ignore */
 export interface PlaylistResult {
   collaborative: boolean;
   description: string;
@@ -325,7 +356,7 @@ export interface PlaylistResult {
   type: string;
   uri: string;
 }
-
+/** @ignore */
 export interface Owner {
   display_name: string;
   external_urls: ExternalUrls;
@@ -334,18 +365,18 @@ export interface Owner {
   type: string;
   uri: string;
 }
-
+/** @ignore */
 export interface Followers {
   href: string | null;
   total: number;
 }
-
+/** @ignore */
 export interface Tracks {
   href: string;
   items: Track[];
   next: string | null;
 }
-
+/** @ignore */
 export interface PlaylistTracks {
   href: string;
   items: SpecialTracks[];
@@ -355,27 +386,27 @@ export interface PlaylistTracks {
   previous: string | null;
   total: number;
 }
-
+/** @ignore */
 export interface SpecialTracks {
   added_at: string;
   is_local: boolean;
   primary_color: string | null;
   track: Track;
 }
-
+/** @ignore */
 export interface Copyright {
   text: string;
   type: string;
 }
-
+/** @ignore */
 export interface ExternalUrls {
   spotify: string;
 }
-
+/** @ignore */
 export interface ExternalIds {
   isrc: string;
 }
-
+/** @ignore */
 export interface Album {
   album_type: string;
   artists: Artist[];
@@ -391,13 +422,13 @@ export interface Album {
   type: string;
   uri: string;
 }
-
+/** @ignore */
 export interface Image {
   height: number;
   url: string;
   width: number;
 }
-
+/** @ignore */
 export interface Artist {
   external_urls: {
     spotify: string;
@@ -415,7 +446,7 @@ export interface Artist {
   type: string;
   uri: string;
 }
-
+/** @ignore */
 export interface Track {
   album?: Album;
   artists: Artist[];

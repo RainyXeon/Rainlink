@@ -5,7 +5,7 @@
   "scripts": {
     "build": "npx tsc --build --verbose",
     "prettier": "npx prettier -w ./src",
-    "build:doc": "typedoc --readme ./md/Welcome.md --out docs/ --entryPointStrategy resolve src/.",
+    "build:doc": "typedoc src/.",
     "build:full": "npm run prettier && npm run build && npm run build:doc"
   },
   "main": "dist/index.js",
@@ -31,8 +31,9 @@
     "delay": "^6.0.0",
     "discord.js": "^14.12.1",
     "node-html-parser": "^6.1.12",
-    "typedoc": "^0.25.8",
+    "typedoc": "^0.25.4",
     "typedoc-material-theme": "^1.0.2",
+    "typedoc-plugin-merge-modules": "^5.1.0",
     "undici": "^6.6.2",
     "ws": "^8.16.0"
   }

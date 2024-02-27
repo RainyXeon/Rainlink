@@ -19,9 +19,13 @@ type HeaderType = {
   origin: string;
 };
 
-type AppleOptions = {
+/** The rainlink spotify plugin options */
+export type AppleOptions = {
+  /** The country code that u want to set content, eg: en */
   countryCode?: string;
+  /** Artwork width */
   imageWidth?: number;
+  /** Artwork height */
   imageHeight?: number;
 };
 
@@ -42,22 +46,34 @@ export class RainlinkPlugin extends SourceRainlinkPlugin {
   public imageWidth: number;
   public imageHeight: number;
 
+  /**
+   * Source identify of the plugin
+   * @returns string
+   */
   public sourceIdentify(): string {
     return 'am';
   }
 
+  /**
+   * Source name of the plugin
+   * @returns string
+   */
   public sourceName(): string {
     return 'apple';
   }
 
+  /**
+   * Type of the plugin
+   * @returns RainlinkPluginType
+   */
   public type(): RainlinkPluginType {
     return RainlinkPluginType.SourceResolver;
   }
 
-  public name(): string {
-    return 'rainlink-apple';
-  }
-
+  /**
+   * Initialize the plugin.
+   * @param appleOptions The rainlink apple plugin options
+   */
   constructor(appleOptions: AppleOptions) {
     super();
     this.methods = {
@@ -80,18 +96,28 @@ export class RainlinkPlugin extends SourceRainlinkPlugin {
     };
   }
 
+  /**
+   * load the plugin
+   * @param rainlink The rainlink class
+   */
   public load(manager: Rainlink): void {
     this.manager = manager;
     this._search = manager.search.bind(manager);
     manager.search = this.search.bind(this);
   }
 
-  async search(query: string, options?: RainlinkSearchOptions): Promise<RainlinkSearchResult> {
+  protected async search(query: string, options?: RainlinkSearchOptions): Promise<RainlinkSearchResult> {
     const res = await this.searchDirect(query, options);
     if (res.tracks.length == 0) return this._search!(query, options);
     else return res;
   }
 
+  /**
+   * Directly search from plugin
+   * @param query URI or track name query
+   * @param options search option like RainlinkSearchOptions
+   * @returns RainlinkSearchResult
+   */
   public async searchDirect(
     query: string,
     options?: RainlinkSearchOptions | undefined,
@@ -139,14 +165,14 @@ export class RainlinkPlugin extends SourceRainlinkPlugin {
     } else return this.buildSearch(undefined, [], RainlinkSearchResultType.SEARCH);
   }
 
-  public async getData(params: string) {
+  private async getData(params: string) {
     const req = await axios.get(`${this.fetchURL}${params}`, {
       headers: this.credentials,
     });
     return req.data.data;
   }
 
-  public async getSearchData(params: string) {
+  private async getSearchData(params: string) {
     const req = await axios.get(`${this.fetchURL}${params}`, {
       headers: this.credentials,
     });
@@ -271,18 +297,19 @@ export class RainlinkPlugin extends SourceRainlinkPlugin {
 }
 
 // Interfaces
+/** @ignore */
 export interface Result {
   tracks: RainlinkTrack[];
   name?: string;
 }
-
+/** @ignore */
 export interface Track {
   id: string;
   type: string;
   href: string;
   attributes: TrackAttributes;
 }
-
+/** @ignore */
 export interface TrackAttributes {
   albumName: string;
   hasTimeSyncedLyrics: boolean;

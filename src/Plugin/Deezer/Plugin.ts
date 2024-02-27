@@ -17,23 +17,33 @@ export class RainlinkPlugin extends SourceRainlinkPlugin {
   private manager: Rainlink | null;
   private _search?: (query: string, options?: RainlinkSearchOptions) => Promise<RainlinkSearchResult>;
   private readonly methods: Record<string, (id: string, requester: unknown) => Promise<Result>>;
-
+  /**
+   * Source identify of the plugin
+   * @returns string
+   */
   public sourceIdentify(): string {
     return 'dz';
   }
 
+  /**
+   * Source name of the plugin
+   * @returns string
+   */
   public sourceName(): string {
     return 'deezer';
   }
 
+  /**
+   * Type of the plugin
+   * @returns RainlinkPluginType
+   */
   public type(): RainlinkPluginType {
     return RainlinkPluginType.SourceResolver;
   }
 
-  public name(): string {
-    return 'rainlink-deezer';
-  }
-
+  /**
+   * Initialize the plugin.
+   */
   constructor() {
     super();
     this.methods = {
@@ -45,18 +55,28 @@ export class RainlinkPlugin extends SourceRainlinkPlugin {
     this._search = undefined;
   }
 
+  /**
+   * load the plugin
+   * @param rainlink The rainlink class
+   */
   public load(manager: Rainlink): void {
     this.manager = manager;
     this._search = manager.search.bind(manager);
     manager.search = this.search.bind(this);
   }
 
-  async search(query: string, options?: RainlinkSearchOptions): Promise<RainlinkSearchResult> {
+  protected async search(query: string, options?: RainlinkSearchOptions): Promise<RainlinkSearchResult> {
     const res = await this.searchDirect(query, options);
     if (res.tracks.length == 0) return this._search!(query, options);
     else return res;
   }
 
+  /**
+   * Directly search from plugin
+   * @param query URI or track name query
+   * @param options search option like RainlinkSearchOptions
+   * @returns RainlinkSearchResult
+   */
   public async searchDirect(
     query: string,
     options?: RainlinkSearchOptions | undefined,
@@ -196,33 +216,41 @@ export class RainlinkPlugin extends SourceRainlinkPlugin {
 }
 
 // Interfaces
-export interface Result {
+/** @ignore */
+interface Result {
   tracks: RainlinkTrack[];
   name?: string;
 }
-export interface Album {
+/** @ignore */
+interface Album {
   title: string;
   tracks: AlbumTracks;
 }
-export interface AlbumTracks {
+/** @ignore */
+interface AlbumTracks {
   data: DeezerTrack[];
   next: string | null;
 }
-export interface Artist {
+/** @ignore */
+interface Artist {
   name: string;
 }
-export interface Playlist {
+/** @ignore */
+interface Playlist {
   tracks: PlaylistTracks;
   title: string;
 }
-export interface PlaylistTracks {
+/** @ignore */
+interface PlaylistTracks {
   data: DeezerTrack[];
   next: string | null;
 }
-export interface DeezerTrack {
+/** @ignore */
+interface DeezerTrack {
   data: RainlinkTrack[];
 }
-export interface SearchResult {
+/** @ignore */
+interface SearchResult {
   exception?: {
     severity: string;
     message: string;

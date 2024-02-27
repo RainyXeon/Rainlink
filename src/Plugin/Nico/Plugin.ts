@@ -15,11 +15,16 @@ const REGEX = RegExp(
   'https?://(?:www\\.|secure\\.|sp\\.)?nicovideo\\.jp/watch/(?<id>(?:[a-z]{2})?[0-9]+)',
 );
 
+/** The rainlink nicovideo plugin options */
 export interface NicoOptions {
+  /** The number of how many track u want to resolve */
   searchLimit: number;
 }
 
 export class RainlinkPlugin extends SourceRainlinkPlugin {
+  /**
+   * The options of the plugin.
+   */
   public options: NicoOptions;
   private _search:
     | ((query: string, options?: RainlinkSearchOptions) => Promise<RainlinkSearchResult>)
@@ -28,6 +33,10 @@ export class RainlinkPlugin extends SourceRainlinkPlugin {
 
   private readonly methods: Record<string, (id: string, requester: unknown) => Promise<Result>>;
 
+  /**
+   * Initialize the plugin.
+   * @param nicoOptions Options for run plugin
+   */
   constructor(nicoOptions: NicoOptions) {
     super();
     this.options = nicoOptions;
@@ -37,22 +46,34 @@ export class RainlinkPlugin extends SourceRainlinkPlugin {
     this.rainlink = null;
   }
 
+  /**
+   * Source identify of the plugin
+   * @returns string
+   */
   public sourceIdentify(): string {
     return 'nv';
   }
 
+  /**
+   * Source name of the plugin
+   * @returns string
+   */
   public sourceName(): string {
     return 'nicovideo';
   }
 
+  /**
+   * Type of the plugin
+   * @returns RainlinkPluginType
+   */
   public type(): RainlinkPluginType {
     return RainlinkPluginType.SourceResolver;
   }
 
-  public name(): string {
-    return 'rainlink-nico';
-  }
-
+  /**
+   * load the plugin
+   * @param rainlink The rainlink class
+   */
   public load(rainlink: Rainlink) {
     this.rainlink = rainlink;
     this._search = rainlink.search.bind(rainlink);
@@ -60,6 +81,21 @@ export class RainlinkPlugin extends SourceRainlinkPlugin {
   }
 
   private async search(query: string, options?: RainlinkSearchOptions): Promise<RainlinkSearchResult> {
+    const res = await this.searchDirect(query, options);
+    if (res.tracks.length == 0) return this._search!(query, options);
+    else return res;
+  }
+
+  /**
+   * Directly search from plugin
+   * @param query URI or track name query
+   * @param options search option like RainlinkSearchOptions
+   * @returns RainlinkSearchResult
+   */
+  public async searchDirect(
+    query: string,
+    options?: RainlinkSearchOptions | undefined,
+  ): Promise<RainlinkSearchResult> {
     if (!this.rainlink || !this._search) throw new Error('rainlink-nico is not loaded yet.');
 
     if (!query) throw new Error('Query is required');
@@ -81,9 +117,7 @@ export class RainlinkPlugin extends SourceRainlinkPlugin {
       const result = await this.searchTrack(query, options?.requester);
 
       return this.buildSearch(undefined, result.tracks, RainlinkSearchResultType.SEARCH);
-    }
-
-    return this._search(query, options);
+    } else return this.buildSearch(undefined, [], RainlinkSearchResultType.SEARCH);
   }
 
   private buildSearch(
@@ -170,11 +204,12 @@ export class RainlinkPlugin extends SourceRainlinkPlugin {
 }
 
 // Interfaces
+/** @ignore */
 export interface Result {
   tracks: RainlinkTrack[];
   name?: string;
 }
-
+/** @ignore */
 export interface OwnerInfo {
   id: number;
   nickname: string;
@@ -194,7 +229,7 @@ export interface OwnerInfo {
   videoLiveNotice: null;
   viewer: number | null;
 }
-
+/** @ignore */
 interface OriginalVideoInfo {
   id: string;
   title: string;
@@ -227,7 +262,7 @@ interface OriginalVideoInfo {
   commentableUserTypeForPayment: string;
   [key: string]: any;
 }
-
+/** @ignore */
 export interface VideoInfo extends OriginalVideoInfo {
   owner: OwnerInfo;
 }

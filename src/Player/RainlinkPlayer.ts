@@ -513,6 +513,6 @@ export class RainlinkPlayer {
 
   /** @ignore */
   protected checkDestroyed(): void {
-    this.checkDestroyed();
+    if (this.state == RainlinkPlayerState.DESTROYED) throw new Error('Player is destroyed');
   }
 }
