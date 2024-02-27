@@ -60,7 +60,7 @@ export interface RainlinkAdditionalOptions {
   nodeResolver?: (
     nodes: RainlinkNodeManager,
     voiceManager?: RainlinkVoiceManager,
-  ) => RainlinkNode | undefined;
+  ) => Promise<RainlinkNode | undefined>;
   /** Custom structures for rainlink to use */
   structures?: Structures;
 }
