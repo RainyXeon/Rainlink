@@ -1,11 +1,11 @@
 {
   "name": "rainlink",
-  "version": "0.0.1",
-  "description": "A lavalink wrapper with backward compatible and rich features",
+  "version": "0.0.1-alpha",
+  "description": "Another lavalink wrapper but focus on stability and rich features",
   "scripts": {
     "build": "npx tsc --build --verbose",
     "prettier": "npx prettier -w ./src",
-    "build:doc": "typedoc --readme README.md --out docs/ --entryPointStrategy resolve src/.",
+    "build:doc": "typedoc --readme ./md/Welcome.md --out docs/ --entryPointStrategy resolve src/.",
     "build:full": "npm run prettier && npm run build && npm run build:doc"
   },
   "main": "dist/index.js",

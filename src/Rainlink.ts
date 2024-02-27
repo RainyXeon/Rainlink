@@ -1,4 +1,5 @@
 import {
+  RainlinkAdditionalOptions,
   RainlinkOptions,
   RainlinkSearchOptions,
   RainlinkSearchResult,
@@ -23,6 +24,7 @@ import {
   TrackStuckEvent,
   WebSocketClosedEvent,
 } from './Interface/LavalinkEvents';
+import { metadata } from './manifest';
 
 export declare interface Rainlink {
   /* tslint:disable:unified-signatures */
@@ -228,6 +230,7 @@ export class Rainlink extends EventEmitter {
       throw new Error('Please set an new lib to connect, example: \nlibrary: new Library.DiscordJS(client) ');
     this.library = options.library.set(this);
     this.rainlinkOptions = options;
+    this.rainlinkOptions.options = this.mergeDefaultOptions(this.rainlinkOptions.options);
     this.voiceManagers = new Map();
     this.nodes = new RainlinkNodeManager(this);
     this.library.listen(this.rainlinkOptions.nodes);
@@ -383,5 +386,22 @@ export class Rainlink extends EventEmitter {
   /** @ignore */
   protected debug(logs: string) {
     this.emit(RainlinkEvents.Debug, `[Rainlink]: ${logs}`);
+  }
+
+  /** @ignore */
+  protected mergeDefaultOptions(data: RainlinkAdditionalOptions): RainlinkAdditionalOptions {
+    return {
+      retryTimeout: data.retryTimeout ?? 3000,
+      retryCount: data.retryCount ?? 15,
+      voiceConnectionTimeout: data.voiceConnectionTimeout ?? 15000,
+      defaultSearchEngine: data.defaultSearchEngine ?? undefined,
+      defaultVolume: data.defaultVolume ?? 100,
+      searchFallback: data.searchFallback ?? false,
+      resume: data.resume ?? false,
+      userAgent: data.userAgent ?? `${metadata.name}/${metadata.version}`,
+      nodeResolver: data.nodeResolver ?? undefined,
+      structures: data.structures ?? undefined,
+      restTimeout: data.restTimeout ?? 3000,
+    };
   }
 }

@@ -1,6 +1,24 @@
 import { AbstractLibrary } from '../Library/AbstractLibrary';
 import { RainlinkPlugin } from '../Plugin/RainlinkPlugin';
 import { RainlinkTrack } from '../Player/RainlinkTrack';
+import { RainlinkVoiceManager } from '../Manager/RainlinkVoiceManager';
+import { RainlinkNodeManager } from '../Manager/RainlinkNodeManager';
+import { RainlinkNode } from '../Node/RainlinkNode';
+import { RainlinkRest } from '../Node/RainlinkRest';
+import { RainlinkPlayer } from '../Player/RainlinkPlayer';
+
+export type Constructor<T> = new (...args: any[]) => T;
+
+export interface Structures {
+  /**
+   * A custom structure that extends the RainlinkRest class
+   */
+  rest?: Constructor<RainlinkRest>;
+  /**
+   * A custom structure that extends the RainlinkPlayer class
+   */
+  player?: Constructor<RainlinkPlayer>;
+}
 
 /**
  * Rainlink node option interface
@@ -22,18 +40,31 @@ export interface RainlinkNodeOptions {
  * Some rainlink additional config option
  */
 export interface RainlinkAdditionalOptions {
-  /** The retry timeout for websocket when dealing connection to lavalink websocket server (ms) */
-  retryTimeout: number;
-  /** Number of retries for websocket when dealing connection to lavalink websocket server */
-  retryCount: number;
-  /** The retry timeout for voice mânger when dealing connection to discord voice server (ms) */
-  voiceConnectionTimeout: number;
+  /** Timeout before trying to reconnect */
+  retryTimeout?: number;
+  /** Number of times to try and reconnect to Lavalink before giving up */
+  retryCount?: number;
+  /** The retry timeout for voice manager when dealing connection to discord voice server (ms) */
+  voiceConnectionTimeout?: number;
   /** The default search engine like default search from youtube, spotify,... */
   defaultSearchEngine?: string;
   /** The default volume when create a player */
   defaultVolume?: number;
   /** Search track from youtube when track resolve failed */
   searchFallback?: boolean;
+  /** Whether to resume a connection on disconnect to Lavalink (Server Side) (Note: DOES NOT RESUME WHEN THE LAVALINK SERVER DIES) */
+  resume?: boolean;
+  /** User Agent to use when making requests to Lavalink */
+  userAgent?: string;
+  /** Node Resolver to use if you want to customize it */
+  nodeResolver?: (
+    nodes: RainlinkNodeManager,
+    voiceManager?: RainlinkVoiceManager,
+  ) => RainlinkNode | undefined;
+  /** Custom structures for rainlink to use */
+  structures?: Structures;
+  /** Time to wait for a response from the Lavalink REST API before giving up */
+  restTimeout?: number;
 }
 
 /**
