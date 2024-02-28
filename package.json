@@ -5,7 +5,7 @@
   "scripts": {
     "build": "npx tsc --build --verbose",
     "prettier": "npx prettier -w ./src",
-    "build:doc": "typedoc src/.",
+    "build:doc": "typedoc src/*",
     "build:full": "npm run prettier && npm run build && npm run build:doc"
   },
   "main": "dist/index.js",
@@ -25,6 +25,7 @@
     "dokdo": "^1.0.1",
     "prettier": "^3.2.5",
     "typedoc": "^0.25.4",
+    "typedoc-material-theme": "^1.0.2",
     "typescript": "^5.3.3"
   },
   "dependencies": {

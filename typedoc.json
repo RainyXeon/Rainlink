@@ -6,6 +6,13 @@
   "excludeProtected": true,
   "excludePrivate": true,
   "entryPointStrategy": "expand",
+  "plugin": ["typedoc-material-theme"],
+  "themeColor": "#cb9820",
+  "sort": [
+    "kind",
+    "instance-first",
+  ],
+  "hideGenerator": true,
   "exclude": [
     "src/Plugin/Nico/NicoSearchConst.ts",
     "src/Plugin/Nico/NicoSearch.ts",
