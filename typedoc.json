@@ -1,5 +1,4 @@
 {
-  "theme": "default",
   "out": "docs",
   "entryPoints": ["src/Rainlink.ts", "src/"],
   "readme": "./md/Welcome.md",
@@ -8,11 +7,7 @@
   "entryPointStrategy": "expand",
   "plugin": ["typedoc-material-theme"],
   "themeColor": "#2da4ed",
-  "sort": [
-    "kind",
-    "instance-first"
-  ],
-  "hideGenerator": true,
+  "sort": ["kind"],
   "exclude": [
     "src/Plugin/Nico/NicoSearchConst.ts",
     "src/Plugin/Nico/NicoSearch.ts",
