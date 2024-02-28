@@ -47,7 +47,7 @@ export class RainlinkNode {
     this.manager = manager;
     this.options = options;
     this.wsUrl = `${options.secure ? 'wss' : 'ws'}://${options.host}:${options.port}/v${metadata.lavalink}/websocket`;
-    this.sessionPlugin = this.manager.plugins.get('rainlink-savesession') as SaveSessionPlugin;
+    this.sessionPlugin = this.manager.plugins.get('rainlink-saveSession') as SaveSessionPlugin;
     const customRest = this.manager.rainlinkOptions.options!.structures!.rest;
     this.rest = customRest
       ? new customRest(manager, options, this)

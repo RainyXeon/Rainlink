@@ -76,7 +76,7 @@ export class RainlinkPlugin extends SourceRainlinkPlugin {
 
   /** Name function for getting plugin name */
   public name(): string {
-    return 'rainlink-nico';
+    return 'rainlink-deezer';
   }
 
   protected async search(query: string, options?: RainlinkSearchOptions): Promise<RainlinkSearchResult> {

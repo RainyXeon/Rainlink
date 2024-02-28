@@ -31,6 +31,14 @@ export class RainlinkPlugin extends Plugin {
   }
 
   /**
+   * The name of the plugin
+   * @returns string
+   */
+  public name(): string {
+    return 'rainlink-playerMoved';
+  }
+
+  /**
    * Unload the plugin.
    */
   public unload(): void {

@@ -16,7 +16,7 @@ export class RainlinkPlugin extends Plugin {
 
   /** Name function for getting plugin name */
   public name(): string {
-    return 'rainlink-savesession';
+    return 'rainlink-saveSession';
   }
 
   /** Type function for diferent type of plugin */
