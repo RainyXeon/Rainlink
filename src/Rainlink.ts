@@ -398,12 +398,13 @@ export class Rainlink extends EventEmitter {
       defaultVolume: data.defaultVolume ?? 100,
       searchFallback: data.searchFallback ?? false,
       resume: data.resume ?? false,
-      userAgent: data.userAgent ?? `@bot/${metadata.name}/${metadata.version}`,
+      userAgent: data.userAgent ?? `@discord/@bot/@project${metadata.name}/${metadata.version}`,
       nodeResolver: data.nodeResolver ?? undefined,
       structures: data.structures ?? {
         player: undefined,
         rest: undefined,
       },
+      resumeTimeout: 300,
     };
   }
 }

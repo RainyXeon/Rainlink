@@ -81,7 +81,7 @@ export class RainlinkNode {
         Authorization: this.options.auth,
         'User-Id': this.manager.id,
         'Client-Name': `rainlink@${metadata.version}`,
-        'Session-Id': this.sessionId !== null && !isResume ? this.sessionId : '',
+        'Session-Id': this.sessionId !== null && isResume ? this.sessionId : '',
         'user-agent': this.manager.rainlinkOptions.options!.userAgent!,
       },
     });
@@ -112,8 +112,13 @@ export class RainlinkNode {
     const wsData = JSON.parse(data.toString());
     switch (wsData.op) {
       case LavalinkEventsEnum.Ready: {
+        const isResume = this.manager.rainlinkOptions.options!.resume!;
+        const timeout = this.manager.rainlinkOptions.options?.resumeTimeout!;
         this.sessionId = wsData.sessionId;
         this.rest = new RainlinkRest(this.manager, this.options, this);
+        if (this.sessionId !== null && isResume) {
+          this.rest.updateSession(String(this.sessionId), isResume, timeout);
+        }
         break;
       }
       case LavalinkEventsEnum.Event: {

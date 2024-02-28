@@ -132,7 +132,7 @@ export class RainlinkRest {
 
   /** @ignore */
   private debug(logs: string) {
-    this.manager.emit(RainlinkEvents.Debug, `[Rainlink Rest] ${logs}`);
+    this.manager.emit(RainlinkEvents.Debug, `[Rainlink Rest]: ${logs}`);
   }
 
   /**
@@ -157,6 +157,28 @@ export class RainlinkRest {
         data: {},
       };
     } else return resData;
+  }
+
+  /**
+   * Update a season to resume able or not
+   * @returns LavalinkResponse
+   */
+  public async updateSession(sessionId: string, mode: boolean, timeout: number): Promise<void> {
+    const options: RainlinkFetcherOptions = {
+      endpoint: `/sessions/${sessionId}`,
+      requestOptions: {
+        headers: { 'Content-Type': 'application/json' },
+        method: 'PATCH',
+        data: {
+          resuming: mode,
+          timeout: timeout,
+        },
+      },
+    };
+
+    await this.fetcher<{ resuming: boolean; timeout: number }>(options);
+    this.debug(`Session updated! resume: ${mode}, timeout: ${timeout}`);
+    return;
   }
 
   /** @ignore */

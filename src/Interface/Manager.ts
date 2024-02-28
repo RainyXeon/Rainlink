@@ -54,6 +54,8 @@ export interface RainlinkAdditionalOptions {
   searchFallback?: boolean;
   /** Whether to resume a connection on disconnect to Lavalink (Server Side) (Note: DOES NOT RESUME WHEN THE LAVALINK SERVER DIES) */
   resume?: boolean;
+  /** When the seasion is deleted from Lavalink. Use second (Server Side) (Note: DOES NOT RESUME WHEN THE LAVALINK SERVER DIES) */
+  resumeTimeout?: number;
   /** User Agent to use when making requests to Lavalink */
   userAgent?: string;
   /** Node Resolver to use if you want to customize it */
