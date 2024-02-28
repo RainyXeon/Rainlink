@@ -5,7 +5,7 @@
   "scripts": {
     "build": "npx tsc --build --verbose",
     "prettier": "npx prettier -w ./src",
-    "build:doc": "typedoc src/*",
+    "build:doc": "typedoc --options typedoc.json src/*",
     "build:full": "npm run prettier && npm run build && npm run build:doc"
   },
   "main": "dist/index.js",
