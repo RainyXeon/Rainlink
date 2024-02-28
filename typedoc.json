@@ -1,6 +1,6 @@
 {
   "out": "docs",
-  "entryPoints": ["src/Rainlink.ts", "src/"],
+  "entryPoints": ["src/*"],
   "readme": "./md/Welcome.md",
   "excludeProtected": true,
   "excludePrivate": true,
