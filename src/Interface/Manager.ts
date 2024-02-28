@@ -73,12 +73,12 @@ export interface RainlinkAdditionalOptions {
 export interface RainlinkOptions {
   /** The lavalink server credentials array*/
   nodes: RainlinkNodeOptions[];
+  /** The discord library for using voice manager, example: discordjs, erisjs. Check {@link Library.default} */
+  library: AbstractLibrary;
+  /** The rainlink plugins array. Check {@link Plugin.default} */
+  plugins?: RainlinkPlugin[];
   /** Rainlink additional options  */
   options?: RainlinkAdditionalOptions;
-  /** The discord library for using voice manager, example: discordjs, erisjs */
-  library: AbstractLibrary;
-  /** The rainlink plugins arrray */
-  plugins?: RainlinkPlugin[];
 }
 
 /**

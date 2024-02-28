@@ -3,7 +3,7 @@ import { Rainlink } from '../Rainlink';
 
 /** The interface class for another rainlink plugin, extend it to use */
 export class RainlinkPlugin {
-  /** Name function for getting  */
+  /** Name function for getting plugin name */
   public name(): string {
     throw new Error('Plugin must implement name() and return a plguin name string');
   }

@@ -80,6 +80,20 @@ export class RainlinkPlugin extends SourceRainlinkPlugin {
     rainlink.search = this.search.bind(this);
   }
 
+  /**
+   * Unload the plugin
+   * @param rainlink The rainlink class
+   */
+  public unload(rainlink: Rainlink) {
+    this.rainlink = rainlink;
+    rainlink.search = rainlink.search.bind(rainlink);
+  }
+
+  /** Name function for getting plugin name */
+  public name(): string {
+    return 'rainlink-nico';
+  }
+
   private async search(query: string, options?: RainlinkSearchOptions): Promise<RainlinkSearchResult> {
     const res = await this.searchDirect(query, options);
     if (res.tracks.length == 0) return this._search!(query, options);

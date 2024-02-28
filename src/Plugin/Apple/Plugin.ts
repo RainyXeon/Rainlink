@@ -70,6 +70,11 @@ export class RainlinkPlugin extends SourceRainlinkPlugin {
     return RainlinkPluginType.SourceResolver;
   }
 
+  /** Name function for getting plugin name */
+  public name(): string {
+    return 'rainlink-nico';
+  }
+
   /**
    * Initialize the plugin.
    * @param appleOptions The rainlink apple plugin options
@@ -104,6 +109,15 @@ export class RainlinkPlugin extends SourceRainlinkPlugin {
     this.manager = manager;
     this._search = manager.search.bind(manager);
     manager.search = this.search.bind(this);
+  }
+
+  /**
+   * Unload the plugin
+   * @param rainlink The rainlink class
+   */
+  public unload(rainlink: Rainlink) {
+    this.manager = rainlink;
+    this.manager.search = rainlink.search.bind(rainlink);
   }
 
   protected async search(query: string, options?: RainlinkSearchOptions): Promise<RainlinkSearchResult> {

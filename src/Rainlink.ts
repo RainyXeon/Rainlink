@@ -25,6 +25,7 @@ import {
   WebSocketClosedEvent,
 } from './Interface/LavalinkEvents';
 import { metadata } from './manifest';
+import { RainlinkPlugin } from './Plugin/RainlinkPlugin';
 
 export declare interface Rainlink {
   /* tslint:disable:unified-signatures */
@@ -217,6 +218,10 @@ export class Rainlink extends EventEmitter {
    * All search plugins (resolver plugins)
    */
   public searchPlugins: Map<string, SourceRainlinkPlugin>;
+  /**
+   * All plugins (include resolver plugins)
+   */
+  public plugins: Map<string, RainlinkPlugin>;
 
   /**
    * The main class that handle all works in lavalink server
@@ -237,6 +242,7 @@ export class Rainlink extends EventEmitter {
     this.players = new RainlinkPlayerManager(this, this.voiceManagers);
     this.searchEngines = new Map<string, string>();
     this.searchPlugins = new Map<string, SourceRainlinkPlugin>();
+    this.plugins = new Map<string, RainlinkPlugin>();
     this.initialSearchEngines();
     if (
       !this.rainlinkOptions.options.defaultSearchEngine ||
@@ -247,8 +253,10 @@ export class Rainlink extends EventEmitter {
     if (this.rainlinkOptions.plugins) {
       for (const [, plugin] of this.rainlinkOptions.plugins.entries()) {
         if (plugin.constructor.name !== 'RainlinkPlugin')
-          throw new Error('Plugin must be an instance of RainlinkPlugin');
+          throw new Error('Plugin must be an instance of RainlinkPlugin or SourceRainlinkPlugin');
         plugin.load(this);
+
+        this.plugins.set(plugin.name(), plugin);
 
         if (plugin.type() == RainlinkPluginType.SourceResolver) {
           const newPlugin = plugin as SourceRainlinkPlugin;
@@ -404,7 +412,7 @@ export class Rainlink extends EventEmitter {
         player: undefined,
         rest: undefined,
       },
-      resumeTimeout: 300,
+      resumeTimeout: data.resumeTimeout ?? 300,
     };
   }
 }

@@ -17,3 +17,7 @@ Here: [https://rainlink.netlify.app/](https://rainlink.netlify.app/)
 - [@Takiyo0](https://github.com/Takiyo0): Creator of [Kazagumo](https://www.npmjs.com/package/kazagumo) / **Player and queue inspiration**
 - [@Solaris9](https://github.com/Solaris9): Original creator of [erela.js](https://www.npmjs.com/package/erela.js) / **Event system inspiration**
 - **And everyone who contribute my project 💗**
+
+# 💫 Credits
+- [@RainyXeon](https://github.com/RainyXeon): Owner of Rainlink
+- [@PAINFUEG0](https://github.com/PAINFUEG0): Tester and member of [#TeamRain](https://comming.soon)

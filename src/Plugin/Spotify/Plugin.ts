@@ -98,6 +98,20 @@ export class RainlinkPlugin extends SourceRainlinkPlugin {
     rainlink.search = this.search.bind(this);
   }
 
+  /**
+   * Unload the plugin
+   * @param rainlink The rainlink class
+   */
+  public unload(rainlink: Rainlink) {
+    this.rainlink = rainlink;
+    rainlink.search = rainlink.search.bind(rainlink);
+  }
+
+  /** Name function for getting plugin name */
+  public name(): string {
+    return 'rainlink-spotify';
+  }
+
   protected async search(query: string, options?: RainlinkSearchOptions): Promise<RainlinkSearchResult> {
     const res = await this.searchDirect(query, options);
     if (res.tracks.length == 0) return this._search!(query, options);
@@ -141,7 +155,7 @@ export class RainlinkPlugin extends SourceRainlinkPlugin {
       } catch (e) {
         return this.buildSearch(undefined, [], RainlinkSearchResultType.SEARCH);
       }
-    } else if (options?.engine === 'spotify' && !isUrl) {
+    } else if (options?.engine === this.sourceName() && !isUrl) {
       const result = await this.searchTrack(query, options?.requester);
 
       return this.buildSearch(undefined, result.tracks, RainlinkSearchResultType.SEARCH);
@@ -273,7 +287,7 @@ export class RainlinkPlugin extends SourceRainlinkPlugin {
           artworkUrl: thumbnail ? thumbnail : spotifyTrack.album?.images[0]?.url,
         },
         pluginInfo: {
-          name: 'rainlink.mod@spotify',
+          name: this.name(),
         },
       },
       requester,

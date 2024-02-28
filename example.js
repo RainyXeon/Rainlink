@@ -21,8 +21,10 @@ const rainlink = new Rainlink({
         retryCount: 20,
         retryTimeout: 2000,
         voiceConnectionTimeout: 5000,
+        resume: true,
+        resumeTimeout: 300
     },
-    plugins: [new Plugin.Deezer()],
+    plugins: [new Plugin.Deezer(), new Plugin.SaveSession()],
 });
 
 client.on("ready", () => console.log(client.user.tag + " Ready!"));

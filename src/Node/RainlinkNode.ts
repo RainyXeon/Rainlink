@@ -8,6 +8,7 @@ import { setTimeout } from 'node:timers/promises';
 import { RainlinkWebsocket } from './RainlinkWebsocket';
 import { LavalinkEventsEnum } from '../Interface/LavalinkEvents';
 import { LavalinkNodeStatsResponse, NodeStats } from '../Interface/Node';
+import { RainlinkPlugin as SaveSessionPlugin } from '../Plugin/SaveSession/Plugin';
 
 export class RainlinkNode {
   /** The rainlink manager */
@@ -34,6 +35,8 @@ export class RainlinkNode {
   private sudoDisconnect = false;
   /** @ignore */
   private wsEvent: RainlinkWebsocket;
+  /** @ignore */
+  private sessionPlugin?: SaveSessionPlugin | null;
 
   /**
    * The lavalink server handler class
@@ -44,6 +47,7 @@ export class RainlinkNode {
     this.manager = manager;
     this.options = options;
     this.wsUrl = `${options.secure ? 'wss' : 'ws'}://${options.host}:${options.port}/v${metadata.lavalink}/websocket`;
+    this.sessionPlugin = this.manager.plugins.get('rainlink-savesession') as SaveSessionPlugin;
     const customRest = this.manager.rainlinkOptions.options!.structures!.rest;
     this.rest = customRest
       ? new customRest(manager, options, this)
@@ -76,6 +80,12 @@ export class RainlinkNode {
   /** Connect this lavalink server */
   public connect(): WebSocket {
     const isResume = this.manager.rainlinkOptions.options!.resume;
+    if (this.sessionPlugin) {
+      this.sessionId =
+        this.sessionId == null && isResume
+          ? this.sessionPlugin.getSession(this.options.host).sessionId
+          : this.sessionId;
+    }
     const newWsClient = new WebSocket(this.wsUrl, {
       headers: {
         Authorization: this.options.auth,
@@ -116,8 +126,12 @@ export class RainlinkNode {
         const timeout = this.manager.rainlinkOptions.options?.resumeTimeout!;
         this.sessionId = wsData.sessionId;
         this.rest = new RainlinkRest(this.manager, this.options, this);
-        if (this.sessionId !== null && isResume) {
-          this.rest.updateSession(String(this.sessionId), isResume, timeout);
+        if (isResume) {
+          this.rest.updateSession(wsData.sessionId, isResume, timeout);
+          if (this.sessionPlugin) {
+            this.sessionPlugin.deleteSession(this.options.host);
+            this.sessionPlugin.setSession(this.options.host, wsData.sessionId);
+          }
         }
         break;
       }
