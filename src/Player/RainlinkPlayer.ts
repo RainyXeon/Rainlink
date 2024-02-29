@@ -122,7 +122,6 @@ export class RainlinkPlayer {
    * @internal
    */
   public async sendServerUpdate(voiceManager: RainlinkVoiceManager): Promise<void> {
-    this.checkDestroyed();
     const playerUpdate = {
       guildId: this.guildId,
       playerOptions: {
