@@ -114,7 +114,7 @@ export class RainlinkPlayer {
     this.deafened = voiceManager.deafened;
     this.muted = voiceManager.muted;
     this.voiceManager = voiceManager;
-    if (voiceOptions.volume && voiceOptions.volume !== 100) this.volume = voiceOptions.volume;
+    if (voiceOptions.volume && voiceOptions.volume !== this.volume) this.volume = voiceOptions.volume;
   }
 
   /**
@@ -122,6 +122,7 @@ export class RainlinkPlayer {
    * @internal
    */
   public async sendServerUpdate(voiceManager: RainlinkVoiceManager): Promise<void> {
+    this.checkDestroyed();
     const playerUpdate = {
       guildId: this.guildId,
       playerOptions: {
@@ -140,6 +141,7 @@ export class RainlinkPlayer {
    * @internal
    */
   public async destroy(): Promise<void> {
+    this.checkDestroyed();
     const voiceManager = this.manager.voiceManagers.get(this.guildId);
     if (voiceManager) {
       voiceManager.disconnect();
@@ -149,6 +151,7 @@ export class RainlinkPlayer {
     this.manager.players.delete(this.guildId);
     this.state = RainlinkPlayerState.DESTROYED;
     this.debug('Player destroyed at ' + this.guildId);
+    this.clear();
     this.manager.emit(RainlinkEvents.PlayerDestroy, this);
   }
 
@@ -221,6 +224,7 @@ export class RainlinkPlayer {
    * @returns RainlinkSearchResult
    */
   public async search(query: string, options?: RainlinkSearchOptions): Promise<RainlinkSearchResult> {
+    this.checkDestroyed();
     return await this.manager.search(query, options);
   }
 
@@ -259,6 +263,24 @@ export class RainlinkPlayer {
   }
 
   /**
+   * Pause or resume a track but different method
+   * @param mode Whether to pause or not
+   * @returns RainlinkPlayer
+   */
+  public async setPause(mode: boolean): Promise<RainlinkPlayer> {
+    this.checkDestroyed();
+    if (!this.paused) return this;
+    await this.node.rest.updatePlayer({
+      guildId: this.guildId,
+      playerOptions: {
+        paused: false,
+      },
+    });
+    this.paused = false;
+    return this;
+  }
+
+  /**
    * Play the previous track
    * @returns RainlinkPlayer
    */
@@ -278,6 +300,7 @@ export class RainlinkPlayer {
    * @returns RainlinkTrack[]
    */
   public getPrevious(): RainlinkTrack[] {
+    this.checkDestroyed();
     return this.queue.previous;
   }
 
@@ -366,6 +389,51 @@ export class RainlinkPlayer {
     if (enable == this.muted) return this;
     this.voiceManager.setDeaf(enable);
     return this;
+  }
+
+  /**
+   * Stop all avtivities and reset to default
+   * @param destroy Whenever you want to destroy a player or not
+   * @returns RainlinkPlayer
+   */
+  public async stop(destroy: boolean): Promise<RainlinkPlayer> {
+    this.checkDestroyed();
+
+    if (destroy) {
+      await this.destroy();
+      return this;
+    }
+
+    await this.node.rest.updatePlayer({
+      guildId: this.guildId,
+      playerOptions: {
+        track: {
+          encoded: null,
+        },
+      },
+    });
+    this.manager.emit(RainlinkEvents.PlayerEnd, this, this.queue.current);
+    this.clear();
+
+    return this;
+  }
+
+  /**
+   * Reset all data to default
+   * @inverval
+   */
+  public clear(): void {
+    this.loop = RainlinkLoopMode.NONE;
+    this.queue.clear();
+    this.queue.current = undefined;
+    this.queue.previous.length = 0;
+    this.volume = this.voiceOptions.volume ?? this.manager.rainlinkOptions!.options!.defaultVolume ?? 100;
+    this.paused = false;
+    this.playing = false;
+    this.data.clear();
+    this.position = 0;
+    this.manager.emit(RainlinkEvents.PlayerEmpty, this);
+    return;
   }
 
   /**
@@ -478,6 +546,7 @@ export class RainlinkPlayer {
    * @returns RainlinkPlayer
    */
   public async send(data: UpdatePlayerInfo): Promise<RainlinkPlayer> {
+    this.checkDestroyed();
     await this.node.rest.updatePlayer(data);
     return this;
   }

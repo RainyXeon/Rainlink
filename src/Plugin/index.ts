@@ -37,8 +37,8 @@ import { RainlinkPlugin as SaveSession } from './SaveSession/Plugin.js';
  *       // About save session plugin:
  *       // This plugin still in development stage and only save sessionId not voiceId.
  *       // Be carefull when using
- *       new Plugin.SaveSession(),
- *       new Plugin.PlayerMoved(client)
+ *       // new Plugin.SaveSession(),
+ *       new Plugin.PlayerMoved(client),
  *     ],
  *   },
  * );
