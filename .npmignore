@@ -1,0 +1,10 @@
+example.js
+.prettierrc.json
+build.bat
+build.sh
+typedoc.json
+tsconfig.json
+bot.test.js
+docs
+md
+src

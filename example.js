@@ -1,6 +1,3 @@
-// const directParam = /directSearch=(.*)/
-// console.log(directParam.exec("directSearch=ytsearch:data"))
-
 const {Client, GatewayIntentBits} = require('discord.js');
 const {Guilds, GuildVoiceStates, GuildMessages, MessageContent} = GatewayIntentBits;
 const {Rainlink, Library, Plugin} = require("./dist");
@@ -17,14 +14,33 @@ const client = new Client({intents: [Guilds, GuildVoiceStates, GuildMessages, Me
 const rainlink = new Rainlink({
     library: new Library.DiscordJS(client),
     nodes: Nodes,
+    plugins: [
+        new Plugin.Deezer(),
+        new Plugin.Nico({
+            searchLimit: 10,
+        }),
+        new Plugin.Apple({
+            countryCode: "us",
+            imageWidth: 600,
+            imageHeight: 900,
+         }),
+        new Plugin.Spotify({
+            clientId: "your_spotify_client_id",
+            clientSecret: "your_spotify_client_secret",
+            playlistPageLimit: 1,
+            albumPageLimit: 1,
+            searchLimit: 20,
+            searchMarket: "US"
+         }),
+        // About save session plugin:
+        // This plugin still in development stage and only save sessionId not voiceId.
+        // Be carefull when using
+        // new Plugin.SaveSession(),
+        new Plugin.PlayerMoved(client),
+    ],
     options: {
-        retryCount: 20,
-        retryTimeout: 2000,
-        voiceConnectionTimeout: 5000,
-        resume: true,
-        resumeTimeout: 300
-    },
-    plugins: [new Plugin.Deezer(), new Plugin.SaveSession()],
+        defaultSearchEngine: "youtubeMusic"
+    }
 });
 
 client.on("ready", () => console.log(client.user.tag + " Ready!"));
