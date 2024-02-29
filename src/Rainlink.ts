@@ -300,9 +300,10 @@ export class Rainlink extends EventEmitter {
    * @returns RainlinkSearchResult
    */
   async search(query: string, options?: RainlinkSearchOptions): Promise<RainlinkSearchResult> {
-    const node = options?.nodeName
-      ? this.nodes.get(options.nodeName) ?? (await this.nodes.getLeastUsedNode())
-      : await this.nodes.getLeastUsedNode();
+    const node =
+      options && options?.nodeName
+        ? this.nodes.get(options.nodeName) ?? (await this.nodes.getLeastUsedNode())
+        : await this.nodes.getLeastUsedNode();
 
     if (!node) throw new Error('No node is available');
 
@@ -374,7 +375,9 @@ export class Rainlink extends EventEmitter {
 
     return this.buildSearch(
       normalizedData.playlistName ?? undefined,
-      normalizedData.tracks.map(track => new RainlinkTrack(track, options?.requester)),
+      normalizedData.tracks.map(
+        track => new RainlinkTrack(track, options && options.requester ? options.requester : undefined),
+      ),
       loadType,
     );
   }
