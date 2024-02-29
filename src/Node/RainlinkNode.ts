@@ -90,7 +90,7 @@ export class RainlinkNode {
       headers: {
         Authorization: this.options.auth,
         'User-Id': this.manager.id,
-        'Client-Name': `rainlink@${metadata.version}`,
+        'Client-Name': `project${metadata.name}@${metadata.version}`,
         'Session-Id': this.sessionId !== null && isResume ? this.sessionId : '',
         'user-agent': this.manager.rainlinkOptions.options!.userAgent!,
       },

@@ -224,7 +224,7 @@ export class Rainlink extends EventEmitter {
   public plugins: Map<string, RainlinkPlugin>;
 
   /**
-   * The main class that handle all works in lavalink server
+   * The main class that handle all works in lavalink server.
    * Call this class by using new Rainlink(your_params) to use!
    * @param options The main ranlink options
    */
@@ -314,18 +314,19 @@ export class Rainlink extends EventEmitter {
 
     const pluginSearch = this.searchPlugins.get(String(options?.engine));
 
-    if (pluginSearch && isDirectSearch == null) {
+    if (options && options!.engine && options!.engine !== null && pluginSearch && isDirectSearch == null) {
       pluginData = await pluginSearch.searchDirect(query, options);
       if (pluginData.tracks.length !== 0) return pluginData;
     }
 
-    const source = options?.engine
-      ? this.searchEngines.get(options.engine)
-      : this.searchEngines.get(
-          this.rainlinkOptions.options!.defaultSearchEngine
-            ? this.rainlinkOptions.options!.defaultSearchEngine
-            : 'youtube',
-        );
+    const source =
+      options && options?.engine
+        ? this.searchEngines.get(options.engine)
+        : this.searchEngines.get(
+            this.rainlinkOptions.options!.defaultSearchEngine
+              ? this.rainlinkOptions.options!.defaultSearchEngine
+              : 'youtube',
+          );
 
     const finalQuery =
       isDirectSearch !== null ? isDirectSearch[1] : !isUrl ? `${source}search:${query}` : query;
