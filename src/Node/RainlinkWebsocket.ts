@@ -51,6 +51,7 @@ export class RainlinkWebsocket {
         return this.debug(`Player ${player.guildId} destroyed from end event`);
 
       player.playing = false;
+      player.paused = true;
 
       if (newData.reason === 'replaced') {
         return this.manager.emit(RainlinkEvents.PlayerEnd, player);

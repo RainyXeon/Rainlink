@@ -105,7 +105,7 @@ export class RainlinkPlayer {
     this.textId = this.voiceOptions.textId;
     this.queue = new RainlinkQueue(this.manager, this);
     this.data = new Map<string, any>();
-    this.paused = false;
+    this.paused = true;
     this.position = 0;
     this.volume = this.manager.rainlinkOptions.options!.defaultVolume!;
     this.playing = false;
@@ -273,10 +273,10 @@ export class RainlinkPlayer {
     await this.node.rest.updatePlayer({
       guildId: this.guildId,
       playerOptions: {
-        paused: false,
+        paused: mode,
       },
     });
-    this.paused = false;
+    this.paused = mode;
     return this;
   }
 
@@ -320,6 +320,7 @@ export class RainlinkPlayer {
     });
 
     this.playing = false;
+    this.paused = true;
     this.position = 0;
     if (this.queue.current) this.queue.previous.push(this.queue.current);
     const currentSong = this.queue.current;
@@ -428,7 +429,7 @@ export class RainlinkPlayer {
     this.queue.current = undefined;
     this.queue.previous.length = 0;
     this.volume = this.voiceOptions.volume ?? this.manager.rainlinkOptions!.options!.defaultVolume ?? 100;
-    this.paused = false;
+    this.paused = true;
     this.playing = false;
     this.data.clear();
     this.position = 0;
