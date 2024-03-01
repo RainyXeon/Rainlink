@@ -189,7 +189,7 @@ export class RainlinkPlayer {
 
     if (!resolveResult) {
       this.manager.emit(RainlinkEvents.PlayerResolveError, this, current, errorMessage);
-      this.manager.emit(RainlinkEvents.Debug, `Player ${this.guildId} resolve error: ${errorMessage}`);
+      this.debug(`Player ${this.guildId} resolve error: ${errorMessage}`);
       this.queue.current = null;
       this.queue.size ? await this.play() : this.manager.emit(RainlinkEvents.PlayerEmpty, this);
       return this;

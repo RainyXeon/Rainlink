@@ -11,55 +11,59 @@ import {
 import { Rainlink } from '../Rainlink';
 
 export class RainlinkWebsocket {
-  public manager: Rainlink;
-  private readonly methods: Record<string, (data: Record<string, any>) => void>;
+  private readonly methods: Record<string, (manager: Rainlink, data: Record<string, any>) => void>;
 
-  constructor(manager: Rainlink) {
-    this.manager = manager;
+  constructor() {
     this.methods = {
-      TrackStartEvent: this.TrackStartEvent.bind(this),
-      TrackEndEvent: this.TrackEndEvent.bind(this),
-      TrackExceptionEvent: this.TrackExceptionEvent.bind(this),
-      TrackStuckEvent: this.TrackStuckEvent.bind(this),
-      WebSocketClosedEvent: this.WebSocketClosedEvent.bind(this),
+      TrackStartEvent: this.TrackStartEvent,
+      TrackEndEvent: this.TrackEndEvent,
+      TrackExceptionEvent: this.TrackExceptionEvent,
+      TrackStuckEvent: this.TrackStuckEvent,
+      WebSocketClosedEvent: this.WebSocketClosedEvent,
     };
   }
 
-  public initial(data: Record<string, any>) {
-    if (data.op == LavalinkEventsEnum.PlayerUpdate) return this.PlayerUpdate(data);
+  public initial(data: Record<string, any>, manager: Rainlink) {
+    if (data.op == LavalinkEventsEnum.PlayerUpdate) return this.PlayerUpdate(manager, data);
     const _function = this.methods[data.type];
-    if (_function !== undefined) _function(data);
+    if (_function !== undefined) _function(manager, data);
   }
 
-  protected TrackStartEvent(data: Record<string, any>) {
+  protected TrackStartEvent(manager: Rainlink, data: Record<string, any>) {
     const newData = data as TrackStartEvent;
-    const player = this.manager.players.get(newData.guildId);
+    const player = manager.players.get(newData.guildId);
     if (player) {
       player.playing = true;
-      this.manager.emit(RainlinkEvents.PlayerStart, player, player.queue.current);
-      this.debug(`Player started at guild ${newData.guildId}`);
+      manager.emit(RainlinkEvents.PlayerStart, player, player.queue.current);
+      manager.emit(
+        RainlinkEvents.Debug,
+        `[Rainlink Player Events]: Player started at guild ${newData.guildId}`,
+      );
     }
     return;
   }
 
-  protected TrackEndEvent(data: Record<string, any>) {
+  protected TrackEndEvent(manager: Rainlink, data: Record<string, any>) {
     const newData = data as TrackEndEvent;
-    const player = this.manager.players.get(newData.guildId);
+    const player = manager.players.get(newData.guildId);
     if (player) {
       // This event emits STOPPED reason when destroying, so return to prevent double emit
       if (player.state === RainlinkPlayerState.DESTROYED)
-        return this.debug(`Player ${player.guildId} destroyed from end event`);
+        return manager.emit(
+          RainlinkEvents.Debug,
+          `[Rainlink Player Events]: Player ${player.guildId} destroyed from end event`,
+        );
 
       player.playing = false;
       player.paused = true;
 
       if (newData.reason === 'replaced') {
-        return this.manager.emit(RainlinkEvents.PlayerEnd, player);
+        return manager.emit(RainlinkEvents.PlayerEnd, player);
       }
       if (['loadFailed', 'cleanup'].includes(newData.reason)) {
         if (player.queue.current) player.queue.previous.push(player.queue.current);
-        if (!player.queue.length) return this.manager.emit(RainlinkEvents.PlayerEmpty, player);
-        this.manager.emit(RainlinkEvents.PlayerEnd, player, player.queue.current);
+        if (!player.queue.length) return manager.emit(RainlinkEvents.PlayerEmpty, player);
+        manager.emit(RainlinkEvents.PlayerEnd, player, player.queue.current);
         player.queue.current = null;
         return player.play();
       }
@@ -74,9 +78,9 @@ export class RainlinkWebsocket {
       player.queue.current = null;
 
       if (player.queue.length) {
-        this.manager.emit(RainlinkEvents.PlayerEnd, this, currentSong);
+        manager.emit(RainlinkEvents.PlayerEnd, this, currentSong);
       } else {
-        return this.manager.emit(RainlinkEvents.PlayerEmpty, this);
+        return manager.emit(RainlinkEvents.PlayerEmpty, this);
       }
 
       return player.play();
@@ -84,48 +88,56 @@ export class RainlinkWebsocket {
     return;
   }
 
-  protected TrackExceptionEvent(data: Record<string, any>) {
+  protected TrackExceptionEvent(manager: Rainlink, data: Record<string, any>) {
     const newData = data as TrackExceptionEvent;
-    const player = this.manager.players.get(newData.guildId);
+    const player = manager.players.get(newData.guildId);
     if (player) {
-      this.manager.emit(RainlinkEvents.PlayerException, player, newData);
-      this.debug(`Player got exception at guild ${newData.guildId}`);
+      manager.emit(RainlinkEvents.PlayerException, player, newData);
+      manager.emit(
+        RainlinkEvents.Debug,
+        `[Rainlink Player Events]: Player got exception at guild ${newData.guildId}`,
+      );
     }
     return;
   }
 
-  protected TrackStuckEvent(data: Record<string, any>) {
+  protected TrackStuckEvent(manager: Rainlink, data: Record<string, any>) {
     const newData = data as TrackStuckEvent;
-    const player = this.manager.players.get(newData.guildId);
+    const player = manager.players.get(newData.guildId);
     if (player) {
-      this.manager.emit(RainlinkEvents.PlayerStuck, player, newData);
-      this.debug(`Player stucked at guild ${newData.guildId}`);
+      manager.emit(RainlinkEvents.PlayerStuck, player, newData);
+      manager.emit(
+        RainlinkEvents.Debug,
+        `[Rainlink Player Events]: Player stucked at guild ${newData.guildId}`,
+      );
     }
     return;
   }
 
-  protected WebSocketClosedEvent(data: Record<string, any>) {
+  protected WebSocketClosedEvent(manager: Rainlink, data: Record<string, any>) {
     const newData = data as WebSocketClosedEvent;
-    const player = this.manager.players.get(newData.guildId);
+    const player = manager.players.get(newData.guildId);
     if (player) {
-      this.manager.emit(RainlinkEvents.PlayerWebsocketClosed, player, newData);
-      this.debug(`Websocket closed at guild ${newData.guildId}`);
+      manager.emit(RainlinkEvents.PlayerWebsocketClosed, player, newData);
+      manager.emit(
+        RainlinkEvents.Debug,
+        `[Rainlink Player Events]: Websocket closed at guild ${newData.guildId}`,
+      );
     }
     return;
   }
 
-  protected PlayerUpdate(data: Record<string, any>) {
+  protected PlayerUpdate(manager: Rainlink, data: Record<string, any>) {
     const newData = data as PlayerUpdate;
-    const player = this.manager.players.get(newData.guildId);
+    const player = manager.players.get(newData.guildId);
     if (player) {
       player.position = Number(newData.state.position);
-      this.debug(`Player updated, position: ${data.state.position}`);
-      this.manager.emit(RainlinkEvents.PlayerUpdate, player, newData);
+      manager.emit(
+        RainlinkEvents.Debug,
+        `[Rainlink Player Events]: Player updated, position: ${data.state.position}`,
+      );
+      manager.emit(RainlinkEvents.PlayerUpdate, player, newData);
     }
     return;
-  }
-
-  protected debug(logs: string) {
-    this.manager.emit(RainlinkEvents.Debug, `[Rainlink Player Events]: ${logs}`);
   }
 }

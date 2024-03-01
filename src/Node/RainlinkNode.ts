@@ -53,7 +53,7 @@ export class RainlinkNode {
       ? new customRest(manager, options, this)
       : new RainlinkRest(manager, options, this);
     this.sessionId = null;
-    this.wsEvent = new RainlinkWebsocket(manager);
+    this.wsEvent = new RainlinkWebsocket();
     this.stats = {
       players: 0,
       playingPlayers: 0,
@@ -136,11 +136,11 @@ export class RainlinkNode {
         break;
       }
       case LavalinkEventsEnum.Event: {
-        this.wsEvent.initial(data);
+        this.wsEvent.initial(wsData, this.manager);
         break;
       }
       case LavalinkEventsEnum.PlayerUpdate: {
-        this.wsEvent.initial(data);
+        this.wsEvent.initial(wsData, this.manager);
         break;
       }
       case LavalinkEventsEnum.Status: {
