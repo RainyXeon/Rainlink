@@ -151,6 +151,7 @@ export class RainlinkPlayer {
     this.state = RainlinkPlayerState.DESTROYED;
     this.debug('Player destroyed at ' + this.guildId);
     this.clear();
+    this.voiceId = ""
     this.manager.emit(RainlinkEvents.PlayerDestroy, this);
   }
 

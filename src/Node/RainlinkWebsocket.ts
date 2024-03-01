@@ -50,7 +50,10 @@ export class RainlinkWebsocket {
       if (player.state === RainlinkPlayerState.DESTROYED)
         return this.debug(`Player ${player.guildId} destroyed from end event`);
 
-      if (newData.reason === 'replaced') return this.manager.emit(RainlinkEvents.PlayerEnd, player);
+      if (newData.reason === 'replaced') {
+        player.playing = false;
+        return this.manager.emit(RainlinkEvents.PlayerEnd, player);
+      }
       if (['loadFailed', 'cleanup'].includes(newData.reason)) {
         if (player.queue.current) player.queue.previous.push(player.queue.current);
         player.playing = false;
@@ -69,8 +72,10 @@ export class RainlinkWebsocket {
       const currentSong = player.queue.current;
       player.queue.current = null;
 
-      if (player.queue.length) this.manager.emit(RainlinkEvents.PlayerEnd, this, currentSong);
-      else {
+      if (player.queue.length) {
+        player.playing = false;
+        this.manager.emit(RainlinkEvents.PlayerEnd, this, currentSong);
+      } else {
         player.playing = false;
         return this.manager.emit(RainlinkEvents.PlayerEmpty, this);
       }
