@@ -54,6 +54,11 @@ export class RainlinkWebsocket {
           `[Rainlink Player Events]: Player ${player.guildId} destroyed from end event`,
         );
 
+      manager.emit(
+        RainlinkEvents.Debug,
+        `[Rainlink Player Events]: Player ended at guild ${newData.guildId}`,
+      );
+
       player.playing = false;
       player.paused = true;
 
@@ -78,9 +83,9 @@ export class RainlinkWebsocket {
       player.queue.current = null;
 
       if (player.queue.length) {
-        manager.emit(RainlinkEvents.PlayerEnd, this, currentSong);
+        manager.emit(RainlinkEvents.PlayerEnd, player, currentSong);
       } else {
-        return manager.emit(RainlinkEvents.PlayerEmpty, this);
+        return manager.emit(RainlinkEvents.PlayerEmpty, player);
       }
 
       return player.play();
