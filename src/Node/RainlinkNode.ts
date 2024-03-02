@@ -3,7 +3,7 @@ import { RainlinkNodeOptions } from '../Interface/Manager';
 import { Rainlink } from '../Rainlink';
 import { RainlinkConnectState, RainlinkEvents } from '../Interface/Constants';
 import { RainlinkRest } from './RainlinkRest';
-import { metadata } from '../manifest';
+import { metadata } from '../metadata';
 import { setTimeout } from 'node:timers/promises';
 import { RainlinkWebsocket } from './RainlinkWebsocket';
 import { LavalinkEventsEnum } from '../Interface/LavalinkEvents';

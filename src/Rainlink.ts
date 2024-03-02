@@ -24,7 +24,7 @@ import {
   TrackStuckEvent,
   WebSocketClosedEvent,
 } from './Interface/LavalinkEvents';
-import { metadata } from './manifest';
+import { metadata } from './metadata';
 import { RainlinkPlugin } from './Plugin/RainlinkPlugin';
 
 export declare interface Rainlink {
