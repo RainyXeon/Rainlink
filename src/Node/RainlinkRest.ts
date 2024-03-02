@@ -3,7 +3,7 @@
 
 import { RainlinkNodeOptions } from '../Interface/Manager';
 import { Rainlink } from '../Rainlink';
-import { metadata } from '../manifest';
+import { metadata } from '../metadata';
 import { LavalinkLoadType, RainlinkEvents } from '../Interface/Constants';
 import { RainlinkNode } from './RainlinkNode';
 import {

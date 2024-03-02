@@ -3,7 +3,7 @@ import { RainlinkNodeOptions } from '../Interface/Manager';
 import { Rainlink } from '../Rainlink';
 import { RainlinkConnectState, RainlinkEvents } from '../Interface/Constants';
 import { RainlinkRest } from './RainlinkRest';
-import { metadata } from '../manifest';
+import { metadata } from '../metadata';
 import { setTimeout } from 'node:timers/promises';
 import { RainlinkWebsocket } from './RainlinkWebsocket';
 import { LavalinkEventsEnum } from '../Interface/LavalinkEvents';
@@ -53,7 +53,7 @@ export class RainlinkNode {
       ? new customRest(manager, options, this)
       : new RainlinkRest(manager, options, this);
     this.sessionId = null;
-    this.wsEvent = new RainlinkWebsocket(manager);
+    this.wsEvent = new RainlinkWebsocket();
     this.stats = {
       players: 0,
       playingPlayers: 0,
@@ -136,11 +136,11 @@ export class RainlinkNode {
         break;
       }
       case LavalinkEventsEnum.Event: {
-        this.wsEvent.initial(data);
+        this.wsEvent.initial(wsData, this.manager);
         break;
       }
       case LavalinkEventsEnum.PlayerUpdate: {
-        this.wsEvent.initial(data);
+        this.wsEvent.initial(wsData, this.manager);
         break;
       }
       case LavalinkEventsEnum.Status: {

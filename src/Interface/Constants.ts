@@ -19,8 +19,10 @@ export enum RainlinkEvents {
   PlayerStuck = 'playerStuck',
   PlayerUpdate = 'playerUpdate',
   PlayerWebsocketClosed = 'playerWebsocketClosed',
-  QueueUpdate = 'queueUpdate',
   PlayerMoved = 'playerMoved',
+  PlayerPaused = 'playerPaused',
+  PlayerResumed = 'playerResumed',
+  QueueUpdate = 'queueUpdate',
 }
 
 /**

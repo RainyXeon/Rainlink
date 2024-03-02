@@ -1,4 +1,4 @@
-import { metadata } from './manifest';
+import { metadata } from './metadata';
 import Library from './Library';
 import Plugin from './Plugin';
 
