@@ -242,6 +242,7 @@ export class RainlinkPlayer {
       },
     });
     this.paused = true;
+    this.manager.emit(RainlinkEvents.PlayerPaused, this, this.queue.current);
     return this;
   }
 
@@ -259,6 +260,7 @@ export class RainlinkPlayer {
       },
     });
     this.paused = false;
+    this.manager.emit(RainlinkEvents.PlayerResumed, this, this.queue.current);
     return this;
   }
 
@@ -277,6 +279,11 @@ export class RainlinkPlayer {
       },
     });
     this.paused = mode;
+    this.manager.emit(
+      mode ? RainlinkEvents.PlayerPaused : RainlinkEvents.PlayerResumed,
+      this,
+      this.queue.current,
+    );
     return this;
   }
 

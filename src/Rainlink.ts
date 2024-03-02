@@ -120,10 +120,21 @@ export declare interface Rainlink {
     listener: (player: RainlinkPlayer, oldChannelId: string, newChannelId: string) => void,
   ): this;
   /**
+   * Emitted when a track paused.
+   * @event Rainlink#playerPaused
+   */
+  on(event: 'playerPaused', listener: (player: RainlinkPlayer, track: RainlinkTrack) => void): this;
+  /**
+   * Emitted when a track resumed.
+   * @event Rainlink#playerResumed
+   */
+  on(event: 'playerResumed', listener: (player: RainlinkPlayer, data: RainlinkTrack) => void): this;
+  /**
    * Emitted when a queue updated.
    * @event Rainlink#queueUpdate
    */
   on(event: 'queueUpdate', listener: (player: RainlinkPlayer, queue: RainlinkQueue) => void): this;
+
   // ------------------------- ON EVENT ------------------------- //
 
   // ------------------------- ONCE EVENT ------------------------- //
