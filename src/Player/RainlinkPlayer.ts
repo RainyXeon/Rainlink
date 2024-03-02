@@ -150,7 +150,7 @@ export class RainlinkPlayer {
     this.manager.players.delete(this.guildId);
     this.state = RainlinkPlayerState.DESTROYED;
     this.debug('Player destroyed at ' + this.guildId);
-    this.clear();
+    this.clear(false);
     this.voiceId = '';
     this.manager.emit(RainlinkEvents.PlayerDestroy, this);
   }
@@ -428,9 +428,10 @@ export class RainlinkPlayer {
 
   /**
    * Reset all data to default
+   * @param Whenever emit empty event or not
    * @inverval
    */
-  public clear(): void {
+  public clear(emitEmpty: boolean = true): void {
     this.loop = RainlinkLoopMode.NONE;
     this.queue.clear();
     this.queue.current = undefined;
@@ -440,7 +441,7 @@ export class RainlinkPlayer {
     this.playing = false;
     this.data.clear();
     this.position = 0;
-    this.manager.emit(RainlinkEvents.PlayerEmpty, this);
+    if (emitEmpty) this.manager.emit(RainlinkEvents.PlayerEmpty, this);
     return;
   }
 
@@ -590,6 +591,6 @@ export class RainlinkPlayer {
 
   /** @ignore */
   protected checkDestroyed(): void {
-    if (this.state == RainlinkPlayerState.DESTROYED) throw new Error('Player is destroyed');
+    if (this.state === RainlinkPlayerState.DESTROYED) throw new Error('Player is destroyed');
   }
 }
