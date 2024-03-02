@@ -1,6 +1,7 @@
 # ⚠️⚠️⚠️ Warning!!
 
 ⚠️⚠️ This lavalink wrapper is just in the development stage, you will take full responsibility for any errors or bugs!!
+⚠️ Update 1: Rainlink now in stage 11 of development (Release beta product)
 
 # 🌦️ Rainlink
 

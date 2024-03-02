@@ -63,7 +63,7 @@ export class RainlinkWebsocket {
       player.paused = true;
 
       if (newData.reason === 'replaced') {
-        return manager.emit(RainlinkEvents.PlayerEnd, player);
+        return manager.emit(RainlinkEvents.PlayerEnd, player, player.queue.current);
       }
       if (['loadFailed', 'cleanup'].includes(newData.reason)) {
         if (player.queue.current) player.queue.previous.push(player.queue.current);
