@@ -325,21 +325,6 @@ export class RainlinkPlayer {
         },
       },
     });
-
-    this.playing = false;
-    this.paused = true;
-    this.position = 0;
-    if (this.queue.current) this.queue.previous.push(this.queue.current);
-    const currentSong = this.queue.current;
-    this.queue.current = null;
-    if (this.queue.length) this.manager.emit(RainlinkEvents.PlayerEnd, this, currentSong);
-    else if (!this.queue.length) {
-      this.manager.emit(RainlinkEvents.PlayerEmpty, this);
-      return this;
-    }
-
-    this.play();
-    this.paused = false;
     return this;
   }
 

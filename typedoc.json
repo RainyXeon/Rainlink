@@ -19,7 +19,7 @@
     "src/Library/ErisJS.ts",
     "src/Library/OceanicJS.ts",
     "src/index.ts",
-    "src/manifest.ts",
+    "src/metadata.ts",
     "src/Node/RainlinkWebsocket.ts"
   ],
   "kindSortOrder": [

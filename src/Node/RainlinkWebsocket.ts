@@ -34,6 +34,7 @@ export class RainlinkWebsocket {
     const player = manager.players.get(newData.guildId);
     if (player) {
       player.playing = true;
+      player.paused = false;
       manager.emit(RainlinkEvents.PlayerStart, player, player.queue.current);
       manager.emit(
         RainlinkEvents.Debug,
@@ -56,7 +57,7 @@ export class RainlinkWebsocket {
 
       manager.emit(
         RainlinkEvents.Debug,
-        `[Rainlink Player Events]: Player ended at guild ${newData.guildId}`,
+        `[Rainlink Player Events]: Player ended at guild ${newData.guildId}, have ${player.queue.length} tracks left`,
       );
 
       player.playing = false;
