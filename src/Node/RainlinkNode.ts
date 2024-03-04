@@ -1,9 +1,8 @@
-import { RawData, WebSocket } from 'ws';
+import { WebSocket } from 'ws';
 import { RainlinkNodeOptions } from '../Interface/Manager';
 import { Rainlink } from '../Rainlink';
 import { RainlinkConnectState, RainlinkEvents, RainlinkServer } from '../Interface/Constants';
 import { RainlinkRest } from './RainlinkRest';
-import { metadata } from '../metadata';
 import { setTimeout } from 'node:timers/promises';
 import { RainlinkWebsocket } from './RainlinkWebsocket';
 import { LavalinkEventsEnum } from '../Interface/LavalinkEvents';
@@ -11,6 +10,7 @@ import { LavalinkNodeStatsResponse, NodeStats } from '../Interface/Node';
 import { RainlinkPlugin as SaveSessionPlugin } from '../Plugin/SaveSession/Plugin';
 import { AbstractDriver } from '../Drivers/AbstractDriver';
 import { Lavalink4 } from '../Drivers/Lavalink4';
+import { Lavalink3 } from '../Drivers/Lavalink3';
 
 export class RainlinkNode {
   /** The rainlink manager */
@@ -46,6 +46,8 @@ export class RainlinkNode {
     this.options = options;
     if (this.manager.rainlinkOptions.driver == RainlinkServer.Lavalink4) {
       this.driver = new Lavalink4(this.manager, options, this);
+    } else if (this.manager.rainlinkOptions.driver == RainlinkServer.Lavalink3) {
+      this.driver = new Lavalink3(this.manager, options, this);
     } else {
       throw new Error('Please include a valid server driver enum');
     }
@@ -102,7 +104,7 @@ export class RainlinkNode {
           ? new customRest(this.manager, this.options, this)
           : new RainlinkRest(this.manager, this.options, this);
         if (isResume) {
-          this.rest.updateSession(data.sessionId, isResume, timeout);
+          this.driver.updateSession(data.sessionId, isResume, timeout);
           if (this.sessionPlugin) {
             this.sessionPlugin.deleteSession(this.options.host);
             this.sessionPlugin.setSession(this.options.host, data.sessionId);

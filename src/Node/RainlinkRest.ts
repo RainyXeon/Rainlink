@@ -124,28 +124,6 @@ export class RainlinkRest {
     } else return resData;
   }
 
-  /**
-   * Update a season to resume able or not
-   * @returns LavalinkResponse
-   */
-  public async updateSession(sessionId: string, mode: boolean, timeout: number): Promise<void> {
-    const options: RainlinkFetcherOptions = {
-      endpoint: `/sessions/${sessionId}`,
-      requestOptions: {
-        headers: { 'Content-Type': 'application/json' },
-        method: 'PATCH',
-        data: {
-          resuming: mode,
-          timeout: timeout,
-        },
-      },
-    };
-
-    await this.nodeManager.driver.fetcher<{ resuming: boolean; timeout: number }>(options);
-    this.debug(`Session updated! resume: ${mode}, timeout: ${timeout}`);
-    return;
-  }
-
   /** @ignore */
   protected testJSON(text: string) {
     if (typeof text !== 'string') {

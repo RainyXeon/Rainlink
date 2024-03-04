@@ -14,4 +14,5 @@ export abstract class AbstractDriver {
   abstract connect(): WebSocket;
   abstract fetcher<D = any>(options: RainlinkFetcherOptions): Promise<D | undefined>;
   abstract wsClose(): void;
+  abstract updateSession(sessionId: string, mode: boolean, timeout: number): Promise<void>;
 }

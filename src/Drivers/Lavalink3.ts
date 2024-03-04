@@ -1,13 +1,21 @@
-import { RainlinkNodeOptions } from '../Interface/Manager';
+import { RainlinkNodeOptions, RainlinkSearchResultType } from '../Interface/Manager';
 import { Rainlink } from '../Rainlink';
 import { metadata } from '../metadata';
 import { RainlinkPlugin as SaveSessionPlugin } from '../Plugin/SaveSession/Plugin';
 import { RawData, WebSocket } from 'ws';
 import axios from 'axios';
-import { RainlinkEvents } from '../Interface/Constants';
+import { LavalinkLoadType, RainlinkEvents } from '../Interface/Constants';
 import { RainlinkFetcherOptions } from '../Interface/Rest';
 import { RainlinkNode } from '../Node/RainlinkNode';
 import { AbstractDriver } from './AbstractDriver';
+
+export enum Lavalink3loadType {
+  TRACK_LOADED = 'TRACK_LOADED',
+  PLAYLIST_LOADED = 'PLAYLIST_LOADED',
+  SEARCH_RESULT = 'SEARCH_RESULT',
+  NO_MATCHES = 'NO_MATCHES',
+  LOAD_FAILED = 'LOAD_FAILED',
+}
 
 export class Lavalink3 extends AbstractDriver {
   /** @ignore */
@@ -44,7 +52,7 @@ export class Lavalink3 extends AbstractDriver {
       headers: {
         Authorization: this.options.auth,
         'User-Id': this.manager.id,
-        'Client-Name': `${metadata.name}@${metadata.version}`,
+        'Client-Name': `${metadata.name}/${metadata.version}`,
         'Session-Id': this.sessionId !== null && isResume ? this.sessionId : '',
         'user-agent': this.manager.rainlinkOptions.options!.userAgent!,
       },
@@ -75,6 +83,8 @@ export class Lavalink3 extends AbstractDriver {
 
     options.requestOptions.headers = lavalinkHeaders;
 
+    this.convertToV3request(options.requestOptions.data);
+
     const res = await axios({
       url: url.toString(),
       ...options.requestOptions,
@@ -89,15 +99,40 @@ export class Lavalink3 extends AbstractDriver {
       return undefined;
     }
 
-    const finalData = String(res.data);
+    const finalData = this.testJSON(String(res.data)) ? (JSON.parse(res.data) as D) : (res.data as D);
 
-    return this.testJSON(finalData) ? (JSON.parse(res.data) as D) : (res.data as D);
+    this.convertToV4response(finalData as Record<string, any>);
+
+    return finalData;
   }
 
   /** @ignore */
   protected wsMessageEvent(data: RawData) {
     const wsData = JSON.parse(data.toString());
+    if (wsData.reason) wsData.reason = (wsData.reason as string).toLowerCase();
     this.node.wsMessageEvent(wsData);
+  }
+
+  /**
+   * Update a season to resume able or not
+   * @returns LavalinkResponse
+   */
+  public async updateSession(sessionId: string, mode: boolean, timeout: number): Promise<void> {
+    const options: RainlinkFetcherOptions = {
+      endpoint: `/sessions/${sessionId}`,
+      requestOptions: {
+        headers: { 'Content-Type': 'application/json' },
+        method: 'PATCH',
+        data: {
+          resumingKey: sessionId,
+          timeout: timeout,
+        },
+      },
+    };
+
+    await this.fetcher<{ resuming: boolean; timeout: number }>(options);
+    this.debug(`Session updated! resume: ${mode}, timeout: ${timeout}`);
+    return;
   }
 
   /** @ignore */
@@ -120,6 +155,33 @@ export class Lavalink3 extends AbstractDriver {
       return true;
     } catch (error) {
       return false;
+    }
+  }
+
+  protected convertToV3request(data?: Record<string, any>) {
+    if (!data) return;
+    if (data.track && data.track.encoded) {
+      data.encodedTrack = data.track.encoded;
+    }
+    return;
+  }
+
+  protected convertToV4response(data?: Record<string, any>) {
+    if (!data) return {};
+    if (data.loadType == Lavalink3loadType.LOAD_FAILED) {
+      data.loadType == LavalinkLoadType.ERROR;
+    }
+    if (data.loadType == Lavalink3loadType.PLAYLIST_LOADED) {
+      data.loadType == LavalinkLoadType.PLAYLIST;
+    }
+    if (data.loadType == Lavalink3loadType.SEARCH_RESULT) {
+      data.loadType == LavalinkLoadType.SEARCH;
+    }
+    if (data.loadType == Lavalink3loadType.TRACK_LOADED) {
+      data.loadType == LavalinkLoadType.TRACK;
+    }
+    if (data.loadType == Lavalink3loadType.NO_MATCHES) {
+      data.loadType == LavalinkLoadType.EMPTY;
     }
   }
 }
