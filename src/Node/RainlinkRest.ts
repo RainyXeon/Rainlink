@@ -39,43 +39,8 @@ export class RainlinkRest {
     this.axios = axios;
     this.options = options;
     this.nodeManager = nodeManager;
-    this.sessionId = this.nodeManager.sessionId;
+    this.sessionId = this.nodeManager.driver.sessionId ? this.nodeManager.driver.sessionId : '';
     this.url = `${options.secure ? 'https://' : 'http://'}${options.host}:${options.port}/v${metadata.lavalink}`;
-  }
-
-  /** @ignore */
-  private async fetcher<D = any>(options: RainlinkFetcherOptions): Promise<D | undefined> {
-    if (options.useSessionId && this.sessionId == null)
-      throw new Error('sessionId not initalized! Please wait for lavalink get connected!');
-    const url = new URL(`${this.url}${options.endpoint}`);
-    if (options.params) url.search = new URLSearchParams(options.params).toString();
-
-    const lavalinkHeaders = {
-      Authorization: this.options.auth,
-      'User-Agent': this.manager.rainlinkOptions.options!.userAgent!,
-      ...options.requestOptions.headers,
-    };
-
-    options.requestOptions.headers = lavalinkHeaders;
-
-    const res = await axios({
-      url: url.toString(),
-      ...options.requestOptions,
-    });
-
-    // const res = await undici.request(url, options.requestOptions typeof undici.Dispatcher.);
-    if (res.status == 204) {
-      this.debug('Player now destroyed');
-      return undefined;
-    }
-    if (res.status !== 200) {
-      this.debug('Something went wrong with lavalink server.' + `Status code: ${res.status}`);
-      return undefined;
-    }
-
-    const finalData = String(res.data);
-
-    return this.testJSON(finalData) ? (JSON.parse(res.data) as D) : (res.data as D);
   }
 
   /**
@@ -92,7 +57,7 @@ export class RainlinkRest {
         method: 'GET',
       },
     };
-    return (await this.fetcher<LavalinkPlayer[]>(options)) ?? [];
+    return (await this.nodeManager.driver.fetcher<LavalinkPlayer[]>(options)) ?? [];
   }
 
   /**
@@ -110,7 +75,7 @@ export class RainlinkRest {
         data: data.playerOptions as Record<string, unknown>,
       },
     };
-    return await this.fetcher<LavalinkPlayer>(options);
+    return await this.nodeManager.driver.fetcher<LavalinkPlayer>(options);
   }
 
   /**
@@ -127,7 +92,7 @@ export class RainlinkRest {
         method: 'DELETE',
       },
     };
-    return this.fetcher(options);
+    return this.nodeManager.driver.fetcher(options);
   }
 
   /** @ignore */
@@ -149,7 +114,7 @@ export class RainlinkRest {
       },
     };
 
-    const resData = await this.fetcher<LavalinkResponse>(options);
+    const resData = await this.nodeManager.driver.fetcher<LavalinkResponse>(options);
 
     if (!resData) {
       return {
@@ -176,7 +141,7 @@ export class RainlinkRest {
       },
     };
 
-    await this.fetcher<{ resuming: boolean; timeout: number }>(options);
+    await this.nodeManager.driver.fetcher<{ resuming: boolean; timeout: number }>(options);
     this.debug(`Session updated! resume: ${mode}, timeout: ${timeout}`);
     return;
   }

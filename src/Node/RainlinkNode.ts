@@ -19,8 +19,6 @@ export class RainlinkNode {
   public options: RainlinkNodeOptions;
   /** The rainlink rest manager */
   public rest: RainlinkRest;
-  /** The lavalink server season id to resume */
-  public sessionId: string | null;
   /** The lavalink server online status */
   public online: boolean = false;
   /** @ignore */
@@ -46,17 +44,16 @@ export class RainlinkNode {
   constructor(manager: Rainlink, options: RainlinkNodeOptions) {
     this.manager = manager;
     this.options = options;
-    const customRest = this.manager.rainlinkOptions.options!.structures!.rest;
-    this.rest = customRest
-      ? new customRest(manager, options, this)
-      : new RainlinkRest(manager, options, this);
-    this.sessionId = null;
-    this.wsEvent = new RainlinkWebsocket();
     if (this.manager.rainlinkOptions.driver == RainlinkServer.Lavalink4) {
       this.driver = new Lavalink4(this.manager, options, this);
     } else {
       throw new Error('Please include a valid server driver enum');
     }
+    const customRest = this.manager.rainlinkOptions.options!.structures!.rest;
+    this.rest = customRest
+      ? new customRest(manager, options, this)
+      : new RainlinkRest(manager, options, this);
+    this.wsEvent = new RainlinkWebsocket();
     this.stats = {
       players: 0,
       playingPlayers: 0,
@@ -99,8 +96,11 @@ export class RainlinkNode {
       case LavalinkEventsEnum.Ready: {
         const isResume = this.manager.rainlinkOptions.options!.resume!;
         const timeout = this.manager.rainlinkOptions.options?.resumeTimeout!;
-        this.sessionId = data.sessionId;
-        this.rest = new RainlinkRest(this.manager, this.options, this);
+        this.driver.sessionId = data.sessionId;
+        const customRest = this.manager.rainlinkOptions.options!.structures!.rest;
+        this.rest = customRest
+          ? new customRest(this.manager, this.options, this)
+          : new RainlinkRest(this.manager, this.options, this);
         if (isResume) {
           this.rest.updateSession(data.sessionId, isResume, timeout);
           if (this.sessionPlugin) {
