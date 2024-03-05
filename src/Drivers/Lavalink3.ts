@@ -103,6 +103,8 @@ export class Lavalink3 extends AbstractDriver {
 
     this.convertToV4response(finalData as Record<string, any>);
 
+    console.log(finalData);
+
     return finalData;
   }
 
@@ -169,19 +171,22 @@ export class Lavalink3 extends AbstractDriver {
   protected convertToV4response(data?: Record<string, any>) {
     if (!data) return {};
     if (data.loadType == Lavalink3loadType.LOAD_FAILED) {
-      data.loadType == LavalinkLoadType.ERROR;
+      data.loadType = LavalinkLoadType.ERROR;
     }
     if (data.loadType == Lavalink3loadType.PLAYLIST_LOADED) {
-      data.loadType == LavalinkLoadType.PLAYLIST;
+      data.loadType = LavalinkLoadType.PLAYLIST;
     }
     if (data.loadType == Lavalink3loadType.SEARCH_RESULT) {
-      data.loadType == LavalinkLoadType.SEARCH;
+      data.loadType = LavalinkLoadType.SEARCH;
     }
     if (data.loadType == Lavalink3loadType.TRACK_LOADED) {
-      data.loadType == LavalinkLoadType.TRACK;
+      data.loadType = LavalinkLoadType.TRACK;
+      data.data = data.tracks[0];
+      data.data.track = undefined;
+      data.tracks = undefined;
     }
     if (data.loadType == Lavalink3loadType.NO_MATCHES) {
-      data.loadType == LavalinkLoadType.EMPTY;
+      data.loadType = LavalinkLoadType.EMPTY;
     }
   }
 }
