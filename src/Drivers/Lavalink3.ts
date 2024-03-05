@@ -168,25 +168,37 @@ export class Lavalink3 extends AbstractDriver {
     return;
   }
 
-  protected convertToV4response(data?: Record<string, any>) {
-    if (!data) return {};
-    if (data.loadType == Lavalink3loadType.LOAD_FAILED) {
-      data.loadType = LavalinkLoadType.ERROR;
+  protected convertToV4response(v3data?: Record<string, any>) {
+    if (!v3data) return {};
+    if (v3data.loadType == Lavalink3loadType.LOAD_FAILED) {
+      v3data.loadType = LavalinkLoadType.ERROR;
     }
-    if (data.loadType == Lavalink3loadType.PLAYLIST_LOADED) {
-      data.loadType = LavalinkLoadType.PLAYLIST;
+    if (v3data.loadType == Lavalink3loadType.PLAYLIST_LOADED) {
+      v3data.loadType = LavalinkLoadType.PLAYLIST;
+      v3data.data.tracks = v3data.tracks;
+      v3data.data.info = v3data.playlistInfo
+      for (const parseData of v3data.data.tracks) {
+        parseData.track = undefined;
+      }
+      v3data.tracks  = undefined;
     }
-    if (data.loadType == Lavalink3loadType.SEARCH_RESULT) {
-      data.loadType = LavalinkLoadType.SEARCH;
+    if (v3data.loadType == Lavalink3loadType.SEARCH_RESULT) {
+      v3data.loadType = LavalinkLoadType.SEARCH;
+      v3data.data = v3data.tracks;
+      for (const parseData of v3data.data) {
+        parseData.track  = undefined;
+      }
+      v3data.tracks  = undefined;
+      v3data.playlistInfo  = undefined;
     }
-    if (data.loadType == Lavalink3loadType.TRACK_LOADED) {
-      data.loadType = LavalinkLoadType.TRACK;
-      data.data = data.tracks[0];
-      data.data.track = undefined;
-      data.tracks = undefined;
+    if (v3data.loadType == Lavalink3loadType.TRACK_LOADED) {
+      v3data.loadType = LavalinkLoadType.TRACK;
+      v3data.data = v3data.tracks[0];
+      v3data.data.track  = undefined;
+      v3data.tracks  = undefined;
     }
-    if (data.loadType == Lavalink3loadType.NO_MATCHES) {
-      data.loadType = LavalinkLoadType.EMPTY;
+    if (v3data.loadType == Lavalink3loadType.NO_MATCHES) {
+      v3data.loadType = LavalinkLoadType.EMPTY;
     }
   }
 }
