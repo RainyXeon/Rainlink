@@ -3,18 +3,16 @@ import { RainlinkPlugin as SaveSessionPlugin } from '../Plugin/SaveSession/Plugi
 import { WebSocket } from 'ws';
 
 export abstract class AbstractDriver {
-  /**
-   * Ws url for dealing connection to lavalink/nodelink server
-   */
+  /** Ws url for dealing connection to lavalink/nodelink server */
   abstract wsUrl: string;
-  /**
-   * Http url for dealing rest request to lavalink/nodelink server
-   */
+  /** Http url for dealing rest request to lavalink/nodelink server */
   abstract httpUrl: string;
   /** The lavalink server season plugin to save all resume id */
   abstract sessionPlugin?: SaveSessionPlugin | null;
   /** The lavalink server season id to resume */
   abstract sessionId: string | null;
+  /** */
+  abstract functionMap: Map<string, <D = any>(options: RainlinkRequesterOptions) => D>;
   /**
    * Connect to lavalink/nodelink server
    * @returns WebSocket

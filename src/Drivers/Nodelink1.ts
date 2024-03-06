@@ -9,7 +9,7 @@ import { RainlinkRequesterOptions } from '../Interface/Rest';
 import { RainlinkNode } from '../Node/RainlinkNode';
 import { AbstractDriver } from './AbstractDriver';
 
-export class Nodelink2 extends AbstractDriver {
+export class Nodelink1 extends AbstractDriver {
   public wsUrl: string;
   public httpUrl: string;
   public sessionPlugin?: SaveSessionPlugin | null;
@@ -104,6 +104,20 @@ export class Nodelink2 extends AbstractDriver {
   }
 
   public async updateSession(sessionId: string, mode: boolean, timeout: number): Promise<void> {
+    // const options: RainlinkRequesterOptions = {
+    //   endpoint: `/sessions/${sessionId}`,
+    //   requestOptions: {
+    //     headers: { 'Content-Type': 'application/json' },
+    //     method: 'PATCH',
+    //     data: {
+    //       resuming: mode,
+    //       timeout: timeout,
+    //     },
+    //   },
+    // };
+
+    // await this.requester<{ resuming: boolean; timeout: number }>(options);
+    // this.debug(`Session updated! resume: ${mode}, timeout: ${timeout}`);
     return;
   }
 

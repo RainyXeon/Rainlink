@@ -44,7 +44,8 @@ const Nodes = [{
     host: 'localhost',
     port: 2333,
     auth: 'youshallnotpass',
-    secure: false
+    secure: false,
+    driver: RainlinkServer.Lavalink4
 }];
 
 const client = new Client({intents: [Guilds, GuildVoiceStates, GuildMessages, MessageContent]});

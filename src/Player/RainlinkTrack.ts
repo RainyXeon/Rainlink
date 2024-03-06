@@ -74,8 +74,7 @@ export class RainlinkTrack {
       !!this.author &&
       !!this.duration &&
       !!this.title &&
-      !!this.uri &&
-      !!this.realUri
+      !!this.uri
     );
   }
 
@@ -111,7 +110,10 @@ export class RainlinkTrack {
   public async resolver(manager: Rainlink, options?: ResolveOptions): Promise<RainlinkTrack> {
     const { overwrite } = options ? options : { overwrite: false };
 
-    if (this.isPlayable) return this;
+    if (this.isPlayable) {
+      this.realUri = this.raw.info.uri;
+      return this;
+    }
 
     manager.emit(
       RainlinkEvents.Debug,

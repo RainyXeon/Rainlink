@@ -1,7 +1,7 @@
 import { WebSocket } from 'ws';
 import { RainlinkNodeOptions } from '../Interface/Manager';
 import { Rainlink } from '../Rainlink';
-import { RainlinkConnectState, RainlinkEvents, RainlinkServer } from '../Interface/Constants';
+import { RainlinkConnectState, RainlinkEvents, RainlinkDriver } from '../Interface/Constants';
 import { RainlinkRest } from './RainlinkRest';
 import { setTimeout } from 'node:timers/promises';
 import { RainlinkWebsocket } from './RainlinkWebsocket';
@@ -9,8 +9,11 @@ import { LavalinkEventsEnum } from '../Interface/LavalinkEvents';
 import { LavalinkNodeStatsResponse, NodeStats } from '../Interface/Node';
 import { RainlinkPlugin as SaveSessionPlugin } from '../Plugin/SaveSession/Plugin';
 import { AbstractDriver } from '../Drivers/AbstractDriver';
+// Drivers
 import { Lavalink4 } from '../Drivers/Lavalink4';
 import { Lavalink3 } from '../Drivers/Lavalink3';
+import { Nodelink1 } from '../Drivers/Nodelink1';
+import { Nodelink2 } from '../Drivers/Nodelink2';
 
 export class RainlinkNode {
   /** The rainlink manager */
@@ -44,12 +47,26 @@ export class RainlinkNode {
   constructor(manager: Rainlink, options: RainlinkNodeOptions) {
     this.manager = manager;
     this.options = options;
-    if (this.manager.rainlinkOptions.driver == RainlinkServer.Lavalink4) {
-      this.driver = new Lavalink4(this.manager, options, this);
-    } else if (this.manager.rainlinkOptions.driver == RainlinkServer.Lavalink3) {
-      this.driver = new Lavalink3(this.manager, options, this);
-    } else {
-      throw new Error('Please include a valid server driver enum');
+    switch (options.driver) {
+      case RainlinkDriver.Nodelink1: {
+        this.driver = new Nodelink1(this.manager, options, this);
+        break;
+      }
+      case RainlinkDriver.Nodelink2: {
+        this.driver = new Nodelink2(this.manager, options, this);
+        break;
+      }
+      case RainlinkDriver.Lavalink3: {
+        this.driver = new Lavalink3(this.manager, options, this);
+        break;
+      }
+      case RainlinkDriver.Lavalink4: {
+        this.driver = new Lavalink4(this.manager, options, this);
+        break;
+      }
+      default: {
+        throw new Error('Please include a valid server driver enum');
+      }
     }
     const customRest = this.manager.rainlinkOptions.options!.structures!.rest;
     this.rest = customRest
@@ -142,7 +159,7 @@ export class RainlinkNode {
     if (!this.sudoDisconnect && this.retryCounter !== this.manager.rainlinkOptions.options!.retryCount) {
       await setTimeout(this.manager.rainlinkOptions.options!.retryTimeout);
       this.retryCounter = this.retryCounter + 1;
-      this.reconnect();
+      this.reconnect(true);
       return;
     }
     this.nodeClosed();
@@ -175,8 +192,8 @@ export class RainlinkNode {
   }
 
   /** Reconnect back to this lavalink server */
-  public reconnect() {
-    this.clean();
+  public reconnect(noClean: boolean) {
+    if (!noClean) this.clean();
     this.driver.connect();
   }
 

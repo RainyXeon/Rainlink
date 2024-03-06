@@ -1,13 +1,14 @@
 const {Client, GatewayIntentBits} = require('discord.js');
 const {Guilds, GuildVoiceStates, GuildMessages, MessageContent} = GatewayIntentBits;
-const {Rainlink, Library, Plugin, RainlinkServer} = require("./dist");
+const {Rainlink, Library, Plugin, RainlinkDriver} = require("./dist");
 
 const Nodes = [{
     name: 'owo',
     host: 'localhost',
     port: 2333,
     auth: 'youshallnotpass',
-    secure: false
+    secure: false,
+    driver: RainlinkDriver.Lavalink3
 }];
 
 const client = new Client({intents: [Guilds, GuildVoiceStates, GuildMessages, MessageContent]});
@@ -37,8 +38,7 @@ const rainlink = new Rainlink({
         // Be carefull when using
         // new Plugin.SaveSession(),
         new Plugin.PlayerMoved(client),
-    ],
-    driver: RainlinkServer.Lavalink4
+    ]
 });
 
 client.on("ready", () => console.log(client.user.tag + " Ready!"));
