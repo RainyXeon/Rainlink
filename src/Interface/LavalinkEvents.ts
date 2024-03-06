@@ -1,5 +1,3 @@
-import { RawTrack } from './Rest';
-
 /**
  * Lavalink events enum
  */
