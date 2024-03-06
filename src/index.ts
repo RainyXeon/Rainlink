@@ -1,7 +1,6 @@
 import { metadata } from './metadata';
 import Library from './Library';
 import Plugin from './Plugin';
-import Driver from './Drivers';
 
 // Export main class
 export * from './Rainlink';
@@ -32,8 +31,5 @@ export * from './Interface/Track';
 export * from './Plugin/RainlinkPlugin';
 export * from './Plugin/SourceRainlinkPlugin';
 export { Plugin };
-// Export driver
-export * from './Drivers/AbstractDriver';
-export { Driver };
 // Export version
 export const version = metadata.version;

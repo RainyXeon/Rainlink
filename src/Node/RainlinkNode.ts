@@ -33,7 +33,7 @@ export class RainlinkNode {
   private wsEvent: RainlinkWebsocket;
   /** @ignore */
   private sessionPlugin?: SaveSessionPlugin | null;
-  /** @ignore */
+  /** Driver for connect to current version of Nodelink/Lavalink */
   public driver: AbstractDriver;
 
   /**

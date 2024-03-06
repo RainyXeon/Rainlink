@@ -5,7 +5,7 @@ import { RainlinkPlugin as SaveSessionPlugin } from '../Plugin/SaveSession/Plugi
 import { RawData, WebSocket } from 'ws';
 import axios from 'axios';
 import { RainlinkEvents } from '../Interface/Constants';
-import { RainlinkFetcherOptions } from '../Interface/Rest';
+import { RainlinkRequesterOptions } from '../Interface/Rest';
 import { EventEmitter } from 'events';
 import { RainlinkNode } from '../Node/RainlinkNode';
 import { LavalinkEventsEnum } from '../Interface/LavalinkEvents';
@@ -63,7 +63,7 @@ export class Lavalink4 extends AbstractDriver {
   }
 
   /** @ignore */
-  public async fetcher<D = any>(options: RainlinkFetcherOptions): Promise<D | undefined> {
+  public async requester<D = any>(options: RainlinkRequesterOptions): Promise<D | undefined> {
     if (options.useSessionId && this.sessionId == null)
       throw new Error('sessionId not initalized! Please wait for lavalink get connected!');
     const url = new URL(`${this.httpUrl}${options.endpoint}`);
@@ -116,7 +116,7 @@ export class Lavalink4 extends AbstractDriver {
    * @returns LavalinkResponse
    */
   public async updateSession(sessionId: string, mode: boolean, timeout: number): Promise<void> {
-    const options: RainlinkFetcherOptions = {
+    const options: RainlinkRequesterOptions = {
       endpoint: `/sessions/${sessionId}`,
       requestOptions: {
         headers: { 'Content-Type': 'application/json' },
@@ -128,7 +128,7 @@ export class Lavalink4 extends AbstractDriver {
       },
     };
 
-    await this.fetcher<{ resuming: boolean; timeout: number }>(options);
+    await this.requester<{ resuming: boolean; timeout: number }>(options);
     this.debug(`Session updated! resume: ${mode}, timeout: ${timeout}`);
     return;
   }

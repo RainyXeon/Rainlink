@@ -18,6 +18,9 @@
     "src/Library/DiscordJS.ts",
     "src/Library/ErisJS.ts",
     "src/Library/OceanicJS.ts",
+    "src/Drivers/Lavalink4.ts",
+    "src/Drivers/Lavalink3.ts",
+    "src/Drivers/Nodelink2.ts",
     "src/index.ts",
     "src/metadata.ts",
     "src/Node/RainlinkWebsocket.ts"
