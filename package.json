@@ -12,9 +12,17 @@
   "module": "dist/index.mjs",
   "types": "dist/index.d.ts",
   "keywords": [
+    "bot",
+    "music",
+    "lavalink.js",
+    "lavalink-api",
+    "discord.js",
+    "eris.js",
+    "oceanic.js",
     "lavalink",
     "wrapper",
-    "lavalink-wrapper"
+    "lavalink-wrapper",
+    "rainlink"
   ],
   "author": "RainyXeon",
   "license": "ISC",
