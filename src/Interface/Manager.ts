@@ -6,7 +6,7 @@ import { RainlinkNodeManager } from '../Manager/RainlinkNodeManager';
 import { RainlinkNode } from '../Node/RainlinkNode';
 import { RainlinkRest } from '../Node/RainlinkRest';
 import { RainlinkPlayer } from '../Player/RainlinkPlayer';
-import { RainlinkServer } from './Constants';
+import { RainlinkDriver } from './Constants';
 
 export type Constructor<T> = new (...args: any[]) => T;
 
@@ -35,6 +35,8 @@ export interface RainlinkNodeOptions {
   auth: string;
   /** Whenever lavalink user ssl or not */
   secure: boolean;
+  /** The driver class for handling lavalink response */
+  driver: RainlinkDriver;
 }
 
 /**
@@ -76,8 +78,6 @@ export interface RainlinkOptions {
   nodes: RainlinkNodeOptions[];
   /** The discord library for using voice manager, example: discordjs, erisjs. Check {@link Library.default} */
   library: AbstractLibrary;
-  /** The driver class for handling lavalink response */
-  driver: RainlinkServer;
   /** The rainlink plugins array. Check {@link Plugin.default} */
   plugins?: RainlinkPlugin[];
   /** Rainlink additional options  */

@@ -6,20 +6,15 @@ import { RawData, WebSocket } from 'ws';
 import axios from 'axios';
 import { RainlinkEvents } from '../Interface/Constants';
 import { RainlinkRequesterOptions } from '../Interface/Rest';
-import { EventEmitter } from 'events';
 import { RainlinkNode } from '../Node/RainlinkNode';
-import { LavalinkEventsEnum } from '../Interface/LavalinkEvents';
 import { AbstractDriver } from './AbstractDriver';
 
 export class Lavalink4 extends AbstractDriver {
-  /** @ignore */
   public wsUrl: string;
-  /** @ignore */
   public httpUrl: string;
-  /** @ignore */
   public sessionPlugin?: SaveSessionPlugin | null;
-  /** The lavalink server season id to resume */
   public sessionId: string | null;
+  public functionMap: Map<string, <D = any>(options: RainlinkRequesterOptions) => D>;
   private wsClient?: WebSocket;
 
   constructor(
@@ -31,9 +26,9 @@ export class Lavalink4 extends AbstractDriver {
     this.wsUrl = `${options.secure ? 'wss' : 'ws'}://${options.host}:${options.port}/v4/websocket`;
     this.httpUrl = `${options.secure ? 'https://' : 'http://'}${options.host}:${options.port}/v4`;
     this.sessionId = null;
+    this.functionMap = new Map<string, <D = any>(options: RainlinkRequesterOptions) => D>();
   }
 
-  /** Connect this lavalink server */
   public connect(): WebSocket {
     const isResume = this.manager.rainlinkOptions.options!.resume;
     if (this.sessionPlugin) {
@@ -46,7 +41,7 @@ export class Lavalink4 extends AbstractDriver {
       headers: {
         Authorization: this.options.auth,
         'User-Id': this.manager.id,
-        'Client-Name': `${metadata.name}@${metadata.version}`,
+        'Client-Name': `${metadata.name}/${metadata.version}`,
         'Session-Id': this.sessionId !== null && isResume ? this.sessionId : '',
         'user-agent': this.manager.rainlinkOptions.options!.userAgent!,
       },
@@ -62,7 +57,6 @@ export class Lavalink4 extends AbstractDriver {
     return ws;
   }
 
-  /** @ignore */
   public async requester<D = any>(options: RainlinkRequesterOptions): Promise<D | undefined> {
     if (options.useSessionId && this.sessionId == null)
       throw new Error('sessionId not initalized! Please wait for lavalink get connected!');
@@ -96,13 +90,11 @@ export class Lavalink4 extends AbstractDriver {
     return this.testJSON(finalData) ? (JSON.parse(res.data) as D) : (res.data as D);
   }
 
-  /** @ignore */
   protected wsMessageEvent(data: RawData) {
     const wsData = JSON.parse(data.toString());
     this.node.wsMessageEvent(wsData);
   }
 
-  /** @ignore */
   private debug(logs: string) {
     this.manager.emit(RainlinkEvents.Debug, `[Rainlink v4 Plugin]: ${logs}`);
   }
@@ -111,10 +103,6 @@ export class Lavalink4 extends AbstractDriver {
     if (this.wsClient) this.wsClient.close();
   }
 
-  /**
-   * Update a season to resume able or not
-   * @returns LavalinkResponse
-   */
   public async updateSession(sessionId: string, mode: boolean, timeout: number): Promise<void> {
     const options: RainlinkRequesterOptions = {
       endpoint: `/sessions/${sessionId}`,
@@ -133,7 +121,6 @@ export class Lavalink4 extends AbstractDriver {
     return;
   }
 
-  /** @ignore */
   protected testJSON(text: string) {
     if (typeof text !== 'string') {
       return false;

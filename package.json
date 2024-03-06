@@ -1,6 +1,6 @@
 {
   "name": "rainlink",
-  "version": "0.2.0-beta",
+  "version": "0.2.1-beta",
   "description": "Another lavalink wrapper but focus on stability and rich features",
   "scripts": {
     "build": "npx tsc --build --verbose",
@@ -12,9 +12,17 @@
   "module": "dist/index.mjs",
   "types": "dist/index.d.ts",
   "keywords": [
+    "bot",
+    "music",
+    "lavalink.js",
+    "lavalink-api",
+    "discord.js",
+    "eris.js",
+    "oceanic.js",
     "lavalink",
     "wrapper",
-    "lavalink-wrapper"
+    "lavalink-wrapper",
+    "rainlink"
   ],
   "author": "RainyXeon",
   "license": "ISC",

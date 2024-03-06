@@ -22,6 +22,7 @@ export class Lavalink3 extends AbstractDriver {
   public httpUrl: string;
   public sessionPlugin?: SaveSessionPlugin | null;
   public sessionId: string | null;
+  public functionMap: Map<string, <D = any>(options: RainlinkRequesterOptions) => D>;
   private wsClient?: WebSocket;
 
   constructor(
@@ -32,6 +33,7 @@ export class Lavalink3 extends AbstractDriver {
     super();
     this.wsUrl = `${options.secure ? 'wss' : 'ws'}://${options.host}:${options.port}/v3/websocket`;
     this.httpUrl = `${options.secure ? 'https://' : 'http://'}${options.host}:${options.port}/v3`;
+    this.functionMap = new Map<string, <D = any>(options: RainlinkRequesterOptions) => D>();
     this.sessionId = null;
   }
 
