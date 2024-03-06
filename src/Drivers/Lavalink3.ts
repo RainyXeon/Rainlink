@@ -99,11 +99,20 @@ export class Lavalink3 extends AbstractDriver {
       return undefined;
     }
 
-    const finalData = this.testJSON(String(res.data)) ? (JSON.parse(res.data) as D) : (res.data as D);
+    const preFinalData = this.testJSON(String(res.data)) ? (JSON.parse(res.data) as D) : (res.data as D);
+    let finalData: any = preFinalData;
 
-    this.convertToV4response(finalData as Record<string, any>);
+    if (finalData.loadType) {
+      finalData = this.convertV4trackResponse(finalData) as D;
+    }
 
-    console.log(finalData);
+    if (finalData.guildId && finalData.track && finalData.track.encoded) {
+      finalData.track = this.buildV4track(finalData.track);
+    }
+
+    // console.log('------------------------- Lavalink Data -------------------------');
+    // console.log(finalData);
+    // console.log('------------------------- Lavalink Data -------------------------');
 
     return finalData;
   }
@@ -168,7 +177,7 @@ export class Lavalink3 extends AbstractDriver {
     return;
   }
 
-  protected convertToV4response(v3data?: Record<string, any>) {
+  protected convertV4trackResponse(v3data: Record<string, any>): Record<string, any> {
     if (!v3data) return {};
     if (v3data.loadType == Lavalink3loadType.LOAD_FAILED) {
       v3data.loadType = LavalinkLoadType.ERROR;
@@ -176,29 +185,48 @@ export class Lavalink3 extends AbstractDriver {
     if (v3data.loadType == Lavalink3loadType.PLAYLIST_LOADED) {
       v3data.loadType = LavalinkLoadType.PLAYLIST;
       v3data.data.tracks = v3data.tracks;
-      v3data.data.info = v3data.playlistInfo
-      for (const parseData of v3data.data.tracks) {
-        parseData.track = undefined;
+      v3data.data.info = v3data.playlistInfo;
+      for (let i = 0; i < v3data.data.tracks.length; i++) {
+        v3data.data.tracks[i] = this.buildV4track(v3data.data.tracks[i]);
       }
-      v3data.tracks  = undefined;
+      delete v3data.tracks;
     }
     if (v3data.loadType == Lavalink3loadType.SEARCH_RESULT) {
       v3data.loadType = LavalinkLoadType.SEARCH;
       v3data.data = v3data.tracks;
-      for (const parseData of v3data.data) {
-        parseData.track  = undefined;
+      for (let i = 0; i < v3data.data.length; i++) {
+        v3data.data[i] = this.buildV4track(v3data.data[i]);
       }
-      v3data.tracks  = undefined;
-      v3data.playlistInfo  = undefined;
+      delete v3data.tracks;
+      delete v3data.playlistInfo;
     }
     if (v3data.loadType == Lavalink3loadType.TRACK_LOADED) {
       v3data.loadType = LavalinkLoadType.TRACK;
-      v3data.data = v3data.tracks[0];
-      v3data.data.track  = undefined;
-      v3data.tracks  = undefined;
+      v3data.data = this.buildV4track(v3data.tracks[0]);
+      delete v3data.tracks;
     }
     if (v3data.loadType == Lavalink3loadType.NO_MATCHES) {
       v3data.loadType = LavalinkLoadType.EMPTY;
     }
+    return v3data;
+  }
+
+  protected buildV4track(v3data: Record<string, any>) {
+    return {
+      encoded: v3data.encoded,
+      info: {
+        sourceName: v3data.info.sourceName,
+        identifier: v3data.info.identifier,
+        isSeekable: v3data.info.isSeekable,
+        author: v3data.info.author,
+        length: v3data.info.length,
+        isStream: v3data.info.isStream,
+        position: v3data.info.position,
+        title: v3data.info.title,
+        uri: v3data.info.uri,
+        artworkUrl: undefined,
+      },
+      pluginInfo: undefined,
+    };
   }
 }
