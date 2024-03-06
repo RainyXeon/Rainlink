@@ -16,7 +16,7 @@ Here: [https://rainlink.netlify.app/](https://rainlink.netlify.app/)
 ```js
 const {Client, GatewayIntentBits} = require('discord.js');
 const {Guilds, GuildVoiceStates, GuildMessages, MessageContent} = GatewayIntentBits;
-const {Rainlink, Library, Plugin, RainlinkServer} = require("./dist");
+const {Rainlink, Library, Plugin, RainlinkDriver} = require("./dist");
 
 const Nodes = [{
     name: 'owo',
@@ -24,7 +24,7 @@ const Nodes = [{
     port: 2333,
     auth: 'youshallnotpass',
     secure: false,
-    driver: RainlinkServer.Lavalink4
+    driver: RainlinkDriver.Lavalink4
 }];
 
 const client = new Client({intents: [Guilds, GuildVoiceStates, GuildMessages, MessageContent]});
