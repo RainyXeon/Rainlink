@@ -75,8 +75,7 @@ const rainlink = new Rainlink({
         // Be carefull when using
         // new Plugin.SaveSession(),
         new Plugin.PlayerMoved(client),
-    ],
-    driver: RainlinkServer.Lavalink4
+    ]
 });
 
 client.on("ready", () => console.log(client.user.tag + " Ready!"));
