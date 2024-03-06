@@ -3,26 +3,20 @@
 
 import { RainlinkNodeOptions } from '../Interface/Manager';
 import { Rainlink } from '../Rainlink';
-import { metadata } from '../metadata';
 import { LavalinkLoadType, RainlinkEvents } from '../Interface/Constants';
 import { RainlinkNode } from './RainlinkNode';
 import {
   LavalinkPlayer,
   LavalinkResponse,
-  RainlinkFetcherOptions,
+  RainlinkRequesterOptions,
   UpdatePlayerInfo,
 } from '../Interface/Rest';
-import axios from 'axios';
 
 export class RainlinkRest {
-  /** @ignore */
-  protected axios: typeof axios;
   /** The rainlink manager */
   public manager: Rainlink;
   /** @ignore */
   protected options: RainlinkNodeOptions;
-  /** @ignore */
-  protected url: string;
   /** The node manager (RainlinkNode class) */
   public nodeManager: RainlinkNode;
   /** @ignore */
@@ -36,46 +30,9 @@ export class RainlinkRest {
    */
   constructor(manager: Rainlink, options: RainlinkNodeOptions, nodeManager: RainlinkNode) {
     this.manager = manager;
-    this.axios = axios;
     this.options = options;
     this.nodeManager = nodeManager;
-    this.sessionId = this.nodeManager.sessionId;
-    this.url = `${options.secure ? 'https://' : 'http://'}${options.host}:${options.port}/v${metadata.lavalink}`;
-  }
-
-  /** @ignore */
-  private async fetcher<D = any>(options: RainlinkFetcherOptions): Promise<D | undefined> {
-    if (options.useSessionId && this.sessionId == null)
-      throw new Error('sessionId not initalized! Please wait for lavalink get connected!');
-    const url = new URL(`${this.url}${options.endpoint}`);
-    if (options.params) url.search = new URLSearchParams(options.params).toString();
-
-    const lavalinkHeaders = {
-      Authorization: this.options.auth,
-      'User-Agent': this.manager.rainlinkOptions.options!.userAgent!,
-      ...options.requestOptions.headers,
-    };
-
-    options.requestOptions.headers = lavalinkHeaders;
-
-    const res = await axios({
-      url: url.toString(),
-      ...options.requestOptions,
-    });
-
-    // const res = await undici.request(url, options.requestOptions typeof undici.Dispatcher.);
-    if (res.status == 204) {
-      this.debug('Player now destroyed');
-      return undefined;
-    }
-    if (res.status !== 200) {
-      this.debug('Something went wrong with lavalink server.' + `Status code: ${res.status}`);
-      return undefined;
-    }
-
-    const finalData = String(res.data);
-
-    return this.testJSON(finalData) ? (JSON.parse(res.data) as D) : (res.data as D);
+    this.sessionId = this.nodeManager.driver.sessionId ? this.nodeManager.driver.sessionId : '';
   }
 
   /**
@@ -83,7 +40,7 @@ export class RainlinkRest {
    * @returns Promise that resolves to an array of Lavalink players
    */
   public async getPlayers(): Promise<LavalinkPlayer[]> {
-    const options: RainlinkFetcherOptions = {
+    const options: RainlinkRequesterOptions = {
       endpoint: `/sessions/${this.sessionId}/players`,
       params: undefined,
       useSessionId: true,
@@ -92,7 +49,7 @@ export class RainlinkRest {
         method: 'GET',
       },
     };
-    return (await this.fetcher<LavalinkPlayer[]>(options)) ?? [];
+    return (await this.nodeManager.driver.requester<LavalinkPlayer[]>(options)) ?? [];
   }
 
   /**
@@ -100,7 +57,7 @@ export class RainlinkRest {
    * @returns Promise that resolves to a Lavalink player
    */
   public async updatePlayer(data: UpdatePlayerInfo): Promise<LavalinkPlayer | undefined> {
-    const options: RainlinkFetcherOptions = {
+    const options: RainlinkRequesterOptions = {
       endpoint: `/sessions/${this.sessionId}/players/${data.guildId}`,
       params: { noReplace: data.noReplace?.toString() || 'false' },
       useSessionId: true,
@@ -110,7 +67,7 @@ export class RainlinkRest {
         data: data.playerOptions as Record<string, unknown>,
       },
     };
-    return await this.fetcher<LavalinkPlayer>(options);
+    return await this.nodeManager.driver.requester<LavalinkPlayer>(options);
   }
 
   /**
@@ -118,7 +75,7 @@ export class RainlinkRest {
    * @returns Promise that resolves to a Lavalink player
    */
   public destroyPlayer(guildId: string) {
-    const options: RainlinkFetcherOptions = {
+    const options: RainlinkRequesterOptions = {
       endpoint: `/sessions/${this.sessionId}/players/${guildId}`,
       params: undefined,
       useSessionId: true,
@@ -127,7 +84,7 @@ export class RainlinkRest {
         method: 'DELETE',
       },
     };
-    return this.fetcher(options);
+    return this.nodeManager.driver.requester(options);
   }
 
   /** @ignore */
@@ -140,7 +97,7 @@ export class RainlinkRest {
    * @returns LavalinkResponse
    */
   public async resolver(data: string): Promise<LavalinkResponse> {
-    const options: RainlinkFetcherOptions = {
+    const options: RainlinkRequesterOptions = {
       endpoint: `/loadtracks`,
       params: { identifier: data },
       requestOptions: {
@@ -149,7 +106,7 @@ export class RainlinkRest {
       },
     };
 
-    const resData = await this.fetcher<LavalinkResponse>(options);
+    const resData = await this.nodeManager.driver.requester<LavalinkResponse>(options);
 
     if (!resData) {
       return {
@@ -157,28 +114,6 @@ export class RainlinkRest {
         data: {},
       };
     } else return resData;
-  }
-
-  /**
-   * Update a season to resume able or not
-   * @returns LavalinkResponse
-   */
-  public async updateSession(sessionId: string, mode: boolean, timeout: number): Promise<void> {
-    const options: RainlinkFetcherOptions = {
-      endpoint: `/sessions/${sessionId}`,
-      requestOptions: {
-        headers: { 'Content-Type': 'application/json' },
-        method: 'PATCH',
-        data: {
-          resuming: mode,
-          timeout: timeout,
-        },
-      },
-    };
-
-    await this.fetcher<{ resuming: boolean; timeout: number }>(options);
-    this.debug(`Session updated! resume: ${mode}, timeout: ${timeout}`);
-    return;
   }
 
   /** @ignore */

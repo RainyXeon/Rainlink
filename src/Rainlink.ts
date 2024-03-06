@@ -18,12 +18,6 @@ import { RawTrack } from './Interface/Rest';
 import { RainlinkPlayer } from './Player/RainlinkPlayer';
 import { SourceRainlinkPlugin } from './Plugin/SourceRainlinkPlugin';
 import { RainlinkQueue } from './Player/RainlinkQueue';
-import {
-  PlayerUpdate,
-  TrackExceptionEvent,
-  TrackStuckEvent,
-  WebSocketClosedEvent,
-} from './Interface/LavalinkEvents';
 import { metadata } from './metadata';
 import { RainlinkPlugin } from './Plugin/RainlinkPlugin';
 
@@ -92,24 +86,24 @@ export declare interface Rainlink {
    * Emitted when a player have an exception.
    * @event Rainlink#playerException
    */
-  on(event: 'playerException', listener: (player: RainlinkPlayer, data: TrackExceptionEvent) => void): this;
+  on(event: 'playerException', listener: (player: RainlinkPlayer, data: Record<string, any>) => void): this;
   /**
    * Emitted when a player updated info.
    * @event Rainlink#playerUpdate
    */
-  on(event: 'playerUpdate', listener: (player: RainlinkPlayer, data: PlayerUpdate) => void): this;
+  on(event: 'playerUpdate', listener: (player: RainlinkPlayer, data: Record<string, any>) => void): this;
   /**
    * Emitted when a track stucked.
    * @event Rainlink#playerStuck
    */
-  on(event: 'playerStuck', listener: (player: RainlinkPlayer, data: TrackStuckEvent) => void): this;
+  on(event: 'playerStuck', listener: (player: RainlinkPlayer, data: Record<string, any>) => void): this;
   /**
    * Emitted when a player's websocket closed.
    * @event Rainlink#playerWebsocketClosed
    */
   on(
     event: 'playerWebsocketClosed',
-    listener: (player: RainlinkPlayer, data: WebSocketClosedEvent) => void,
+    listener: (player: RainlinkPlayer, data: Record<string, any>) => void,
   ): this;
   /**
    * Emitted when a playuer is moved into another channel. [Require plugin]
@@ -152,12 +146,12 @@ export declare interface Rainlink {
     listener: (player: RainlinkPlayer, track: RainlinkTrack, message: string) => void,
   ): this;
   once(event: 'playerEmpty', listener: (player: RainlinkPlayer) => void): this;
-  once(event: 'playerException', listener: (player: RainlinkPlayer, data: TrackExceptionEvent) => void): this;
-  once(event: 'playerUpdate', listener: (player: RainlinkPlayer, data: PlayerUpdate) => void): this;
-  once(event: 'playerStuck', listener: (player: RainlinkPlayer, data: TrackStuckEvent) => void): this;
+  once(event: 'playerException', listener: (player: RainlinkPlayer, data: Record<string, any>) => void): this;
+  once(event: 'playerUpdate', listener: (player: RainlinkPlayer, data: Record<string, any>) => void): this;
+  once(event: 'playerStuck', listener: (player: RainlinkPlayer, data: Record<string, any>) => void): this;
   once(
     event: 'playerWebsocketClosed',
-    listener: (player: RainlinkPlayer, data: WebSocketClosedEvent) => void,
+    listener: (player: RainlinkPlayer, data: Record<string, any>) => void,
   ): this;
   once(
     event: 'playerMoved',
@@ -181,12 +175,12 @@ export declare interface Rainlink {
     listener: (player: RainlinkPlayer, track: RainlinkTrack, message: string) => void,
   ): this;
   off(event: 'playerEmpty', listener: (player: RainlinkPlayer) => void): this;
-  off(event: 'playerException', listener: (player: RainlinkPlayer, data: TrackExceptionEvent) => void): this;
-  off(event: 'playerUpdate', listener: (player: RainlinkPlayer, data: PlayerUpdate) => void): this;
-  off(event: 'playerStuck', listener: (player: RainlinkPlayer, data: TrackStuckEvent) => void): this;
+  off(event: 'playerException', listener: (player: RainlinkPlayer, data: Record<string, any>) => void): this;
+  off(event: 'playerUpdate', listener: (player: RainlinkPlayer, data: Record<string, any>) => void): this;
+  off(event: 'playerStuck', listener: (player: RainlinkPlayer, data: Record<string, any>) => void): this;
   off(
     event: 'playerWebsocketClosed',
-    listener: (player: RainlinkPlayer, data: WebSocketClosedEvent) => void,
+    listener: (player: RainlinkPlayer, data: Record<string, any>) => void,
   ): this;
   off(
     event: 'playerMoved',

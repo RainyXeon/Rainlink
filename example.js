@@ -1,6 +1,6 @@
 const {Client, GatewayIntentBits} = require('discord.js');
 const {Guilds, GuildVoiceStates, GuildMessages, MessageContent} = GatewayIntentBits;
-const {Rainlink, Library, Plugin} = require("./dist");
+const {Rainlink, Library, Plugin, RainlinkServer} = require("./dist");
 
 const Nodes = [{
     name: 'owo',
@@ -38,9 +38,7 @@ const rainlink = new Rainlink({
         // new Plugin.SaveSession(),
         new Plugin.PlayerMoved(client),
     ],
-    options: {
-        defaultSearchEngine: "youtubeMusic"
-    }
+    driver: RainlinkServer.Lavalink4
 });
 
 client.on("ready", () => console.log(client.user.tag + " Ready!"));
@@ -87,8 +85,6 @@ client.on("messageCreate", async msg => {
             shardId: 0,
             volume: 40
         })
-
-        console.log(player)
 
         let result = await rainlink.search(query, {requester: msg.author});
         if (!result.tracks.length) return msg.reply("No results found!");

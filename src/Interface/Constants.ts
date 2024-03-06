@@ -103,6 +103,15 @@ export enum RainlinkLoopMode {
 }
 
 /**
+ * Rainlink server enum
+ */
+export enum RainlinkServer {
+  Lavalink4 = 'lavalink@4',
+  Lavalink3 = 'lavalink@3',
+  Nodelink2 = 'nodelink@2',
+}
+
+/**
  * Rainlink prebuilt filter data
  */
 export const RainlinkFilterData = {

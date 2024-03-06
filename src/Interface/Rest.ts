@@ -3,7 +3,7 @@ import { FilterOptions } from './Player';
 import { LavalinkLoadType } from './Constants';
 import { Exception } from './LavalinkEvents';
 
-export interface RainlinkFetcherOptions {
+export interface RainlinkRequesterOptions {
   endpoint: string;
   params?: string | Record<string, string>;
   useSessionId?: boolean;
