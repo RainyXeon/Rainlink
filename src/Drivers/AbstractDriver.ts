@@ -12,7 +12,7 @@ export abstract class AbstractDriver {
   /** The lavalink server season id to resume */
   abstract sessionId: string | null;
   /** */
-  abstract functionMap: Map<string, <D = any>(options: RainlinkRequesterOptions) => D>;
+  abstract functionMap: Map<string, (...args: any) => unknown>;
   /**
    * Connect to lavalink/nodelink server
    * @returns WebSocket

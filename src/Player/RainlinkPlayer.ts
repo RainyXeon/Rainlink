@@ -381,6 +381,7 @@ export class RainlinkPlayer {
     this.checkDestroyed();
     if (enable == this.muted) return this;
     this.voiceManager.setDeaf(enable);
+    this.muted = enable;
     return this;
   }
 
@@ -439,6 +440,7 @@ export class RainlinkPlayer {
     this.checkDestroyed();
     if (enable == this.deafened) return this;
     this.voiceManager.setDeaf(enable);
+    this.deafened = enable;
     return this;
   }
 

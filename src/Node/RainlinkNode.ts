@@ -12,7 +12,6 @@ import { AbstractDriver } from '../Drivers/AbstractDriver';
 // Drivers
 import { Lavalink4 } from '../Drivers/Lavalink4';
 import { Lavalink3 } from '../Drivers/Lavalink3';
-import { Nodelink2 } from '../Drivers/Nodelink2';
 
 export class RainlinkNode {
   /** The rainlink manager */
@@ -47,10 +46,6 @@ export class RainlinkNode {
     this.manager = manager;
     this.options = options;
     switch (options.driver) {
-      case RainlinkDriver.Nodelink2: {
-        this.driver = new Nodelink2(this.manager, options, this);
-        break;
-      }
       case RainlinkDriver.Lavalink3: {
         this.driver = new Lavalink3(this.manager, options, this);
         break;
