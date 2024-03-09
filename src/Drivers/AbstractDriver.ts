@@ -11,8 +11,8 @@ export abstract class AbstractDriver {
   abstract sessionPlugin?: SaveSessionPlugin | null;
   /** The lavalink server season id to resume */
   abstract sessionId: string | null;
-  /** */
-  abstract functionMap: Map<string, (...args: any) => unknown>;
+  /** All function to extend support driver */
+  abstract functions: Map<string, (...args: any) => unknown>;
   /**
    * Connect to lavalink/nodelink server
    * @returns WebSocket

@@ -22,7 +22,7 @@ export class Lavalink3 extends AbstractDriver {
   public httpUrl: string;
   public sessionPlugin?: SaveSessionPlugin | null;
   public sessionId: string | null;
-  public functionMap: Map<string, (...args: any) => unknown>;
+  public functions: Map<string, (...args: any) => unknown>;
   private wsClient?: WebSocket;
 
   constructor(
@@ -33,7 +33,7 @@ export class Lavalink3 extends AbstractDriver {
     super();
     this.wsUrl = `${options.secure ? 'wss' : 'ws'}://${options.host}:${options.port}/v3/websocket`;
     this.httpUrl = `${options.secure ? 'https://' : 'http://'}${options.host}:${options.port}/v3`;
-    this.functionMap = new Map<string, (...args: any) => unknown>();
+    this.functions = new Map<string, (...args: any) => unknown>();
     this.sessionId = null;
   }
 
@@ -69,6 +69,9 @@ export class Lavalink3 extends AbstractDriver {
     if (options.useSessionId && this.sessionId == null)
       throw new Error('sessionId not initalized! Please wait for lavalink get connected!');
     const url = new URL(`${this.httpUrl}${options.endpoint}`);
+
+    this.convertToV3request(options.requestOptions.data);
+
     if (options.params) url.search = new URLSearchParams(options.params).toString();
 
     const lavalinkHeaders = {
@@ -78,8 +81,6 @@ export class Lavalink3 extends AbstractDriver {
     };
 
     options.requestOptions.headers = lavalinkHeaders;
-
-    this.convertToV3request(options.requestOptions.data);
 
     const res = await axios({
       url: url.toString(),
@@ -105,10 +106,6 @@ export class Lavalink3 extends AbstractDriver {
     if (finalData.guildId && finalData.track && finalData.track.encoded) {
       finalData.track = this.buildV4track(finalData.track);
     }
-
-    // console.log('------------------------- Lavalink Data -------------------------');
-    // console.log(finalData);
-    // console.log('------------------------- Lavalink Data -------------------------');
 
     return finalData;
   }
@@ -166,42 +163,50 @@ export class Lavalink3 extends AbstractDriver {
 
   protected convertToV3request(data?: Record<string, any>) {
     if (!data) return;
-    if (data.track && data.track.encoded) {
+    if (data.track && data.track.encoded !== undefined) {
       data.encodedTrack = data.track.encoded;
+      delete data.track;
     }
     return;
   }
 
   protected convertV4trackResponse(v3data: Record<string, any>): Record<string, any> {
     if (!v3data) return {};
-    if (v3data.loadType == Lavalink3loadType.LOAD_FAILED) {
-      v3data.loadType = LavalinkLoadType.ERROR;
-    }
-    if (v3data.loadType == Lavalink3loadType.PLAYLIST_LOADED) {
-      v3data.loadType = LavalinkLoadType.PLAYLIST;
-      v3data.data.tracks = v3data.tracks;
-      v3data.data.info = v3data.playlistInfo;
-      for (let i = 0; i < v3data.data.tracks.length; i++) {
-        v3data.data.tracks[i] = this.buildV4track(v3data.data.tracks[i]);
+    switch (v3data.loadType) {
+      case Lavalink3loadType.LOAD_FAILED: {
+        v3data.loadType = LavalinkLoadType.ERROR;
+        break;
       }
-      delete v3data.tracks;
-    }
-    if (v3data.loadType == Lavalink3loadType.SEARCH_RESULT) {
-      v3data.loadType = LavalinkLoadType.SEARCH;
-      v3data.data = v3data.tracks;
-      for (let i = 0; i < v3data.data.length; i++) {
-        v3data.data[i] = this.buildV4track(v3data.data[i]);
+      case Lavalink3loadType.PLAYLIST_LOADED: {
+        v3data.loadType = LavalinkLoadType.PLAYLIST;
+        v3data.data.tracks = v3data.tracks;
+        v3data.data.info = v3data.playlistInfo;
+        for (let i = 0; i < v3data.data.tracks.length; i++) {
+          v3data.data.tracks[i] = this.buildV4track(v3data.data.tracks[i]);
+        }
+        delete v3data.tracks;
+        break;
       }
-      delete v3data.tracks;
-      delete v3data.playlistInfo;
-    }
-    if (v3data.loadType == Lavalink3loadType.TRACK_LOADED) {
-      v3data.loadType = LavalinkLoadType.TRACK;
-      v3data.data = this.buildV4track(v3data.tracks[0]);
-      delete v3data.tracks;
-    }
-    if (v3data.loadType == Lavalink3loadType.NO_MATCHES) {
-      v3data.loadType = LavalinkLoadType.EMPTY;
+      case Lavalink3loadType.SEARCH_RESULT: {
+        v3data.loadType = LavalinkLoadType.SEARCH;
+        v3data.data = v3data.tracks;
+        for (let i = 0; i < v3data.data.length; i++) {
+          v3data.data[i] = this.buildV4track(v3data.data[i]);
+        }
+        delete v3data.tracks;
+        delete v3data.playlistInfo;
+        break;
+      }
+      case Lavalink3loadType.TRACK_LOADED: {
+        v3data.loadType = LavalinkLoadType.TRACK;
+        v3data.data = this.buildV4track(v3data.tracks[0]);
+        delete v3data.tracks;
+        break;
+      }
+      case Lavalink3loadType.NO_MATCHES: {
+        v3data.loadType = LavalinkLoadType.EMPTY;
+        break;
+      }
     }
     return v3data;
   }

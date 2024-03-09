@@ -4,12 +4,23 @@ import { metadata } from '../metadata';
 import { RainlinkPlugin as SaveSessionPlugin } from '../Plugin/SaveSession/Plugin';
 import { RawData, WebSocket } from 'ws';
 import axios from 'axios';
-import { RainlinkEvents } from '../Interface/Constants';
+import { LavalinkLoadType, RainlinkEvents } from '../Interface/Constants';
 import { RainlinkRequesterOptions } from '../Interface/Rest';
 import { RainlinkNode } from '../Node/RainlinkNode';
 import { AbstractDriver } from './AbstractDriver';
+import { RainlinkPlayer } from '../Player/RainlinkPlayer';
 
-export class Lavalink4 extends AbstractDriver {
+export enum Nodelink2loadType {
+  SHORTS = 'shorts',
+  ALBUM = 'album',
+  ARTIST = 'artist',
+  SHOW = 'show',
+  EPISODE = 'episode',
+  STATION = 'station',
+  PODCAST = 'podcast',
+}
+
+export class Nodelink2 extends AbstractDriver {
   public wsUrl: string;
   public httpUrl: string;
   public sessionPlugin?: SaveSessionPlugin | null;
@@ -27,6 +38,7 @@ export class Lavalink4 extends AbstractDriver {
     this.httpUrl = `${options.secure ? 'https://' : 'http://'}${options.host}:${options.port}/v4`;
     this.sessionId = null;
     this.functions = new Map<string, (...args: any) => unknown>();
+    this.functions.set('getLyric', this.getLyric);
   }
 
   public connect(): WebSocket {
@@ -85,9 +97,14 @@ export class Lavalink4 extends AbstractDriver {
       return undefined;
     }
 
-    const finalData = String(res.data);
+    const preFinalData = this.testJSON(String(res.data)) ? (JSON.parse(res.data) as D) : (res.data as D);
+    let finalData: any = preFinalData;
 
-    return this.testJSON(finalData) ? (JSON.parse(res.data) as D) : (res.data as D);
+    if (finalData.loadType) {
+      finalData = this.convertV4trackResponse(finalData) as D;
+    }
+
+    return finalData;
   }
 
   protected wsMessageEvent(data: RawData) {
@@ -103,22 +120,67 @@ export class Lavalink4 extends AbstractDriver {
     if (this.wsClient) this.wsClient.close();
   }
 
+  protected convertV4trackResponse(nl2Data: Record<string, any>): Record<string, any> {
+    if (!nl2Data) return {};
+    switch (nl2Data.loadType) {
+      case Nodelink2loadType.SHORTS: {
+        nl2Data.loadType = LavalinkLoadType.TRACK;
+        break;
+      }
+      case Nodelink2loadType.ALBUM: {
+        nl2Data.loadType = LavalinkLoadType.PLAYLIST;
+        break;
+      }
+      case Nodelink2loadType.ARTIST: {
+        nl2Data.loadType = LavalinkLoadType.SEARCH;
+        break;
+      }
+      case Nodelink2loadType.EPISODE: {
+        nl2Data.loadType = LavalinkLoadType.PLAYLIST;
+        break;
+      }
+      case Nodelink2loadType.STATION: {
+        nl2Data.loadType = LavalinkLoadType.PLAYLIST;
+        break;
+      }
+      case Nodelink2loadType.PODCAST: {
+        nl2Data.loadType = LavalinkLoadType.PLAYLIST;
+        break;
+      }
+      case Nodelink2loadType.SHOW: {
+        nl2Data.loadType = LavalinkLoadType.PLAYLIST;
+        break;
+      }
+      default: {
+        nl2Data.loadType = LavalinkLoadType.TRACK;
+        break;
+      }
+    }
+    return nl2Data;
+  }
+
   public async updateSession(sessionId: string, mode: boolean, timeout: number): Promise<void> {
+    this.debug(
+      "[WARNING]: Nodelink doesn't support resuming, set resume to true is useless in Nodelink2 driver",
+    );
+    return;
+  }
+
+  public async getLyric(player: RainlinkPlayer) {
     const options: RainlinkRequesterOptions = {
-      endpoint: `/sessions/${sessionId}`,
+      endpoint: `/loadlyrics`,
+      params: {
+        encodedTrack: String(player.queue.current?.encoded),
+        language: 'en',
+      },
+      useSessionId: false,
       requestOptions: {
         headers: { 'Content-Type': 'application/json' },
-        method: 'PATCH',
-        data: {
-          resuming: mode,
-          timeout: timeout,
-        },
+        method: 'GET',
       },
     };
-
-    await this.requester<{ resuming: boolean; timeout: number }>(options);
-    this.debug(`Session updated! resume: ${mode}, timeout: ${timeout}`);
-    return;
+    const data = await player.node.driver.requester(options);
+    return data;
   }
 
   protected testJSON(text: string) {

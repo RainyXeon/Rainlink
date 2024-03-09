@@ -83,6 +83,8 @@ export class RainlinkPlayer {
    * Player's voice manager
    */
   public voiceManager: RainlinkVoiceManager;
+  /** All function to extend support driver */
+  public functions: Map<string, (...args: any) => unknown>;
 
   /**
    * The rainlink player handler class
@@ -114,6 +116,12 @@ export class RainlinkPlayer {
     this.deafened = voiceManager.deafened;
     this.muted = voiceManager.muted;
     this.voiceManager = voiceManager;
+    this.functions = new Map<string, (...args: any) => unknown>();
+    if (this.node.driver.functions.size !== 0) {
+      this.node.driver.functions.forEach((functionCode, key) => {
+        this.functions.set(key, functionCode);
+      });
+    }
     if (voiceOptions.volume && voiceOptions.volume !== this.volume) this.volume = voiceOptions.volume;
   }
 
