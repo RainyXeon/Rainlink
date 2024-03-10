@@ -1,4 +1,3 @@
-import axios from 'axios';
 import {
   RainlinkSearchOptions,
   RainlinkSearchResult,
@@ -8,6 +7,7 @@ import { Rainlink } from '../../Rainlink';
 import { RainlinkTrack } from '../../Player/RainlinkTrack';
 import { SourceRainlinkPlugin } from '../SourceRainlinkPlugin';
 import { RainlinkEvents, RainlinkPluginType } from '../../Interface/Constants';
+import { fetch } from 'undici';
 
 const REGEX =
   /(?:https:\/\/music\.apple\.com\/)(?:.+)?(artist|album|music-video|playlist)\/([\w\-\.]+(\/)+[\w\-\.]+|[^&]+)\/([\w\-\.]+(\/)+[\w\-\.]+|[^&]+)/;
@@ -179,18 +179,20 @@ export class RainlinkPlugin extends SourceRainlinkPlugin {
     } else return this.buildSearch(undefined, [], RainlinkSearchResultType.SEARCH);
   }
 
-  private async getData(params: string) {
-    const req = await axios.get(`${this.fetchURL}${params}`, {
+  private async getData<D = any>(params: string) {
+    const req = await fetch(`${this.fetchURL}${params}`, {
       headers: this.credentials,
     });
-    return req.data.data;
+    const res = (await req.json()) as any;
+    return res.data as D;
   }
 
-  private async getSearchData(params: string) {
-    const req = await axios.get(`${this.fetchURL}${params}`, {
+  private async getSearchData<D = any>(params: string) {
+    const req = await fetch(`${this.fetchURL}${params}`, {
       headers: this.credentials,
     });
-    return req.data;
+    const res = (await req.json()) as any;
+    return res.data as D;
   }
 
   private async searchTrack(query: string, requester: unknown): Promise<Result> {

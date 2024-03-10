@@ -1,13 +1,12 @@
-import { AxiosRequestConfig } from 'axios';
 import { FilterOptions } from './Player';
 import { LavalinkLoadType } from './Constants';
 import { Exception } from './LavalinkEvents';
+import { Dispatcher } from 'undici';
 
-export interface RainlinkRequesterOptions {
-  endpoint: string;
+export interface RainlinkRequesterOptions extends Dispatcher.RequestOptions {
   params?: string | Record<string, string>;
   useSessionId?: boolean;
-  requestOptions: AxiosRequestConfig;
+  data?: Record<string, unknown>;
 }
 
 export interface LavalinkPlayer {
@@ -109,6 +108,7 @@ export interface Playlist {
   info: {
     name: string;
     selectedTrack: number;
+    artworkUrl: string | undefined;
   };
   pluginInfo: unknown;
   tracks: RawTrack[];

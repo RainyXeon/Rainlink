@@ -55,7 +55,8 @@ export class RainlinkWebsocket {
       }
       if (['loadFailed', 'cleanup'].includes(data.reason)) {
         if (player.queue.current) player.queue.previous.push(player.queue.current);
-        if (!player.queue.length) return manager.emit(RainlinkEvents.PlayerEmpty, player);
+        if (!player.queue.length && !player.sudoDestroy)
+          return manager.emit(RainlinkEvents.PlayerEmpty, player);
         manager.emit(RainlinkEvents.PlayerEnd, player, player.queue.current);
         player.queue.current = null;
         return player.play();
@@ -72,9 +73,9 @@ export class RainlinkWebsocket {
 
       if (player.queue.length) {
         manager.emit(RainlinkEvents.PlayerEnd, player, currentSong);
-      } else {
+      } else if (!player.queue.length && !player.sudoDestroy) {
         return manager.emit(RainlinkEvents.PlayerEmpty, player);
-      }
+      } else return;
 
       return player.play();
     }

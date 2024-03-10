@@ -1,4 +1,3 @@
-import axios from 'axios';
 import {
   RainlinkSearchOptions,
   RainlinkSearchResult,
@@ -8,6 +7,7 @@ import { Rainlink } from '../../Rainlink';
 import { RainlinkTrack } from '../../Player/RainlinkTrack';
 import { SourceRainlinkPlugin } from '../SourceRainlinkPlugin';
 import { RainlinkEvents, RainlinkPluginType } from '../../Interface/Constants';
+import { fetch, request } from 'undici';
 
 const API_URL = 'https://api.deezer.com/';
 const REGEX = /^https?:\/\/(?:www\.)?deezer\.com\/[a-z]+\/(track|album|playlist)\/(\d+)$/;
@@ -102,7 +102,8 @@ export class RainlinkPlugin extends SourceRainlinkPlugin {
     const isUrl = /^https?:\/\//.test(query);
 
     if (SHORT_REGEX.test(query)) {
-      const res = await axios.head(query);
+      const url = new URL(query);
+      const res = await request(url.origin + url.pathname, { method: 'HEAD' });
       query = String(res.headers.location);
     }
 
@@ -132,9 +133,10 @@ export class RainlinkPlugin extends SourceRainlinkPlugin {
 
   private async searchTrack(query: string, requester: unknown): Promise<Result> {
     try {
-      const request = await axios.get(`${API_URL}/search/track?q=${decodeURIComponent(query)}`);
+      const req = await fetch(`${API_URL}/search/track?q=${decodeURIComponent(query)}`);
+      const data = await req.json();
 
-      const res = request.data as SearchResult;
+      const res = data as SearchResult;
       return {
         tracks: res.data.map(track => this.buildRainlinkTrack(track, requester)),
       };
@@ -145,8 +147,9 @@ export class RainlinkPlugin extends SourceRainlinkPlugin {
 
   private async getTrack(id: string, requester: unknown): Promise<Result> {
     try {
-      const request = await axios.get(`${API_URL}/track/${id}/`);
-      const track = request.data as DeezerTrack;
+      const request = await fetch(`${API_URL}/track/${id}/`);
+      const data = await request.json();
+      const track = data as DeezerTrack;
 
       return { tracks: [this.buildRainlinkTrack(track, requester)] };
     } catch (e: any) {
@@ -156,8 +159,9 @@ export class RainlinkPlugin extends SourceRainlinkPlugin {
 
   private async getAlbum(id: string, requester: unknown): Promise<Result> {
     try {
-      const request = await axios.get(`${API_URL}/album/${id}`);
-      const album = request.data as Album;
+      const request = await fetch(`${API_URL}/album/${id}/`);
+      const data = await request.json();
+      const album = data as Album;
 
       const tracks = album.tracks.data
         .filter(this.filterNullOrUndefined)
@@ -171,8 +175,9 @@ export class RainlinkPlugin extends SourceRainlinkPlugin {
 
   private async getPlaylist(id: string, requester: unknown): Promise<Result> {
     try {
-      const request = await axios.get(`${API_URL}/playlist/${id}`);
-      const playlist = request.data as Playlist;
+      const request = await fetch(`${API_URL}/playlist/${id}`);
+      const data = await request.json();
+      const playlist = data as Playlist;
 
       const tracks = playlist.tracks.data
         .filter(this.filterNullOrUndefined)

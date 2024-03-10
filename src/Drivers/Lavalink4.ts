@@ -3,11 +3,11 @@ import { Rainlink } from '../Rainlink';
 import { metadata } from '../metadata';
 import { RainlinkPlugin as SaveSessionPlugin } from '../Plugin/SaveSession/Plugin';
 import { RawData, WebSocket } from 'ws';
-import axios from 'axios';
 import { RainlinkEvents } from '../Interface/Constants';
 import { RainlinkRequesterOptions } from '../Interface/Rest';
 import { RainlinkNode } from '../Node/RainlinkNode';
 import { AbstractDriver } from './AbstractDriver';
+import { request } from 'undici';
 
 export class Lavalink4 extends AbstractDriver {
   public wsUrl: string;
@@ -60,34 +60,36 @@ export class Lavalink4 extends AbstractDriver {
   public async requester<D = any>(options: RainlinkRequesterOptions): Promise<D | undefined> {
     if (options.useSessionId && this.sessionId == null)
       throw new Error('sessionId not initalized! Please wait for lavalink get connected!');
-    const url = new URL(`${this.httpUrl}${options.endpoint}`);
+    const url = new URL(`${this.httpUrl}${options.path}`);
     if (options.params) url.search = new URLSearchParams(options.params).toString();
+
+    if (options.data) {
+      options.body = JSON.stringify(options.data);
+    }
 
     const lavalinkHeaders = {
       Authorization: this.options.auth,
       'User-Agent': this.manager.rainlinkOptions.options!.userAgent!,
-      ...options.requestOptions.headers,
+      ...options.headers,
     };
 
-    options.requestOptions.headers = lavalinkHeaders;
+    options.headers = lavalinkHeaders;
+    options.path = url.pathname + url.search;
 
-    const res = await axios({
-      url: url.toString(),
-      ...options.requestOptions,
-    });
+    const res = await request(url.origin, options);
 
-    if (res.status == 204) {
+    if (res.statusCode == 204) {
       this.debug('Player now destroyed');
       return undefined;
     }
-    if (res.status !== 200) {
-      this.debug('Something went wrong with lavalink server.' + `Status code: ${res.status}`);
+    if (res.statusCode !== 200) {
+      this.debug('Something went wrong with lavalink server.' + `Status code: ${res.statusCode}`);
       return undefined;
     }
 
-    const finalData = String(res.data);
+    const finalData = await res.body.json();
 
-    return this.testJSON(finalData) ? (JSON.parse(res.data) as D) : (res.data as D);
+    return finalData as D;
   }
 
   protected wsMessageEvent(data: RawData) {
@@ -105,31 +107,17 @@ export class Lavalink4 extends AbstractDriver {
 
   public async updateSession(sessionId: string, mode: boolean, timeout: number): Promise<void> {
     const options: RainlinkRequesterOptions = {
-      endpoint: `/sessions/${sessionId}`,
-      requestOptions: {
-        headers: { 'Content-Type': 'application/json' },
-        method: 'PATCH',
-        data: {
-          resuming: mode,
-          timeout: timeout,
-        },
+      path: `/sessions/${sessionId}`,
+      headers: { 'Content-Type': 'application/json' },
+      method: 'PATCH',
+      data: {
+        resuming: mode,
+        timeout: timeout,
       },
     };
 
     await this.requester<{ resuming: boolean; timeout: number }>(options);
     this.debug(`Session updated! resume: ${mode}, timeout: ${timeout}`);
     return;
-  }
-
-  protected testJSON(text: string) {
-    if (typeof text !== 'string') {
-      return false;
-    }
-    try {
-      JSON.parse(text);
-      return true;
-    } catch (error) {
-      return false;
-    }
   }
 }

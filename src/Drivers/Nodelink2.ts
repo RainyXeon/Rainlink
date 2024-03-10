@@ -3,12 +3,12 @@ import { Rainlink } from '../Rainlink';
 import { metadata } from '../metadata';
 import { RainlinkPlugin as SaveSessionPlugin } from '../Plugin/SaveSession/Plugin';
 import { RawData, WebSocket } from 'ws';
-import axios from 'axios';
 import { LavalinkLoadType, RainlinkEvents } from '../Interface/Constants';
 import { RainlinkRequesterOptions } from '../Interface/Rest';
 import { RainlinkNode } from '../Node/RainlinkNode';
 import { AbstractDriver } from './AbstractDriver';
 import { RainlinkPlayer } from '../Player/RainlinkPlayer';
+import { request } from 'undici';
 
 export enum Nodelink2loadType {
   SHORTS = 'shorts',
@@ -72,32 +72,34 @@ export class Nodelink2 extends AbstractDriver {
   public async requester<D = any>(options: RainlinkRequesterOptions): Promise<D | undefined> {
     if (options.useSessionId && this.sessionId == null)
       throw new Error('sessionId not initalized! Please wait for lavalink get connected!');
-    const url = new URL(`${this.httpUrl}${options.endpoint}`);
+    const url = new URL(`${this.httpUrl}${options.path}`);
     if (options.params) url.search = new URLSearchParams(options.params).toString();
+
+    if (options.data) {
+      options.body = JSON.stringify(options.data);
+    }
 
     const lavalinkHeaders = {
       Authorization: this.options.auth,
       'User-Agent': this.manager.rainlinkOptions.options!.userAgent!,
-      ...options.requestOptions.headers,
+      ...options.headers,
     };
 
-    options.requestOptions.headers = lavalinkHeaders;
+    options.headers = lavalinkHeaders;
+    options.path = url.pathname + url.search;
 
-    const res = await axios({
-      url: url.toString(),
-      ...options.requestOptions,
-    });
+    const res = await request(url.origin, options);
 
-    if (res.status == 204) {
+    if (res.statusCode == 204) {
       this.debug('Player now destroyed');
       return undefined;
     }
-    if (res.status !== 200) {
-      this.debug('Something went wrong with lavalink server.' + `Status code: ${res.status}`);
+    if (res.statusCode !== 200) {
+      this.debug('Something went wrong with lavalink server.' + `Status code: ${res.statusCode}`);
       return undefined;
     }
 
-    const preFinalData = this.testJSON(String(res.data)) ? (JSON.parse(res.data) as D) : (res.data as D);
+    const preFinalData = (await res.body.json()) as D;
     let finalData: any = preFinalData;
 
     if (finalData.loadType) {
@@ -168,16 +170,14 @@ export class Nodelink2 extends AbstractDriver {
 
   public async getLyric(player: RainlinkPlayer) {
     const options: RainlinkRequesterOptions = {
-      endpoint: `/loadlyrics`,
+      path: `/loadlyrics`,
       params: {
         encodedTrack: String(player.queue.current?.encoded),
         language: 'en',
       },
       useSessionId: false,
-      requestOptions: {
-        headers: { 'Content-Type': 'application/json' },
-        method: 'GET',
-      },
+      headers: { 'Content-Type': 'application/json' },
+      method: 'GET',
     };
     const data = await player.node.driver.requester(options);
     return data;
