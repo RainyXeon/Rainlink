@@ -23,6 +23,9 @@ export enum RainlinkEvents {
   PlayerPaused = 'playerPaused',
   PlayerResumed = 'playerResumed',
   QueueUpdate = 'queueUpdate',
+  VoiceConnect = 'voiceConnect',
+  VoiceDisconnect = 'voiceDisconnect',
+  VoiceError = 'voiceError',
 }
 
 /**

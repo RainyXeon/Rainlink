@@ -1,8 +1,9 @@
-import { RainlinkEvents, RainlinkPlayerState, VoiceState } from '../Interface/Constants';
+import { RainlinkDriver, RainlinkEvents, RainlinkPlayerState, VoiceState } from '../Interface/Constants';
 import { VoiceChannelOptions } from '../Interface/Player';
 import { RainlinkVoiceManager } from './RainlinkVoiceManager';
 import { RainlinkPlayer } from '../Player/RainlinkPlayer';
 import { Rainlink } from '../Rainlink';
+import { RainlinkPlugin } from '../Plugin/VoiceReceiver/Plugin';
 
 export class RainlinkPlayerManager extends Map<string, RainlinkPlayer> {
   /** The map of all voice manager that being handled */
@@ -55,6 +56,8 @@ export class RainlinkPlayerManager extends Map<string, RainlinkPlayer> {
       player.state = RainlinkPlayerState.CONNECTED;
       this.debug('Player created at ' + options.guildId);
       this.manager.emit(RainlinkEvents.PlayerCreate, this);
+      const voiceReceiver = this.manager.plugins.get('rainlink-voiceReceiver') as RainlinkPlugin;
+      if (voiceManager && node.options.driver == RainlinkDriver.Nodelink2) voiceReceiver.setup(node, options);
       return player;
     } catch (error) {
       voiceManager.disconnect();

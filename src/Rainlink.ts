@@ -128,6 +128,24 @@ export declare interface Rainlink {
    * @event Rainlink#queueUpdate
    */
   on(event: 'queueUpdate', listener: (player: RainlinkPlayer, queue: RainlinkQueue) => void): this;
+  /**
+   * Emitted when connected to voice receive server [ONLY Nodelink DRIVER!!!!!!].
+   * @event Rainlink#voiceConnect
+   */
+  on(event: 'voiceConnect', listener: (voiceOptions: VoiceChannelOptions) => void): this;
+  /**
+   * Emitted when disconnected to voice receive server [ONLY Nodelink DRIVER!!!!!!].
+   * @event Rainlink#voiceDisconnect
+   */
+  on(
+    event: 'voiceDisconnect',
+    listener: (voiceOptions: VoiceChannelOptions, code: number, reason: Buffer) => void,
+  ): this;
+  /**
+   * Emitted when voice receive server errored [ONLY Nodelink DRIVER!!!!!!].
+   * @event Rainlink#VoiceError
+   */
+  on(event: 'VoiceError', listener: (voiceOptions: VoiceChannelOptions, error: Error) => void): this;
 
   // ------------------------- ON EVENT ------------------------- //
 

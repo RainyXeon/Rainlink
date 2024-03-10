@@ -31,7 +31,7 @@ export type AppleOptions = {
 
 const credentials = {
   APPLE_TOKEN:
-    'eyJhbGciOiJFUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6IldlYlBsYXlLaWQifQ.eyJpc3MiOiJBTVBXZWJQbGF5IiwiaWF0IjoxNzAyNTAyMjM0LCJleHAiOjE3MDk3NTk4MzQsInJvb3RfaHR0cHNfb3JpZ2luIjpbImFwcGxlLmNvbSJdfQ.zzeMLmez71PLinP9GozYSQnF7NYyCiXHB9tKL3-cyu3LzyeRnYz0ejLj4CrNJs0dlNkFg9_mwKmMLueUAR-KRg',
+    'eyJhbGciOiJFUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6IldlYlBsYXlLaWQifQ.eyJpc3MiOiJBTVBXZWJQbGF5IiwiaWF0IjoxNzA5Njg5NTM4LCJleHAiOjE3MTY5NDcxMzgsInJvb3RfaHR0cHNfb3JpZ2luIjpbImFwcGxlLmNvbSJdfQ.QuL8x1Wb-EjFfRUKmaUlAX4TchI4EmeqYt1tVm2OMvM5Lbmuv45ON5qIDYOPQEPALfaElh1lh3_6g5BNToJh6A',
 };
 
 export class RainlinkPlugin extends SourceRainlinkPlugin {

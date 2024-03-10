@@ -4,6 +4,7 @@ import { RainlinkPlugin as Nico } from './Nico/Plugin.js';
 import { RainlinkPlugin as Spotify } from './Spotify/Plugin.js';
 import { RainlinkPlugin as PlayerMoved } from './PlayerMoved/Plugin.js';
 import { RainlinkPlugin as SaveSession } from './SaveSession/Plugin.js';
+import { RainlinkPlugin as VoiceReceiver } from './VoiceReceiver/Plugin.js';
 
 /**
  * Import example:
@@ -39,6 +40,9 @@ import { RainlinkPlugin as SaveSession } from './SaveSession/Plugin.js';
  *       // Be carefull when using
  *       // new Plugin.SaveSession(),
  *       new Plugin.PlayerMoved(client),
+ *  *    // About voice receiver plugin:
+ *       // This plugin only works with node use Nodelink2 driver.
+ *       new Plugin.VoiceReceiver()
  *     ],
  *   },
  * );
@@ -57,4 +61,5 @@ export default {
   Spotify,
   PlayerMoved,
   SaveSession,
+  VoiceReceiver,
 };
