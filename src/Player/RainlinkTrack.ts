@@ -141,7 +141,7 @@ export class RainlinkTrack {
 
   /** @ignore */
   protected async getTrack(manager: Rainlink): Promise<RawTrack> {
-    const node = await manager.nodes.getLeastUsedNode();
+    const node = await manager.nodes.getLeastUsed();
 
     if (!node) throw new Error('No nodes available');
 
