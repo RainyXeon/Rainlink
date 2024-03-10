@@ -1,7 +1,11 @@
 {
   "name": "rainlink",
-  "version": "0.2.3-beta",
+  "version": "0.2.5-beta",
   "description": "Another lavalink wrapper but focus on stability and rich features",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/RainyXeon/Rainlink.git"
+  },
   "scripts": {
     "build": "npx tsc --build --verbose",
     "prettier": "npx prettier -w ./src",

@@ -20,7 +20,7 @@ export class RainlinkNodeManager extends Map<string, RainlinkNode> {
    * Add a new Node.
    * @returns RainlinkNode
    */
-  addNode(node: RainlinkNodeOptions) {
+  add(node: RainlinkNodeOptions) {
     const newNode = new RainlinkNode(this.manager, node);
     newNode.connect();
     this.set(node.name, newNode);
@@ -31,7 +31,7 @@ export class RainlinkNodeManager extends Map<string, RainlinkNode> {
    * Get a least used node.
    * @returns RainlinkNode
    */
-  public async getLeastUsedNode(): Promise<RainlinkNode> {
+  public async getLeastUsed(): Promise<RainlinkNode> {
     if (this.manager.rainlinkOptions.options!.nodeResolver) {
       const resolverData = await this.manager.rainlinkOptions.options!.nodeResolver(this);
       if (resolverData) return resolverData;
@@ -59,7 +59,7 @@ export class RainlinkNodeManager extends Map<string, RainlinkNode> {
    * Remove a node.
    * @returns void
    */
-  removeNode(name: string): void {
+  remove(name: string): void {
     const node = this.get(name);
     if (node) {
       node.disconnect();

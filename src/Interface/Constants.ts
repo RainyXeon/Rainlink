@@ -109,7 +109,6 @@ export enum RainlinkDriver {
   Lavalink4 = 'lavalink@4',
   Lavalink3 = 'lavalink@3',
   Nodelink2 = 'nodelink@2',
-  Nodelink1 = 'nodelink@1',
 }
 
 /**
