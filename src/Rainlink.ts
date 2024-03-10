@@ -132,20 +132,33 @@ export declare interface Rainlink {
    * Emitted when connected to voice receive server [ONLY Nodelink DRIVER!!!!!!].
    * @event Rainlink#voiceConnect
    */
-  on(event: 'voiceConnect', listener: (voiceOptions: VoiceChannelOptions) => void): this;
+  on(event: 'voiceConnect', listener: (node: RainlinkNode) => void): this;
   /**
    * Emitted when disconnected to voice receive server [ONLY Nodelink DRIVER!!!!!!].
    * @event Rainlink#voiceDisconnect
    */
-  on(
-    event: 'voiceDisconnect',
-    listener: (voiceOptions: VoiceChannelOptions, code: number, reason: Buffer) => void,
-  ): this;
+  on(event: 'voiceDisconnect', listener: (node: RainlinkNode, code: number, reason: Buffer) => void): this;
   /**
    * Emitted when voice receive server errored [ONLY Nodelink DRIVER!!!!!!].
    * @event Rainlink#VoiceError
    */
-  on(event: 'VoiceError', listener: (voiceOptions: VoiceChannelOptions, error: Error) => void): this;
+  on(event: 'VoiceError', listener: (node: RainlinkNode, error: Error) => void): this;
+  /**
+   * Emitted when user started speaking [ONLY Nodelink DRIVER!!!!!!].
+   * @event Rainlink#voiceStartSpeaking
+   */
+  on(
+    event: 'voiceStartSpeaking',
+    listener: (node: RainlinkNode, userId: string, guildId: string) => void,
+  ): this;
+  /**
+   * Emitted when user finished speaking [ONLY Nodelink DRIVER!!!!!!].
+   * @event Rainlink#voiceEndSpeaking
+   */
+  on(
+    event: 'voiceEndSpeaking',
+    listener: (node: RainlinkNode, userTrack: string, userId: string, guildId: string) => void,
+  ): this;
 
   // ------------------------- ON EVENT ------------------------- //
 
@@ -176,6 +189,17 @@ export declare interface Rainlink {
     listener: (player: RainlinkPlayer, oldChannelId: string, newChannelId: string) => void,
   ): this;
   once(event: 'queueUpdate', listener: (player: RainlinkPlayer, queue: RainlinkQueue) => void): this;
+  once(event: 'voiceConnect', listener: (node: RainlinkNode) => void): this;
+  once(event: 'voiceDisconnect', listener: (node: RainlinkNode, code: number, reason: Buffer) => void): this;
+  once(event: 'VoiceError', listener: (node: RainlinkNode, error: Error) => void): this;
+  once(
+    event: 'voiceStartSpeaking',
+    listener: (node: RainlinkNode, userId: string, guildId: string) => void,
+  ): this;
+  once(
+    event: 'voiceEndSpeaking',
+    listener: (node: RainlinkNode, userTrack: string, userId: string, guildId: string) => void,
+  ): this;
   // ------------------------- ONCE EVENT ------------------------- //
 
   // ------------------------- OFF EVENT ------------------------- //
@@ -205,6 +229,17 @@ export declare interface Rainlink {
     listener: (player: RainlinkPlayer, oldChannelId: string, newChannelId: string) => void,
   ): this;
   off(event: 'queueUpdate', listener: (player: RainlinkPlayer, queue: RainlinkQueue) => void): this;
+  off(event: 'voiceConnect', listener: (node: RainlinkNode) => void): this;
+  off(event: 'voiceDisconnect', listener: (node: RainlinkNode, code: number, reason: Buffer) => void): this;
+  off(event: 'VoiceError', listener: (node: RainlinkNode, error: Error) => void): this;
+  off(
+    event: 'voiceStartSpeaking',
+    listener: (node: RainlinkNode, userId: string, guildId: string) => void,
+  ): this;
+  off(
+    event: 'voiceEndSpeaking',
+    listener: (node: RainlinkNode, userTrack: string, userId: string, guildId: string) => void,
+  ): this;
   // ------------------------- OFF EVENT ------------------------- //
 }
 

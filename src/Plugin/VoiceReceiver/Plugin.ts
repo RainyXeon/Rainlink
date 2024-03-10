@@ -42,22 +42,38 @@ export class RainlinkPlugin extends Plugin {
     });
     ws.on('open', () => {
       this.debug("Connected to nodelink's voice receive server!");
-      this.manager?.emit(RainlinkEvents.VoiceConnect, voiceOptions);
+      this.manager?.emit(RainlinkEvents.VoiceConnect, node);
     });
-    ws.on('message', (data: RawData) => this.wsMessageEvent(data));
+    ws.on('message', (data: RawData) => this.wsMessageEvent(node, data));
     ws.on('error', err => {
       this.debug(`Errored at nodelink's voice receive server!`);
-      this.manager?.emit(RainlinkEvents.VoiceError, voiceOptions, err);
+      this.manager?.emit(RainlinkEvents.VoiceError, node, err);
     });
     ws.on('close', (code: number, reason: Buffer) => {
       this.debug(`Disconnected to nodelink's voice receive server! Code: ${code} Reason: ${reason}`);
-      this.manager?.emit(RainlinkEvents.VoiceDisconnect, voiceOptions, code, reason);
+      this.manager?.emit(RainlinkEvents.VoiceDisconnect, node, code, reason);
     });
   }
 
-  protected wsMessageEvent(data: RawData) {
+  protected wsMessageEvent(node: RainlinkNode, data: RawData) {
     const wsData = JSON.parse(data.toString());
     this.debug(String(data));
+    switch (wsData.type) {
+      case 'startSpeakingEvent': {
+        this.manager?.emit(RainlinkEvents.VoiceStartSpeaking, node, wsData.data.userId, wsData.data.guildId);
+        break;
+      }
+      case 'endSpeakingEvent': {
+        this.manager?.emit(
+          RainlinkEvents.VoiceEndSpeaking,
+          node,
+          wsData.data.data,
+          wsData.data.userId,
+          wsData.data.guildId,
+        );
+        break;
+      }
+    }
     // this.node.wsMessageEvent(wsData);
   }
 

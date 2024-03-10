@@ -26,6 +26,8 @@ export enum RainlinkEvents {
   VoiceConnect = 'voiceConnect',
   VoiceDisconnect = 'voiceDisconnect',
   VoiceError = 'voiceError',
+  VoiceStartSpeaking = 'voiceStartSpeaking',
+  VoiceEndSpeaking = 'voiceEndSpeaking',
 }
 
 /**

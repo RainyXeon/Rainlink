@@ -9,6 +9,7 @@ import { RainlinkNode } from '../Node/RainlinkNode';
 import { AbstractDriver } from './AbstractDriver';
 import { RainlinkPlayer } from '../Player/RainlinkPlayer';
 import { request } from 'undici';
+import util from 'node:util';
 
 export enum Nodelink2loadType {
   SHORTS = 'shorts',
@@ -90,12 +91,17 @@ export class Nodelink2 extends AbstractDriver {
 
     const res = await request(url.origin, options);
 
+    // this.debug(`Request URL: ${url.origin}${options.path}`);
+
     if (res.statusCode == 204) {
       this.debug('Player now destroyed');
       return undefined;
     }
     if (res.statusCode !== 200) {
-      this.debug('Something went wrong with lavalink server.' + `Status code: ${res.statusCode}`);
+      this.debug(
+        'Something went wrong with lavalink server.' +
+          `Status code: ${res.statusCode}\n Headers: ${util.inspect(options.headers)}`,
+      );
       return undefined;
     }
 
