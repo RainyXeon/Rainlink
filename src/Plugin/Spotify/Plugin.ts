@@ -1,3 +1,4 @@
+import { request } from 'undici';
 import { RainlinkPluginType } from '../../Interface/Constants.js';
 import {
   RainlinkSearchOptions,
@@ -8,7 +9,6 @@ import { RainlinkTrack } from '../../Player/RainlinkTrack.js';
 import { Rainlink } from '../../Rainlink.js';
 import { SourceRainlinkPlugin } from '../SourceRainlinkPlugin.js';
 import { RequestManager } from './RequestManager.js';
-import axios from 'axios';
 
 const REGEX =
   /(?:https:\/\/open\.spotify\.com\/|spotify:)(?:.+)?(track|playlist|album|artist)[\/:]([A-Za-z0-9]+)/;
@@ -37,7 +37,6 @@ export class RainlinkPlugin extends SourceRainlinkPlugin {
    * The options of the plugin.
    */
   public options: SpotifyOptions;
-  private axios = axios;
 
   private _search: ((query: string, options?: RainlinkSearchOptions) => Promise<RainlinkSearchResult>) | null;
   private rainlink: Rainlink | null;
@@ -135,7 +134,7 @@ export class RainlinkPlugin extends SourceRainlinkPlugin {
     const isUrl = /^https?:\/\//.test(query);
 
     if (SHORT_REGEX.test(query)) {
-      const res = await this.axios.head(query);
+      const res = await request(query, { method: 'HEAD' });
       query = String(res.headers.location);
     }
 

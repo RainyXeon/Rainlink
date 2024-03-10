@@ -85,6 +85,8 @@ export class RainlinkPlayer {
   public voiceManager: RainlinkVoiceManager;
   /** All function to extend support driver */
   public functions: Map<string, (...args: any) => unknown>;
+  /** @ignore */
+  public sudoDestroy: boolean;
 
   /**
    * The rainlink player handler class
@@ -116,6 +118,7 @@ export class RainlinkPlayer {
     this.deafened = voiceManager.deafened;
     this.muted = voiceManager.muted;
     this.voiceManager = voiceManager;
+    this.sudoDestroy = false;
     this.functions = new Map<string, (...args: any) => unknown>();
     if (this.node.driver.functions.size !== 0) {
       this.node.driver.functions.forEach((functionCode, key) => {
@@ -149,6 +152,7 @@ export class RainlinkPlayer {
    */
   public async destroy(): Promise<void> {
     this.checkDestroyed();
+    this.sudoDestroy = true;
     const voiceManager = this.manager.voiceManagers.get(this.guildId);
     if (voiceManager) {
       voiceManager.disconnect();
@@ -161,6 +165,7 @@ export class RainlinkPlayer {
     this.clear(false);
     this.voiceId = '';
     this.manager.emit(RainlinkEvents.PlayerDestroy, this);
+    this.sudoDestroy = false;
   }
 
   /**
@@ -415,7 +420,7 @@ export class RainlinkPlayer {
       },
     });
     this.manager.emit(RainlinkEvents.PlayerEnd, this, this.queue.current);
-    this.clear();
+    this.clear(true);
 
     return this;
   }
@@ -425,7 +430,7 @@ export class RainlinkPlayer {
    * @param Whenever emit empty event or not
    * @inverval
    */
-  public clear(emitEmpty: boolean = true): void {
+  public clear(emitEmpty: boolean): void {
     this.loop = RainlinkLoopMode.NONE;
     this.queue.clear();
     this.queue.current = undefined;
