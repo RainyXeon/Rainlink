@@ -63,6 +63,7 @@ export class RainlinkPlugin extends Plugin {
     if (!targetWs) return;
     targetWs.close(1006, 'Player destroyed');
     this.runningWs.delete(guildId);
+    this.debug("Destroy connection to nodelink's voice receive server!");
     return;
   }
 
