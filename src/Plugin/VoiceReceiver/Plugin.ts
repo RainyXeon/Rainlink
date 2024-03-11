@@ -10,6 +10,7 @@ export class RainlinkPlugin extends Plugin {
   protected manager?: Rainlink;
   /** Whenever the plugin is enabled or not */
   public enabled: boolean = false;
+  protected runningWs: Map<string, WebSocket> = new Map<string, WebSocket>();
 
   constructor() {
     super();
@@ -25,8 +26,8 @@ export class RainlinkPlugin extends Plugin {
     return RainlinkPluginType.Default;
   }
 
-  /** Setup the ws voice reciver client */
-  public setup(node: RainlinkNode, voiceOptions: VoiceChannelOptions): void {
+  /** Open the ws voice reciver client */
+  public open(node: RainlinkNode, voiceOptions: VoiceChannelOptions): void {
     if (!this.enabled) throw new Error('This plugin is unloaded!');
     if (node.options.driver !== RainlinkDriver.Nodelink2)
       throw new Error('This node not support voice receiver, please use Nodelink2 to use this feature!');
@@ -40,6 +41,7 @@ export class RainlinkPlugin extends Plugin {
         'Guild-Id': voiceOptions.guildId,
       },
     });
+    this.runningWs.set(voiceOptions.guildId, ws);
     ws.on('open', () => {
       this.debug("Connected to nodelink's voice receive server!");
       this.manager?.emit(RainlinkEvents.VoiceConnect, node);
@@ -53,6 +55,15 @@ export class RainlinkPlugin extends Plugin {
       this.debug(`Disconnected to nodelink's voice receive server! Code: ${code} Reason: ${reason}`);
       this.manager?.emit(RainlinkEvents.VoiceDisconnect, node, code, reason);
     });
+  }
+
+  /** Open the ws voice reciver client */
+  public close(guildId: string): void {
+    const targetWs = this.runningWs.get(guildId);
+    if (!targetWs) return;
+    targetWs.close(1006, 'Player destroyed');
+    this.runningWs.delete(guildId);
+    return;
   }
 
   protected wsMessageEvent(node: RainlinkNode, data: RawData) {
