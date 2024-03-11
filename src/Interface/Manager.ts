@@ -54,7 +54,12 @@ export interface RainlinkAdditionalOptions {
   /** The default volume when create a player */
   defaultVolume?: number;
   /** Search track from youtube when track resolve failed */
-  searchFallback?: boolean;
+  searchFallback?: {
+    /** Whenever enable this search fallback or not */
+    enable: boolean;
+    /** Choose a fallback search engine, recommended soundcloud and youtube */
+    engine: string;
+  };
   /** Whether to resume a connection on disconnect to Lavalink (Server Side) (Note: DOES NOT RESUME WHEN THE LAVALINK SERVER DIES) */
   resume?: boolean;
   /** When the seasion is deleted from Lavalink. Use second (Server Side) (Note: DOES NOT RESUME WHEN THE LAVALINK SERVER DIES) */

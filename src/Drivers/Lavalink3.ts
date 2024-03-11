@@ -8,6 +8,7 @@ import { RainlinkRequesterOptions } from '../Interface/Rest';
 import { RainlinkNode } from '../Node/RainlinkNode';
 import { AbstractDriver } from './AbstractDriver';
 import { request } from 'undici';
+import util from 'node:util';
 
 export enum Lavalink3loadType {
   TRACK_LOADED = 'TRACK_LOADED',
@@ -87,12 +88,17 @@ export class Lavalink3 extends AbstractDriver {
 
     const res = await request(url.origin, options);
 
+    // this.debug(`Request URL: ${url.origin}${options.path}`);
+
     if (res.statusCode == 204) {
       this.debug('Player now destroyed');
       return undefined;
     }
     if (res.statusCode !== 200) {
-      this.debug('Something went wrong with lavalink server.' + `Status code: ${res.statusCode}`);
+      this.debug(
+        'Something went wrong with lavalink server.' +
+          `Status code: ${res.statusCode}\n Headers: ${util.inspect(options.headers)}`,
+      );
       return undefined;
     }
 

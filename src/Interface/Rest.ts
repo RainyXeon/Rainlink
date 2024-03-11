@@ -108,7 +108,6 @@ export interface Playlist {
   info: {
     name: string;
     selectedTrack: number;
-    artworkUrl: string | undefined;
   };
   pluginInfo: unknown;
   tracks: RawTrack[];

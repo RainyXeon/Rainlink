@@ -4,6 +4,7 @@ import { RainlinkNode } from '../Node/RainlinkNode';
 import { RainlinkQueue } from './RainlinkQueue';
 import { RainlinkVoiceManager } from '../Manager/RainlinkVoiceManager';
 import {
+  RainlinkDriver,
   RainlinkEvents,
   RainlinkFilterData,
   RainlinkLoopMode,
@@ -13,6 +14,7 @@ import { RainlinkTrack } from './RainlinkTrack';
 import { UpdatePlayerInfo, UpdatePlayerOptions } from '../Interface/Rest';
 import { Snowflake } from 'discord.js';
 import { RainlinkSearchOptions, RainlinkSearchResult } from '../Interface/Manager';
+import { RainlinkPlugin } from '../Plugin/VoiceReceiver/Plugin';
 
 export class RainlinkPlayer {
   /**
@@ -158,6 +160,9 @@ export class RainlinkPlayer {
       voiceManager.disconnect();
       this.manager.voiceManagers.delete(this.guildId);
     }
+    const voiceReceiver = this.manager.plugins.get('rainlink-voiceReceiver') as RainlinkPlugin;
+    if (voiceManager && this.node.options.driver == RainlinkDriver.Nodelink2)
+      voiceReceiver.close(this.guildId);
     await this.node.rest.destroyPlayer(this.guildId);
     this.manager.players.delete(this.guildId);
     this.state = RainlinkPlayerState.DESTROYED;
