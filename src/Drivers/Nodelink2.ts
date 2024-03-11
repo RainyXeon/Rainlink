@@ -21,6 +21,22 @@ export enum Nodelink2loadType {
   PODCAST = 'podcast',
 }
 
+export interface NodelinkGetLyricsInterface {
+  loadType: Nodelink2loadType | LavalinkLoadType;
+  data:
+    | {
+        name: string;
+        synced: boolean;
+        data: {
+          startTime: number;
+          endTime: number;
+          text: string;
+        }[];
+        rtl: boolean;
+      }
+    | {};
+}
+
 export class Nodelink2 extends AbstractDriver {
   public wsUrl: string;
   public httpUrl: string;
@@ -174,18 +190,21 @@ export class Nodelink2 extends AbstractDriver {
     return;
   }
 
-  public async getLyric(player: RainlinkPlayer) {
+  public async getLyric(
+    player: RainlinkPlayer,
+    language: string,
+  ): Promise<NodelinkGetLyricsInterface | undefined> {
     const options: RainlinkRequesterOptions = {
       path: `/loadlyrics`,
       params: {
         encodedTrack: String(player.queue.current?.encoded),
-        language: 'en',
+        language: language,
       },
       useSessionId: false,
       headers: { 'Content-Type': 'application/json' },
       method: 'GET',
     };
-    const data = await player.node.driver.requester(options);
+    const data = await player.node.driver.requester<NodelinkGetLyricsInterface>(options);
     return data;
   }
 

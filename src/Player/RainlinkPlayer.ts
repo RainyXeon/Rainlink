@@ -124,7 +124,7 @@ export class RainlinkPlayer {
     this.functions = new Map<string, (...args: any) => unknown>();
     if (this.node.driver.functions.size !== 0) {
       this.node.driver.functions.forEach((functionCode, key) => {
-        this.functions.set(key, functionCode);
+        this.functions.set(key, functionCode.bind(null, this));
       });
     }
     if (voiceOptions.volume && voiceOptions.volume !== this.volume) this.volume = voiceOptions.volume;
