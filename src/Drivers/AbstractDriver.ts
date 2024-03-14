@@ -1,4 +1,5 @@
 import { RainlinkRequesterOptions } from '../Interface/Rest';
+import { RainlinkPlayer } from '../Player/RainlinkPlayer';
 import { RainlinkPlugin as SaveSessionPlugin } from '../Plugin/SaveSession/Plugin';
 import { WebSocket } from 'ws';
 
@@ -12,7 +13,7 @@ export abstract class AbstractDriver {
   /** The lavalink server season id to resume */
   abstract sessionId: string | null;
   /** All function to extend support driver */
-  abstract functions: Map<string, (...args: any) => unknown>;
+  abstract functions: Map<string, (player: RainlinkPlayer, ...args: any) => unknown>;
   /**
    * Connect to lavalink/nodelink server
    * @returns WebSocket
