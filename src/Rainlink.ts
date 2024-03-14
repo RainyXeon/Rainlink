@@ -466,10 +466,18 @@ export class Rainlink extends EventEmitter {
       voiceConnectionTimeout: data.voiceConnectionTimeout ?? 15000,
       defaultSearchEngine: data.defaultSearchEngine ?? undefined,
       defaultVolume: data.defaultVolume ?? 100,
-      searchFallback: {
-        enable: data.searchFallback!.enable ?? false,
-        engine: data.searchFallback!.engine ?? 'soundcloud',
-      },
+      searchFallback: data.searchFallback
+        ? {
+            enable: data.searchFallback.enable == true ? true : false,
+            engine:
+              data.searchFallback.engine !== null && data.searchFallback.engine !== undefined
+                ? data.searchFallback.engine
+                : 'soundcloud',
+          }
+        : {
+            enable: false,
+            engine: 'soundcloud',
+          },
       resume: data.resume ?? false,
       userAgent: data.userAgent ?? `@discord/@bot/@project${metadata.name}/${metadata.version}`,
       nodeResolver: data.nodeResolver ?? undefined,

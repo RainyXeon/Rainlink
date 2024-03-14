@@ -9,13 +9,14 @@ import { RainlinkNode } from '../Node/RainlinkNode';
 import { AbstractDriver } from './AbstractDriver';
 import { request } from 'undici';
 import util from 'node:util';
+import { RainlinkPlayer } from '../Player/RainlinkPlayer';
 
 export class Lavalink4 extends AbstractDriver {
   public wsUrl: string;
   public httpUrl: string;
   public sessionPlugin?: SaveSessionPlugin | null;
   public sessionId: string | null;
-  public functions: Map<string, (...args: any) => unknown>;
+  public functions: Map<string, (player: RainlinkPlayer, ...args: any) => unknown>;
   private wsClient?: WebSocket;
 
   constructor(
@@ -27,7 +28,7 @@ export class Lavalink4 extends AbstractDriver {
     this.wsUrl = `${options.secure ? 'wss' : 'ws'}://${options.host}:${options.port}/v4/websocket`;
     this.httpUrl = `${options.secure ? 'https://' : 'http://'}${options.host}:${options.port}/v4`;
     this.sessionId = null;
-    this.functions = new Map<string, (...args: any) => unknown>();
+    this.functions = new Map<string, (player: RainlinkPlayer, ...args: any) => unknown>();
   }
 
   public connect(): WebSocket {
