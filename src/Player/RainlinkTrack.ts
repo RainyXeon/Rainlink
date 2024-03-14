@@ -105,7 +105,7 @@ export class RainlinkTrack {
   /**
    * Resolve the track
    * @param options Resolve options
-   * @returns Promise<KazagumoTrack>
+   * @returns Promise<RainlinkTrack>
    */
   public async resolver(manager: Rainlink, options?: ResolveOptions): Promise<RainlinkTrack> {
     const { overwrite } = options ? options : { overwrite: false };

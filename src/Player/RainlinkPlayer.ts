@@ -182,7 +182,7 @@ export class RainlinkPlayer {
   public async play(track?: RainlinkTrack, options?: PlayOptions): Promise<RainlinkPlayer> {
     this.checkDestroyed();
 
-    if (track && !(track instanceof RainlinkTrack)) throw new Error('track must be a KazagumoTrack');
+    if (track && !(track instanceof RainlinkTrack)) throw new Error('track must be a RainlinkTrack');
 
     if (!track && !this.queue.totalSize) throw new Error('No track is available to play');
 
@@ -495,7 +495,7 @@ export class RainlinkPlayer {
   /**
    * Set text channel
    * @param textId Text channel ID
-   * @returns KazagumoPlayer
+   * @returns RainlinkPlayer
    */
   public setTextChannel(textId: Snowflake): RainlinkPlayer {
     this.checkDestroyed();
@@ -506,7 +506,7 @@ export class RainlinkPlayer {
   /**
    * Set voice channel and move the player to the voice channel
    * @param voiceId Voice channel ID
-   * @returns KazagumoPlayer
+   * @returns RainlinkPlayer
    */
   public setVoiceChannel(voiceId: Snowflake): RainlinkPlayer {
     this.checkDestroyed();
@@ -538,7 +538,7 @@ export class RainlinkPlayer {
   /**
    * Set a filter that prebuilt in rainlink
    * @param filter The filter name
-   * @returns KazagumoPlayer
+   * @returns RainlinkPlayer
    */
   public async setFilter(filter: keyof typeof RainlinkFilterData): Promise<RainlinkPlayer> {
     this.checkDestroyed();

@@ -47,7 +47,7 @@ export class RainlinkQueue extends Array<RainlinkTrack> {
 
   /**
    * Add track(s) to the queue
-   * @param track KazagumoTrack to add
+   * @param track RainlinkTrack to add
    * @returns RainlinkQueue
    */
   public add(track: RainlinkTrack | RainlinkTrack[]): RainlinkQueue {
