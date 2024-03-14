@@ -252,7 +252,7 @@ export class RainlinkPlayer {
    */
   public async pause(): Promise<RainlinkPlayer> {
     this.checkDestroyed();
-    if (this.paused) return this;
+    if (this.paused == true) return this;
     await this.node.rest.updatePlayer({
       guildId: this.guildId,
       playerOptions: {
@@ -260,6 +260,7 @@ export class RainlinkPlayer {
       },
     });
     this.paused = true;
+    this.playing = false;
     this.manager.emit(RainlinkEvents.PlayerPaused, this, this.queue.current);
     return this;
   }
@@ -270,7 +271,7 @@ export class RainlinkPlayer {
    */
   public async resume(): Promise<RainlinkPlayer> {
     this.checkDestroyed();
-    if (!this.paused) return this;
+    if (this.paused == false) return this;
     await this.node.rest.updatePlayer({
       guildId: this.guildId,
       playerOptions: {
@@ -278,6 +279,7 @@ export class RainlinkPlayer {
       },
     });
     this.paused = false;
+    this.playing = true;
     this.manager.emit(RainlinkEvents.PlayerResumed, this, this.queue.current);
     return this;
   }
@@ -289,7 +291,7 @@ export class RainlinkPlayer {
    */
   public async setPause(mode: boolean): Promise<RainlinkPlayer> {
     this.checkDestroyed();
-    if (!this.paused) return this;
+    if (this.paused == mode) return this;
     await this.node.rest.updatePlayer({
       guildId: this.guildId,
       playerOptions: {
@@ -297,6 +299,7 @@ export class RainlinkPlayer {
       },
     });
     this.paused = mode;
+    this.playing = !mode;
     this.manager.emit(
       mode ? RainlinkEvents.PlayerPaused : RainlinkEvents.PlayerResumed,
       this,
@@ -579,7 +582,10 @@ export class RainlinkPlayer {
       if (endTime) playerOptions.endTime = endTime;
       if (volume) playerOptions.volume = volume;
     }
-    if (playerOptions.paused) this.paused = playerOptions.paused;
+    if (playerOptions.paused) {
+      this.paused = playerOptions.paused;
+      this.playing = !this.paused;
+    }
     if (playerOptions.position) this.position = playerOptions.position;
     if (playerOptions.volume) this.volume = playerOptions.volume;
     await this.node.rest.updatePlayer({
