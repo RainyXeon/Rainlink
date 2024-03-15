@@ -187,17 +187,9 @@ export class RainlinkPlugin extends SourceRainlinkPlugin {
     return res.data as D;
   }
 
-  private async getSearchData<D = any>(params: string) {
-    const req = await fetch(`${this.fetchURL}${params}`, {
-      headers: this.credentials,
-    });
-    const res = (await req.json()) as any;
-    return res.data as D;
-  }
-
   private async searchTrack(query: string, requester: unknown): Promise<Result> {
     try {
-      const res = await this.getSearchData(
+      const res = await this.getData(
         `/search?types=songs&term=${query.replace(/ /g, '+').toLocaleLowerCase()}`,
       ).catch(e => {
         throw new Error(e);
