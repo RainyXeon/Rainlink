@@ -1,7 +1,8 @@
 # ⚠️⚠️⚠️ Warning!!
 
 ⚠️⚠️ This lavalink wrapper is just in the development stage, you will take full responsibility for any errors or bugs!!
-⚠️ Update 1: Rainlink now in stage 11 of development (Release beta product)
+
+⚠️ Update 3: Rainlink now in stage 15 of development (Release beta 3 product)
 
 # 🌦️ Rainlink
 
@@ -69,16 +70,16 @@ rainlink.on('nodeDisconnect', (node, players, moved) => {
     console.warn(`Lavalink ${node.options.name}: Disconnected`);
 });
 
-rainlink.on("playerStart", (player, track) => {
+rainlink.on("trackStart", (player, track) => {
     client.channels.cache.get(player.textId)?.send({content: `Now playing **${track.title}** by **${track.author}**`})
         .then(x => player.data.set("message", x));
 });
 
-rainlink.on("playerEnd", (player) => {
+rainlink.on("trackEnd", (player) => {
     player.data.get("message")?.edit({content: `Finished playing`});
 });
 
-rainlink.on("playerEmpty", player => {
+rainlink.on("queueEmpty", player => {
     client.channels.cache.get(player.textId)?.send({content: `Destroyed player due to inactivity.`})
         .then(x => player.data.set("message", x));
     player.destroy();
