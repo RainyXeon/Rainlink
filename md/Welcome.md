@@ -90,16 +90,16 @@ rainlink.on('nodeDisconnect', (node, players, moved) => {
     console.warn(`Lavalink ${node.options.name}: Disconnected`);
 });
 
-rainlink.on("playerStart", (player, track) => {
+rainlink.on("trackStart", (player, track) => {
     client.channels.cache.get(player.textId)?.send({content: `Now playing **${track.title}** by **${track.author}**`})
         .then(x => player.data.set("message", x));
 });
 
-rainlink.on("playerEnd", (player) => {
+rainlink.on("trackEnd", (player) => {
     player.data.get("message")?.edit({content: `Finished playing`});
 });
 
-rainlink.on("playerEmpty", player => {
+rainlink.on("queueEmpty", player => {
     client.channels.cache.get(player.textId)?.send({content: `Destroyed player due to inactivity.`})
         .then(x => player.data.set("message", x));
     player.destroy();

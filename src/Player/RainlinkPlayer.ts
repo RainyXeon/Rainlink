@@ -206,10 +206,10 @@ export class RainlinkPlayer {
     });
 
     if (!resolveResult) {
-      this.manager.emit(RainlinkEvents.PlayerResolveError, this, current, errorMessage);
+      this.manager.emit(RainlinkEvents.TrackResolveError, this, current, errorMessage);
       this.debug(`Player ${this.guildId} resolve error: ${errorMessage}`);
       this.queue.current = null;
-      this.queue.size ? await this.play() : this.manager.emit(RainlinkEvents.PlayerEmpty, this);
+      this.queue.size ? await this.play() : this.manager.emit(RainlinkEvents.QueueEmpty, this);
       return this;
     }
 
@@ -261,7 +261,7 @@ export class RainlinkPlayer {
     });
     this.paused = true;
     this.playing = false;
-    this.manager.emit(RainlinkEvents.PlayerPaused, this, this.queue.current);
+    this.manager.emit(RainlinkEvents.PlayerPause, this, this.queue.current);
     return this;
   }
 
@@ -280,7 +280,7 @@ export class RainlinkPlayer {
     });
     this.paused = false;
     this.playing = true;
-    this.manager.emit(RainlinkEvents.PlayerResumed, this, this.queue.current);
+    this.manager.emit(RainlinkEvents.PlayerResume, this, this.queue.current);
     return this;
   }
 
@@ -301,7 +301,7 @@ export class RainlinkPlayer {
     this.paused = mode;
     this.playing = !mode;
     this.manager.emit(
-      mode ? RainlinkEvents.PlayerPaused : RainlinkEvents.PlayerResumed,
+      mode ? RainlinkEvents.PlayerPause : RainlinkEvents.PlayerResume,
       this,
       this.queue.current,
     );
@@ -427,7 +427,7 @@ export class RainlinkPlayer {
         },
       },
     });
-    this.manager.emit(RainlinkEvents.PlayerEnd, this, this.queue.current);
+    this.manager.emit(RainlinkEvents.TrackEnd, this, this.queue.current);
     this.clear(true);
 
     return this;
@@ -448,7 +448,7 @@ export class RainlinkPlayer {
     this.playing = false;
     this.data.clear();
     this.position = 0;
-    if (emitEmpty) this.manager.emit(RainlinkEvents.PlayerEmpty, this);
+    if (emitEmpty) this.manager.emit(RainlinkEvents.QueueEmpty, this);
     return;
   }
 

@@ -8,6 +8,9 @@ import { RainlinkRest } from '../Node/RainlinkRest';
 import { RainlinkPlayer } from '../Player/RainlinkPlayer';
 import { RainlinkDriver } from './Constants';
 
+/**
+ * A structure interface
+ */
 export type Constructor<T> = new (...args: any[]) => T;
 
 export interface Structures {
