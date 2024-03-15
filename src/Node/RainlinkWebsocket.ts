@@ -26,7 +26,7 @@ export class RainlinkWebsocket {
     if (player) {
       player.playing = true;
       player.paused = false;
-      manager.emit(RainlinkEvents.PlayerStart, player, player.queue.current);
+      manager.emit(RainlinkEvents.TrackStart, player, player.queue.current);
       manager.emit(RainlinkEvents.Debug, `[Rainlink Player Events]: Player started at guild ${data.guildId}`);
     }
     return;
@@ -51,13 +51,13 @@ export class RainlinkWebsocket {
       player.paused = true;
 
       if (data.reason === 'replaced') {
-        return manager.emit(RainlinkEvents.PlayerEnd, player, player.queue.current);
+        return manager.emit(RainlinkEvents.TrackEnd, player, player.queue.current);
       }
       if (['loadFailed', 'cleanup'].includes(data.reason)) {
         if (player.queue.current) player.queue.previous.push(player.queue.current);
         if (!player.queue.length && !player.sudoDestroy)
-          return manager.emit(RainlinkEvents.PlayerEmpty, player);
-        manager.emit(RainlinkEvents.PlayerEnd, player, player.queue.current);
+          return manager.emit(RainlinkEvents.QueueEmpty, player);
+        manager.emit(RainlinkEvents.QueueEmpty, player, player.queue.current);
         player.queue.current = null;
         return player.play();
       }
@@ -72,9 +72,9 @@ export class RainlinkWebsocket {
       player.queue.current = null;
 
       if (player.queue.length) {
-        manager.emit(RainlinkEvents.PlayerEnd, player, currentSong);
+        manager.emit(RainlinkEvents.TrackEnd, player, currentSong);
       } else if (!player.queue.length && !player.sudoDestroy) {
-        return manager.emit(RainlinkEvents.PlayerEmpty, player);
+        return manager.emit(RainlinkEvents.QueueEmpty, player);
       } else return;
 
       return player.play();
@@ -97,7 +97,7 @@ export class RainlinkWebsocket {
   protected TrackStuckEvent(manager: Rainlink, data: Record<string, any>) {
     const player = manager.players.get(data.guildId);
     if (player) {
-      manager.emit(RainlinkEvents.PlayerStuck, player, data);
+      manager.emit(RainlinkEvents.TrackStuck, player, data);
       manager.emit(RainlinkEvents.Debug, `[Rainlink Player Events]: Player stucked at guild ${data.guildId}`);
     }
     return;

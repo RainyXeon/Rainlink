@@ -29,6 +29,8 @@ export declare interface Rainlink {
    * @event Rainlink#debug
    */
   on(event: 'debug', listener: (logs: string) => void): this;
+
+  ////// ------------------------- Node Event ------------------------- /////
   /**
    * Emitted when a lavalink server is connected.
    * @event Rainlink#nodeConnect
@@ -49,39 +51,19 @@ export declare interface Rainlink {
    * @event Rainlink#nodeError
    */
   on(event: 'nodeError', listener: (node: RainlinkNode, error: Error) => void): this;
+  ////// ------------------------- Node Event ------------------------- /////
+
+  ////// ------------------------- Player Event ------------------------- /////
   /**
    * Emitted when a player is created.
    * @event Rainlink#playerCreate
    */
   on(event: 'playerCreate', listener: (player: RainlinkPlayer, track: RainlinkTrack) => void): this;
   /**
-   * Emitted when a track is going to end.
-   * @event Rainlink#playerEnd
-   */
-  on(event: 'playerEnd', listener: (player: RainlinkPlayer) => void): this;
-  /**
-   * Emitted when a track is going to play.
-   * @event Rainlink#playerStart
-   */
-  on(event: 'playerStart', listener: (player: RainlinkPlayer, track: RainlinkTrack) => void): this;
-  /**
    * Emitted when a player is going to destroyed.
    * @event Rainlink#playerDestroy
    */
   on(event: 'playerDestroy', listener: (player: RainlinkPlayer) => void): this;
-  /**
-   * Emitted when a track is failed to resolve using fallback search engine.
-   * @event Rainlink#playerResolveError
-   */
-  on(
-    event: 'playerResolveError',
-    listener: (player: RainlinkPlayer, track: RainlinkTrack, message: string) => void,
-  ): this;
-  /**
-   * Emitted when a player have an empty queue.
-   * @event Rainlink#playerEmpty
-   */
-  on(event: 'playerEmpty', listener: (player: RainlinkPlayer) => void): this;
   /**
    * Emitted when a player have an exception.
    * @event Rainlink#playerException
@@ -93,19 +75,6 @@ export declare interface Rainlink {
    */
   on(event: 'playerUpdate', listener: (player: RainlinkPlayer, data: Record<string, any>) => void): this;
   /**
-   * Emitted when a track stucked.
-   * @event Rainlink#playerStuck
-   */
-  on(event: 'playerStuck', listener: (player: RainlinkPlayer, data: Record<string, any>) => void): this;
-  /**
-   * Emitted when a player's websocket closed.
-   * @event Rainlink#playerWebsocketClosed
-   */
-  on(
-    event: 'playerWebsocketClosed',
-    listener: (player: RainlinkPlayer, data: Record<string, any>) => void,
-  ): this;
-  /**
    * Emitted when a playuer is moved into another channel. [Require plugin]
    * @event Rainlink#playerMoved
    */
@@ -115,19 +84,85 @@ export declare interface Rainlink {
   ): this;
   /**
    * Emitted when a track paused.
-   * @event Rainlink#playerPaused
+   * @event Rainlink#playerPause
    */
-  on(event: 'playerPaused', listener: (player: RainlinkPlayer, track: RainlinkTrack) => void): this;
+  on(event: 'playerPause', listener: (player: RainlinkPlayer, track: RainlinkTrack) => void): this;
   /**
    * Emitted when a track resumed.
-   * @event Rainlink#playerResumed
+   * @event Rainlink#playerResume
    */
-  on(event: 'playerResumed', listener: (player: RainlinkPlayer, data: RainlinkTrack) => void): this;
+  on(event: 'playerResume', listener: (player: RainlinkPlayer, data: RainlinkTrack) => void): this;
   /**
-   * Emitted when a queue updated.
-   * @event Rainlink#queueUpdate
+   * Emitted when a player's websocket closed.
+   * @event Rainlink#playerWebsocketClosed
    */
-  on(event: 'queueUpdate', listener: (player: RainlinkPlayer, queue: RainlinkQueue) => void): this;
+  on(
+    event: 'playerWebsocketClosed',
+    listener: (player: RainlinkPlayer, data: Record<string, any>) => void,
+  ): this;
+  ////// ------------------------- Player Event ------------------------- /////
+
+  ////// ------------------------- Track Event ------------------------- /////
+  /**
+   * Emitted when a track is going to play.
+   * @event Rainlink#trackStart
+   */
+  on(event: 'trackStart', listener: (player: RainlinkPlayer, track: RainlinkTrack) => void): this;
+  /**
+   * Emitted when a track is going to end.
+   * @event Rainlink#trackEnd
+   */
+  on(event: 'trackEnd', listener: (player: RainlinkPlayer) => void): this;
+  /**
+   * Emitted when a track stucked.
+   * @event Rainlink#trackStuck
+   */
+  on(event: 'trackStuck', listener: (player: RainlinkPlayer, data: Record<string, any>) => void): this;
+  /**
+   * Emitted when a track is failed to resolve using fallback search engine.
+   * @event Rainlink#trackResolveError
+   */
+  on(
+    event: 'trackResolveError',
+    listener: (player: RainlinkPlayer, track: RainlinkTrack, message: string) => void,
+  ): this;
+  ////// ------------------------- Track Event ------------------------- /////
+
+  ////// ------------------------- Queue Event ------------------------- /////
+  /**
+   * Emitted when a track added into queue.
+   * @event Rainlink#queueAdd
+   */
+  on(
+    event: 'queueAdd',
+    listener: (player: RainlinkPlayer, queue: RainlinkQueue, track: RainlinkTrack) => void,
+  ): this;
+  /**
+   * Emitted when a track removed from queue.
+   * @event Rainlink#queueRemove
+   */
+  on(
+    event: 'queueRemove',
+    listener: (player: RainlinkPlayer, queue: RainlinkQueue, track: RainlinkTrack) => void,
+  ): this;
+  /**
+   * Emitted when a queue shuffled.
+   * @event Rainlink#queueShuffle
+   */
+  on(event: 'queueShuffle', listener: (player: RainlinkPlayer, queue: RainlinkQueue) => void): this;
+  /**
+   * Emitted when a queue cleared.
+   * @event Rainlink#queueClear
+   */
+  on(event: 'queueClear', listener: (player: RainlinkPlayer, queue: RainlinkQueue) => void): this;
+  /**
+   * Emitted when a queue is empty.
+   * @event Rainlink#queueEmpty
+   */
+  on(event: 'queueEmpty', listener: (player: RainlinkPlayer, queue: RainlinkQueue) => void): this;
+  ////// ------------------------- Queue Event ------------------------- /////
+
+  ////// ------------------------- Voice Event ------------------------- /////
   /**
    * Emitted when connected to voice receive server [ONLY Nodelink DRIVER!!!!!!].
    * @event Rainlink#voiceConnect
@@ -159,87 +194,195 @@ export declare interface Rainlink {
     event: 'voiceEndSpeaking',
     listener: (node: RainlinkNode, userTrack: string, userId: string, guildId: string) => void,
   ): this;
-
+  ////// ------------------------- Voice Event ------------------------- /////
   // ------------------------- ON EVENT ------------------------- //
 
+
+
   // ------------------------- ONCE EVENT ------------------------- //
+  /** @ignore */
   once(event: 'debug', listener: (logs: string) => void): this;
+  ////// ------------------------- Node Event ------------------------- /////
+  /** @ignore */
   once(event: 'nodeConnect', listener: (node: RainlinkNode) => void): this;
+  /** @ignore */
   once(event: 'nodeDisconnect', listener: (node: RainlinkNode, code: number, reason: Buffer) => void): this;
+  /** @ignore */
   once(event: 'nodeClosed', listener: (node: RainlinkNode) => void): this;
+  /** @ignore */
   once(event: 'nodeError', listener: (node: RainlinkNode, error: Error) => void): this;
+  ////// ------------------------- Node Event ------------------------- /////
+
+  ////// ------------------------- Player Event ------------------------- /////
+  /** @ignore */
   once(event: 'playerCreate', listener: (player: RainlinkPlayer, track: RainlinkTrack) => void): this;
-  once(event: 'playerEnd', listener: (player: RainlinkPlayer) => void): this;
-  once(event: 'playerStart', listener: (player: RainlinkPlayer, track: RainlinkTrack) => void): this;
+  /** @ignore */
   once(event: 'playerDestroy', listener: (player: RainlinkPlayer) => void): this;
-  once(
-    event: 'playerResolveError',
-    listener: (player: RainlinkPlayer, track: RainlinkTrack, message: string) => void,
-  ): this;
-  once(event: 'playerEmpty', listener: (player: RainlinkPlayer) => void): this;
+  /** @ignore */
   once(event: 'playerException', listener: (player: RainlinkPlayer, data: Record<string, any>) => void): this;
+  /** @ignore */
   once(event: 'playerUpdate', listener: (player: RainlinkPlayer, data: Record<string, any>) => void): this;
-  once(event: 'playerStuck', listener: (player: RainlinkPlayer, data: Record<string, any>) => void): this;
-  once(
-    event: 'playerWebsocketClosed',
-    listener: (player: RainlinkPlayer, data: Record<string, any>) => void,
-  ): this;
+  /** @ignore */
   once(
     event: 'playerMoved',
     listener: (player: RainlinkPlayer, oldChannelId: string, newChannelId: string) => void,
   ): this;
-  once(event: 'queueUpdate', listener: (player: RainlinkPlayer, queue: RainlinkQueue) => void): this;
+  /** @ignore */
+  once(event: 'playerPause', listener: (player: RainlinkPlayer, track: RainlinkTrack) => void): this;
+  /** @ignore */
+  once(event: 'playerResume', listener: (player: RainlinkPlayer, data: RainlinkTrack) => void): this;
+  /** @ignore */
+  once(
+    event: 'playerWebsocketClosed',
+    listener: (player: RainlinkPlayer, data: Record<string, any>) => void,
+  ): this;
+  ////// ------------------------- Player Event ------------------------- /////
+
+  ////// ------------------------- Track Event ------------------------- /////
+  /** @ignore */
+  once(event: 'trackStart', listener: (player: RainlinkPlayer, track: RainlinkTrack) => void): this;
+  /** @ignore */
+  once(event: 'trackEnd', listener: (player: RainlinkPlayer) => void): this;
+  /** @ignore */
+  once(event: 'trackStuck', listener: (player: RainlinkPlayer, data: Record<string, any>) => void): this;
+  /** @ignore */
+  once(
+    event: 'trackResolveError',
+    listener: (player: RainlinkPlayer, track: RainlinkTrack, message: string) => void,
+  ): this;
+  ////// ------------------------- Track Event ------------------------- /////
+
+  ////// ------------------------- Queue Event ------------------------- /////
+  /** @ignore */
+  once(
+    event: 'queueAdd',
+    listener: (player: RainlinkPlayer, queue: RainlinkQueue, track: RainlinkTrack) => void,
+  ): this;
+  /** @ignore */
+  once(
+    event: 'queueRemove',
+    listener: (player: RainlinkPlayer, queue: RainlinkQueue, track: RainlinkTrack) => void,
+  ): this;
+  /** @ignore */
+  once(event: 'queueShuffle', listener: (player: RainlinkPlayer, queue: RainlinkQueue) => void): this;
+  /** @ignore */
+  once(event: 'queueClear', listener: (player: RainlinkPlayer, queue: RainlinkQueue) => void): this;
+  /** @ignore */
+  once(event: 'queueEmpty', listener: (player: RainlinkPlayer, queue: RainlinkQueue) => void): this;
+  ////// ------------------------- Queue Event ------------------------- /////
+
+  ////// ------------------------- Voice Event ------------------------- /////
+  /** @ignore */
   once(event: 'voiceConnect', listener: (node: RainlinkNode) => void): this;
+  /** @ignore */
   once(event: 'voiceDisconnect', listener: (node: RainlinkNode, code: number, reason: Buffer) => void): this;
+  /** @ignore */
   once(event: 'VoiceError', listener: (node: RainlinkNode, error: Error) => void): this;
+  /** @ignore */
   once(
     event: 'voiceStartSpeaking',
     listener: (node: RainlinkNode, userId: string, guildId: string) => void,
   ): this;
+  /** @ignore */
   once(
     event: 'voiceEndSpeaking',
     listener: (node: RainlinkNode, userTrack: string, userId: string, guildId: string) => void,
   ): this;
+  ////// ------------------------- Voice Event ------------------------- /////
   // ------------------------- ONCE EVENT ------------------------- //
 
+
+  
   // ------------------------- OFF EVENT ------------------------- //
+  /** @ignore */
   off(event: 'debug', listener: (logs: string) => void): this;
+  ////// ------------------------- Node Event ------------------------- /////
+  /** @ignore */
   off(event: 'nodeConnect', listener: (node: RainlinkNode) => void): this;
+  /** @ignore */
   off(event: 'nodeDisconnect', listener: (node: RainlinkNode, code: number, reason: Buffer) => void): this;
+  /** @ignore */
   off(event: 'nodeClosed', listener: (node: RainlinkNode) => void): this;
+  /** @ignore */
   off(event: 'nodeError', listener: (node: RainlinkNode, error: Error) => void): this;
+  ////// ------------------------- Node Event ------------------------- /////
+
+  ////// ------------------------- Player Event ------------------------- /////
+  /** @ignore */
   off(event: 'playerCreate', listener: (player: RainlinkPlayer, track: RainlinkTrack) => void): this;
-  off(event: 'playerEnd', listener: (player: RainlinkPlayer) => void): this;
-  off(event: 'playerStart', listener: (player: RainlinkPlayer, track: RainlinkTrack) => void): this;
+  /** @ignore */
   off(event: 'playerDestroy', listener: (player: RainlinkPlayer) => void): this;
-  off(
-    event: 'playerResolveError',
-    listener: (player: RainlinkPlayer, track: RainlinkTrack, message: string) => void,
-  ): this;
-  off(event: 'playerEmpty', listener: (player: RainlinkPlayer) => void): this;
+  /** @ignore */
   off(event: 'playerException', listener: (player: RainlinkPlayer, data: Record<string, any>) => void): this;
+  /** @ignore */
   off(event: 'playerUpdate', listener: (player: RainlinkPlayer, data: Record<string, any>) => void): this;
-  off(event: 'playerStuck', listener: (player: RainlinkPlayer, data: Record<string, any>) => void): this;
-  off(
-    event: 'playerWebsocketClosed',
-    listener: (player: RainlinkPlayer, data: Record<string, any>) => void,
-  ): this;
+  /** @ignore */
   off(
     event: 'playerMoved',
     listener: (player: RainlinkPlayer, oldChannelId: string, newChannelId: string) => void,
   ): this;
-  off(event: 'queueUpdate', listener: (player: RainlinkPlayer, queue: RainlinkQueue) => void): this;
+  /** @ignore */
+  off(event: 'playerPause', listener: (player: RainlinkPlayer, track: RainlinkTrack) => void): this;
+  /** @ignore */
+  off(event: 'playerResume', listener: (player: RainlinkPlayer, data: RainlinkTrack) => void): this;
+  /** @ignore */
+  off(
+    event: 'playerWebsocketClosed',
+    listener: (player: RainlinkPlayer, data: Record<string, any>) => void,
+  ): this;
+  ////// ------------------------- Player Event ------------------------- /////
+
+  ////// ------------------------- Track Event ------------------------- /////
+  /** @ignore */
+  off(event: 'trackStart', listener: (player: RainlinkPlayer, track: RainlinkTrack) => void): this;
+  /** @ignore */
+  off(event: 'trackEnd', listener: (player: RainlinkPlayer) => void): this;
+  /** @ignore */
+  off(event: 'trackStuck', listener: (player: RainlinkPlayer, data: Record<string, any>) => void): this;
+  /** @ignore */
+  off(
+    event: 'trackResolveError',
+    listener: (player: RainlinkPlayer, track: RainlinkTrack, message: string) => void,
+  ): this;
+  ////// ------------------------- Track Event ------------------------- /////
+
+  ////// ------------------------- Queue Event ------------------------- /////
+  /** @ignore */
+  off(
+    event: 'queueAdd',
+    listener: (player: RainlinkPlayer, queue: RainlinkQueue, track: RainlinkTrack) => void,
+  ): this;
+  /** @ignore */
+  off(
+    event: 'queueRemove',
+    listener: (player: RainlinkPlayer, queue: RainlinkQueue, track: RainlinkTrack) => void,
+  ): this;
+  /** @ignore */
+  off(event: 'queueShuffle', listener: (player: RainlinkPlayer, queue: RainlinkQueue) => void): this;
+  /** @ignore */
+  off(event: 'queueClear', listener: (player: RainlinkPlayer, queue: RainlinkQueue) => void): this;
+  /** @ignore */
+  off(event: 'queueEmpty', listener: (player: RainlinkPlayer, queue: RainlinkQueue) => void): this;
+  ////// ------------------------- Queue Event ------------------------- /////
+
+  ////// ------------------------- Voice Event ------------------------- /////
+  /** @ignore */
   off(event: 'voiceConnect', listener: (node: RainlinkNode) => void): this;
+  /** @ignore */
   off(event: 'voiceDisconnect', listener: (node: RainlinkNode, code: number, reason: Buffer) => void): this;
+  /** @ignore */
   off(event: 'VoiceError', listener: (node: RainlinkNode, error: Error) => void): this;
+  /** @ignore */
   off(
     event: 'voiceStartSpeaking',
     listener: (node: RainlinkNode, userId: string, guildId: string) => void,
   ): this;
+  /** @ignore */
   off(
     event: 'voiceEndSpeaking',
     listener: (node: RainlinkNode, userTrack: string, userId: string, guildId: string) => void,
   ): this;
+  ////// ------------------------- Voice Event ------------------------- /////
   // ------------------------- OFF EVENT ------------------------- //
 }
 
