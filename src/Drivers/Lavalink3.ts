@@ -121,6 +121,7 @@ export class Lavalink3 extends AbstractDriver {
   protected wsMessageEvent(data: RawData) {
     const wsData = JSON.parse(data.toString());
     if (wsData.reason) wsData.reason = (wsData.reason as string).toLowerCase();
+    if (wsData.reason == 'LOAD_FAILED') wsData.reason = 'loadFailed';
     this.node.wsMessageEvent(wsData);
   }
 

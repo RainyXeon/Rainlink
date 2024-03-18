@@ -197,8 +197,6 @@ export declare interface Rainlink {
   ////// ------------------------- Voice Event ------------------------- /////
   // ------------------------- ON EVENT ------------------------- //
 
-
-
   // ------------------------- ONCE EVENT ------------------------- //
   /** @ignore */
   once(event: 'debug', listener: (logs: string) => void): this;
@@ -291,8 +289,6 @@ export declare interface Rainlink {
   ////// ------------------------- Voice Event ------------------------- /////
   // ------------------------- ONCE EVENT ------------------------- //
 
-
-  
   // ------------------------- OFF EVENT ------------------------- //
   /** @ignore */
   off(event: 'debug', listener: (logs: string) => void): this;
@@ -622,11 +618,11 @@ export class Rainlink extends EventEmitter {
             engine: 'soundcloud',
           },
       resume: data.resume ?? false,
-      userAgent: data.userAgent ?? `@discord/@bot/@project${metadata.name}/${metadata.version}`,
+      userAgent: data.userAgent ?? `Discord/Bot/${metadata.name}/${metadata.version} (${metadata.github})`,
       nodeResolver: data.nodeResolver ?? undefined,
-      structures: data.structures ?? {
-        player: undefined,
-        rest: undefined,
+      structures: {
+        player: data.structures && data.structures.player ? data.structures.player : undefined,
+        rest: data.structures && data.structures.rest ? data.structures.rest : undefined,
       },
       resumeTimeout: data.resumeTimeout ?? 300,
     };

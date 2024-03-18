@@ -76,11 +76,11 @@ export class RainlinkPlayer {
   /**
    * Whether the player is deafened or not
    */
-  public deafened: boolean;
+  public deaf: boolean;
   /**
    * Whether the player is muted or not
    */
-  public muted: boolean;
+  public mute: boolean;
   /**
    * Player's voice manager
    */
@@ -117,8 +117,8 @@ export class RainlinkPlayer {
     this.playing = false;
     this.loop = RainlinkLoopMode.NONE;
     this.state = RainlinkPlayerState.DESTROYED;
-    this.deafened = voiceManager.deafened;
-    this.muted = voiceManager.muted;
+    this.deaf = voiceOptions.deaf ?? false;
+    this.mute = voiceOptions.mute ?? false;
     this.voiceManager = voiceManager;
     this.sudoDestroy = false;
     this.functions = new Map<string, (...args: any) => unknown>();
@@ -400,9 +400,10 @@ export class RainlinkPlayer {
    */
   public setMute(enable: boolean): RainlinkPlayer {
     this.checkDestroyed();
-    if (enable == this.muted) return this;
-    this.voiceManager.setDeaf(enable);
-    this.muted = enable;
+    if (enable == this.mute) return this;
+    this.mute = enable;
+    this.voiceManager.mute = enable;
+    this.voiceManager.sendVoiceUpdate();
     return this;
   }
 
@@ -459,9 +460,10 @@ export class RainlinkPlayer {
    */
   public setDeaf(enable: boolean): RainlinkPlayer {
     this.checkDestroyed();
-    if (enable == this.deafened) return this;
-    this.voiceManager.setDeaf(enable);
-    this.deafened = enable;
+    if (enable == this.deaf) return this;
+    this.deaf = enable;
+    this.voiceManager.deaf = enable;
+    this.voiceManager.sendVoiceUpdate();
     return this;
   }
 
@@ -524,8 +526,8 @@ export class RainlinkPlayer {
       voiceId: voiceId,
       textId: this.textId,
       shardId: this.voiceOptions.shardId,
-      mute: this.muted,
-      deaf: this.deafened,
+      mute: this.mute,
+      deaf: this.deaf,
     });
 
     this.voiceManager = newVoiceManager;

@@ -27,11 +27,11 @@ export class RainlinkVoiceManager extends EventEmitter {
   /**
    * Mute status in connected voice channel
    */
-  public muted: boolean;
+  public mute: boolean;
   /**
    * Deafen status in connected voice channel
    */
-  public deafened: boolean;
+  public deaf: boolean;
   /**
    * ID of the last voiceId connected to
    */
@@ -68,8 +68,8 @@ export class RainlinkVoiceManager extends EventEmitter {
     this.guildId = options.guildId;
     this.voiceId = options.voiceId;
     this.shardId = options.shardId;
-    this.muted = options.mute ?? false;
-    this.deafened = options.deaf ?? false;
+    this.mute = options.mute ?? false;
+    this.deaf = options.deaf ?? false;
     this.lastvoiceId = null;
     this.sessionId = null;
     this.region = null;
@@ -162,8 +162,8 @@ export class RainlinkVoiceManager extends EventEmitter {
       this.debug(`Channel Disconnected | Guild: ${this.guildId}`);
     }
 
-    this.deafened = self_deaf;
-    this.muted = self_mute;
+    this.deaf = self_deaf;
+    this.mute = self_mute;
     this.sessionId = session_id || null;
     this.debug(
       `State Update Received | Channel: ${this.voiceId} Session ID: ${session_id} Guild: ${this.guildId}`,
@@ -174,12 +174,12 @@ export class RainlinkVoiceManager extends EventEmitter {
    * Send voice data to discord
    * @internal
    */
-  private sendVoiceUpdate() {
+  public sendVoiceUpdate() {
     this.send({
       guild_id: this.guildId,
       channel_id: this.voiceId,
-      self_deaf: this.deafened,
-      self_mute: this.muted,
+      self_deaf: this.deaf,
+      self_mute: this.mute,
     });
   }
 
@@ -188,28 +188,8 @@ export class RainlinkVoiceManager extends EventEmitter {
    * @param data The data to send
    * @internal
    */
-  private send(data: any): void {
+  public send(data: any): void {
     this.manager.library.sendPacket(this.shardId, { op: 4, d: data }, false);
-  }
-
-  /**
-   * Set the deafen status for the current bot user
-   * @param deaf Boolean value to indicate whether to deafen or undeafen
-   * @defaultValue false
-   */
-  public setDeaf(deaf = false): void {
-    this.deafened = deaf;
-    this.sendVoiceUpdate();
-  }
-
-  /**
-   * Set the mute status for the current bot user
-   * @param mute Boolean value to indicate whether to mute or unmute
-   * @defaultValue false
-   */
-  public setMute(mute = false): void {
-    this.muted = mute;
-    this.sendVoiceUpdate();
   }
 
   /**
@@ -219,8 +199,8 @@ export class RainlinkVoiceManager extends EventEmitter {
   public disconnect(): void {
     if (this.state === VoiceConnectState.DISCONNECTED) return;
     this.voiceId = null;
-    this.deafened = false;
-    this.muted = false;
+    this.deaf = false;
+    this.mute = false;
     this.removeAllListeners();
     this.sendVoiceUpdate();
     this.state = VoiceConnectState.DISCONNECTED;
