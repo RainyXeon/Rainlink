@@ -77,6 +77,7 @@ export interface PlayOptions {
   startTime?: number;
   endTime?: number;
   replaceCurrent?: boolean;
+  position?: number;
 }
 
 export interface PlayEncodedOptions {

@@ -55,11 +55,11 @@ import { RainlinkPlugin as VoiceReceiver } from './VoiceReceiver/Plugin.js';
  */
 
 export default {
-  Deezer,
-  Apple,
-  Nico,
-  Spotify,
-  PlayerMoved,
-  SaveSession,
-  VoiceReceiver,
+	Deezer,
+	Apple,
+	Nico,
+	Spotify,
+	PlayerMoved,
+	SaveSession,
+	VoiceReceiver,
 };

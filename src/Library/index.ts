@@ -12,7 +12,7 @@ import { OceanicJS } from './OceanicJS';
  * ```
  */
 export default {
-  DiscordJS,
-  ErisJS,
-  OceanicJS,
+	DiscordJS,
+	ErisJS,
+	OceanicJS,
 };
