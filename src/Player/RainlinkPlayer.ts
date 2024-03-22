@@ -167,8 +167,8 @@ export class RainlinkPlayer {
 		this.manager.players.delete(this.guildId);
 		this.state = RainlinkPlayerState.DESTROYED;
 		this.debug('Player destroyed at ' + this.guildId);
-		this.clear(false);
 		this.voiceId = '';
+		this.clear(false);
 		this.manager.emit(RainlinkEvents.PlayerDestroy, this);
 		this.sudoDestroy = false;
 	}

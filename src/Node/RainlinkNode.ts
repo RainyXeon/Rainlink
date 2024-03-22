@@ -60,7 +60,8 @@ export class RainlinkNode {
 			break;
 		}
 		default: {
-			throw new Error('Please include a valid server driver enum');
+			this.driver = new Lavalink4(this.manager, options, this);
+			break;
 		}
 		}
 		const customRest = this.manager.rainlinkOptions.options!.structures!.rest;
