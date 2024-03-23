@@ -95,7 +95,7 @@ export interface SearchResult {
 
 export interface EmptyResult {
   loadType: LavalinkLoadType.EMPTY;
-  data: {};
+  data: Record<string, never>;
 }
 
 export interface ErrorResult {

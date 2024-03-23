@@ -39,7 +39,7 @@ export interface RainlinkNodeOptions {
   /** Whenever lavalink user ssl or not */
   secure: boolean;
   /** The driver class for handling lavalink response */
-  driver: RainlinkDriver;
+  driver?: RainlinkDriver;
 }
 
 /**

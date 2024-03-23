@@ -1,9 +1,9 @@
 import {
-  RainlinkAdditionalOptions,
-  RainlinkOptions,
-  RainlinkSearchOptions,
-  RainlinkSearchResult,
-  RainlinkSearchResultType,
+	RainlinkAdditionalOptions,
+	RainlinkOptions,
+	RainlinkSearchOptions,
+	RainlinkSearchResult,
+	RainlinkSearchResultType,
 } from './Interface/Manager';
 import { EventEmitter } from 'events';
 import { RainlinkNode } from './Node/RainlinkNode';
@@ -58,7 +58,7 @@ export declare interface Rainlink {
    * Emitted when a player is created.
    * @event Rainlink#playerCreate
    */
-  on(event: 'playerCreate', listener: (player: RainlinkPlayer, track: RainlinkTrack) => void): this;
+  on(event: 'playerCreate', listener: (player: RainlinkPlayer) => void): this;
   /**
    * Emitted when a player is going to destroyed.
    * @event Rainlink#playerDestroy
@@ -197,8 +197,6 @@ export declare interface Rainlink {
   ////// ------------------------- Voice Event ------------------------- /////
   // ------------------------- ON EVENT ------------------------- //
 
-
-
   // ------------------------- ONCE EVENT ------------------------- //
   /** @ignore */
   once(event: 'debug', listener: (logs: string) => void): this;
@@ -215,7 +213,7 @@ export declare interface Rainlink {
 
   ////// ------------------------- Player Event ------------------------- /////
   /** @ignore */
-  once(event: 'playerCreate', listener: (player: RainlinkPlayer, track: RainlinkTrack) => void): this;
+  once(event: 'playerCreate', listener: (player: RainlinkPlayer) => void): this;
   /** @ignore */
   once(event: 'playerDestroy', listener: (player: RainlinkPlayer) => void): this;
   /** @ignore */
@@ -291,8 +289,6 @@ export declare interface Rainlink {
   ////// ------------------------- Voice Event ------------------------- /////
   // ------------------------- ONCE EVENT ------------------------- //
 
-
-  
   // ------------------------- OFF EVENT ------------------------- //
   /** @ignore */
   off(event: 'debug', listener: (logs: string) => void): this;
@@ -309,7 +305,7 @@ export declare interface Rainlink {
 
   ////// ------------------------- Player Event ------------------------- /////
   /** @ignore */
-  off(event: 'playerCreate', listener: (player: RainlinkPlayer, track: RainlinkTrack) => void): this;
+  off(event: 'playerCreate', listener: (player: RainlinkPlayer) => void): this;
   /** @ignore */
   off(event: 'playerDestroy', listener: (player: RainlinkPlayer) => void): this;
   /** @ignore */
@@ -387,248 +383,248 @@ export declare interface Rainlink {
 }
 
 export class Rainlink extends EventEmitter {
-  /**
+	/**
    * Discord library connector
    */
-  public readonly library: AbstractLibrary;
-  /**
+	public readonly library: AbstractLibrary;
+	/**
    * Voice voice managers being handled
    */
-  public readonly voiceManagers: Map<string, RainlinkVoiceManager>;
-  /**
+	public readonly voiceManagers: Map<string, RainlinkVoiceManager>;
+	/**
    * Lavalink server that has been configured
    */
-  public nodes: RainlinkNodeManager;
-  /**
+	public nodes: RainlinkNodeManager;
+	/**
    * Rainlink options
    */
-  public rainlinkOptions: RainlinkOptions;
-  /**
+	public rainlinkOptions: RainlinkOptions;
+	/**
    * Bot id
    */
-  public id: string | undefined;
-  /**
+	public id: string | undefined;
+	/**
    * Player maps
    */
-  public players: RainlinkPlayerManager;
-  /**
+	public players: RainlinkPlayerManager;
+	/**
    * All search engine
    */
-  public searchEngines: Map<string, string>;
-  /**
+	public searchEngines: Map<string, string>;
+	/**
    * All search plugins (resolver plugins)
    */
-  public searchPlugins: Map<string, SourceRainlinkPlugin>;
-  /**
+	public searchPlugins: Map<string, SourceRainlinkPlugin>;
+	/**
    * All plugins (include resolver plugins)
    */
-  public plugins: Map<string, RainlinkPlugin>;
+	public plugins: Map<string, RainlinkPlugin>;
 
-  /**
+	/**
    * The main class that handle all works in lavalink server.
    * Call this class by using new Rainlink(your_params) to use!
    * @param options The main ranlink options
    */
-  constructor(options: RainlinkOptions) {
-    super();
-    this.debug('Start the client.');
-    if (!options.library)
-      throw new Error('Please set an new lib to connect, example: \nlibrary: new Library.DiscordJS(client) ');
-    this.library = options.library.set(this);
-    this.rainlinkOptions = options;
-    this.rainlinkOptions.options = this.mergeDefaultOptions(this.rainlinkOptions.options ?? {});
-    this.voiceManagers = new Map();
-    this.nodes = new RainlinkNodeManager(this);
-    this.library.listen(this.rainlinkOptions.nodes);
-    this.players = new RainlinkPlayerManager(this, this.voiceManagers);
-    this.searchEngines = new Map<string, string>();
-    this.searchPlugins = new Map<string, SourceRainlinkPlugin>();
-    this.plugins = new Map<string, RainlinkPlugin>();
-    this.initialSearchEngines();
-    if (
-      !this.rainlinkOptions.options.defaultSearchEngine ||
+	constructor(options: RainlinkOptions) {
+		super();
+		this.debug('Start the client.');
+		if (!options.library)
+			throw new Error('Please set an new lib to connect, example: \nlibrary: new Library.DiscordJS(client) ');
+		this.library = options.library.set(this);
+		this.rainlinkOptions = options;
+		this.rainlinkOptions.options = this.mergeDefaultOptions(this.rainlinkOptions.options ?? {});
+		this.voiceManagers = new Map();
+		this.nodes = new RainlinkNodeManager(this);
+		this.library.listen(this.rainlinkOptions.nodes);
+		this.players = new RainlinkPlayerManager(this, this.voiceManagers);
+		this.searchEngines = new Map<string, string>();
+		this.searchPlugins = new Map<string, SourceRainlinkPlugin>();
+		this.plugins = new Map<string, RainlinkPlugin>();
+		this.initialSearchEngines();
+		if (
+			!this.rainlinkOptions.options.defaultSearchEngine ||
       this.rainlinkOptions.options.defaultSearchEngine.length == 0
-    )
-      this.rainlinkOptions.options.defaultSearchEngine == 'youtube';
+		)
+			this.rainlinkOptions.options.defaultSearchEngine == 'youtube';
 
-    if (this.rainlinkOptions.plugins) {
-      for (const [, plugin] of this.rainlinkOptions.plugins.entries()) {
-        if (plugin.constructor.name !== 'RainlinkPlugin')
-          throw new Error('Plugin must be an instance of RainlinkPlugin or SourceRainlinkPlugin');
-        plugin.load(this);
+		if (this.rainlinkOptions.plugins) {
+			for (const [, plugin] of this.rainlinkOptions.plugins.entries()) {
+				if (plugin.constructor.name !== 'RainlinkPlugin')
+					throw new Error('Plugin must be an instance of RainlinkPlugin or SourceRainlinkPlugin');
+				plugin.load(this);
 
-        this.plugins.set(plugin.name(), plugin);
+				this.plugins.set(plugin.name(), plugin);
 
-        if (plugin.type() == RainlinkPluginType.SourceResolver) {
-          const newPlugin = plugin as SourceRainlinkPlugin;
-          const sourceName = newPlugin.sourceName();
-          const sourceIdentify = newPlugin.sourceIdentify();
-          this.searchEngines.set(sourceName, sourceIdentify);
-          this.searchPlugins.set(sourceName, newPlugin);
-        }
-      }
-      this.debug(
-        `Registered ${this.rainlinkOptions.plugins.length} plugins, including ${this.searchPlugins.size}`,
-      );
-    }
-  }
+				if (plugin.type() == RainlinkPluginType.SourceResolver) {
+					const newPlugin = plugin as SourceRainlinkPlugin;
+					const sourceName = newPlugin.sourceName();
+					const sourceIdentify = newPlugin.sourceIdentify();
+					this.searchEngines.set(sourceName, sourceIdentify);
+					this.searchPlugins.set(sourceName, newPlugin);
+				}
+			}
+			this.debug(
+				`Registered ${this.rainlinkOptions.plugins.length} plugins, including ${this.searchPlugins.size}`,
+			);
+		}
+	}
 
-  /** @ignore */
-  protected initialSearchEngines() {
-    for (const data of SourceIDs) {
-      this.searchEngines.set(data.name, data.id);
-    }
-  }
+	/** @ignore */
+	protected initialSearchEngines() {
+		for (const data of SourceIDs) {
+			this.searchEngines.set(data.name, data.id);
+		}
+	}
 
-  /**
+	/**
    * Create a new player.
    * @returns RainlinkNode
    */
-  async create(options: VoiceChannelOptions): Promise<RainlinkPlayer> {
-    return await this.players.create(options);
-  }
+	async create(options: VoiceChannelOptions): Promise<RainlinkPlayer> {
+		return await this.players.create(options);
+	}
 
-  /**
+	/**
    * Destroy a specific player.
    * @returns void
    */
-  async destroy(guildId: string): Promise<void> {
-    this.players.destroy(guildId);
-  }
+	async destroy(guildId: string): Promise<void> {
+		this.players.destroy(guildId);
+	}
 
-  /**
+	/**
    * Search a specific track.
    * @returns RainlinkSearchResult
    */
-  async search(query: string, options?: RainlinkSearchOptions): Promise<RainlinkSearchResult> {
-    const node =
+	async search(query: string, options?: RainlinkSearchOptions): Promise<RainlinkSearchResult> {
+		const node =
       options && options?.nodeName
-        ? this.nodes.get(options.nodeName) ?? (await this.nodes.getLeastUsed())
-        : await this.nodes.getLeastUsed();
+      	? this.nodes.get(options.nodeName) ?? (await this.nodes.getLeastUsed())
+      	: await this.nodes.getLeastUsed();
 
-    if (!node) throw new Error('No node is available');
+		if (!node) throw new Error('No node is available');
 
-    let pluginData: RainlinkSearchResult;
+		let pluginData: RainlinkSearchResult;
 
-    const directSearchRegex = /directSearch=(.*)/;
-    const isDirectSearch = directSearchRegex.exec(query);
-    const isUrl = /^https?:\/\/.*/.test(query);
+		const directSearchRegex = /directSearch=(.*)/;
+		const isDirectSearch = directSearchRegex.exec(query);
+		const isUrl = /^https?:\/\/.*/.test(query);
 
-    const pluginSearch = this.searchPlugins.get(String(options?.engine));
+		const pluginSearch = this.searchPlugins.get(String(options?.engine));
 
-    if (options && options!.engine && options!.engine !== null && pluginSearch && isDirectSearch == null) {
-      pluginData = await pluginSearch.searchDirect(query, options);
-      if (pluginData.tracks.length !== 0) return pluginData;
-    }
+		if (options && options!.engine && options!.engine !== null && pluginSearch && isDirectSearch == null) {
+			pluginData = await pluginSearch.searchDirect(query, options);
+			if (pluginData.tracks.length !== 0) return pluginData;
+		}
 
-    const source =
+		const source =
       options && options?.engine
-        ? this.searchEngines.get(options.engine)
-        : this.searchEngines.get(
+      	? this.searchEngines.get(options.engine)
+      	: this.searchEngines.get(
             this.rainlinkOptions.options!.defaultSearchEngine
-              ? this.rainlinkOptions.options!.defaultSearchEngine
-              : 'youtube',
-          );
+            	? this.rainlinkOptions.options!.defaultSearchEngine
+            	: 'youtube',
+      	);
 
-    const finalQuery =
+		const finalQuery =
       isDirectSearch !== null ? isDirectSearch[1] : !isUrl ? `${source}search:${query}` : query;
 
-    const result = await node.rest.resolver(finalQuery).catch(_ => null);
-    if (!result || result.loadType === LavalinkLoadType.EMPTY) {
-      return this.buildSearch(undefined, [], RainlinkSearchResultType.SEARCH);
-    }
+		const result = await node.rest.resolver(finalQuery).catch(() => null);
+		if (!result || result.loadType === LavalinkLoadType.EMPTY) {
+			return this.buildSearch(undefined, [], RainlinkSearchResultType.SEARCH);
+		}
 
-    let loadType: RainlinkSearchResultType;
-    let normalizedData: {
+		let loadType: RainlinkSearchResultType;
+		let normalizedData: {
       playlistName?: string;
       tracks: RawTrack[];
     } = { tracks: [] };
-    switch (result.loadType) {
-      case LavalinkLoadType.TRACK: {
-        loadType = RainlinkSearchResultType.TRACK;
-        normalizedData.tracks = [result.data];
-        break;
-      }
+		switch (result.loadType) {
+		case LavalinkLoadType.TRACK: {
+			loadType = RainlinkSearchResultType.TRACK;
+			normalizedData.tracks = [result.data];
+			break;
+		}
 
-      case LavalinkLoadType.PLAYLIST: {
-        loadType = RainlinkSearchResultType.PLAYLIST;
-        normalizedData = {
-          playlistName: result.data.info.name,
-          tracks: result.data.tracks,
-        };
-        break;
-      }
+		case LavalinkLoadType.PLAYLIST: {
+			loadType = RainlinkSearchResultType.PLAYLIST;
+			normalizedData = {
+				playlistName: result.data.info.name,
+				tracks: result.data.tracks,
+			};
+			break;
+		}
 
-      case LavalinkLoadType.SEARCH: {
-        loadType = RainlinkSearchResultType.SEARCH;
-        normalizedData.tracks = result.data;
-        break;
-      }
+		case LavalinkLoadType.SEARCH: {
+			loadType = RainlinkSearchResultType.SEARCH;
+			normalizedData.tracks = result.data;
+			break;
+		}
 
-      default: {
-        loadType = RainlinkSearchResultType.SEARCH;
-        normalizedData.tracks = [];
-        break;
-      }
-    }
+		default: {
+			loadType = RainlinkSearchResultType.SEARCH;
+			normalizedData.tracks = [];
+			break;
+		}
+		}
 
-    this.debug(`Searched ${query}; Track results: ${normalizedData.tracks.length}`);
+		this.debug(`Searched ${query}; Track results: ${normalizedData.tracks.length}`);
 
-    return this.buildSearch(
-      normalizedData.playlistName ?? undefined,
-      normalizedData.tracks.map(
-        track => new RainlinkTrack(track, options && options.requester ? options.requester : undefined),
-      ),
-      loadType,
-    );
-  }
+		return this.buildSearch(
+			normalizedData.playlistName ?? undefined,
+			normalizedData.tracks.map(
+				track => new RainlinkTrack(track, options && options.requester ? options.requester : undefined),
+			),
+			loadType,
+		);
+	}
 
-  /** @ignore */
-  protected buildSearch(
-    playlistName?: string,
-    tracks: RainlinkTrack[] = [],
-    type?: RainlinkSearchResultType,
-  ): RainlinkSearchResult {
-    return {
-      playlistName,
-      tracks,
-      type: type ?? RainlinkSearchResultType.SEARCH,
-    };
-  }
+	/** @ignore */
+	protected buildSearch(
+		playlistName?: string,
+		tracks: RainlinkTrack[] = [],
+		type?: RainlinkSearchResultType,
+	): RainlinkSearchResult {
+		return {
+			playlistName,
+			tracks,
+			type: type ?? RainlinkSearchResultType.SEARCH,
+		};
+	}
 
-  /** @ignore */
-  protected debug(logs: string) {
-    this.emit(RainlinkEvents.Debug, `[Rainlink]: ${logs}`);
-  }
+	/** @ignore */
+	protected debug(logs: string) {
+		this.emit(RainlinkEvents.Debug, `[Rainlink]: ${logs}`);
+	}
 
-  /** @ignore */
-  protected mergeDefaultOptions(data: RainlinkAdditionalOptions): RainlinkAdditionalOptions {
-    return {
-      retryTimeout: data.retryTimeout ?? 3000,
-      retryCount: data.retryCount ?? 15,
-      voiceConnectionTimeout: data.voiceConnectionTimeout ?? 15000,
-      defaultSearchEngine: data.defaultSearchEngine ?? undefined,
-      defaultVolume: data.defaultVolume ?? 100,
-      searchFallback: data.searchFallback
-        ? {
-            enable: data.searchFallback.enable == true ? true : false,
-            engine:
+	/** @ignore */
+	protected mergeDefaultOptions(data: RainlinkAdditionalOptions): RainlinkAdditionalOptions {
+		return {
+			retryTimeout: data.retryTimeout ?? 3000,
+			retryCount: data.retryCount ?? 15,
+			voiceConnectionTimeout: data.voiceConnectionTimeout ?? 15000,
+			defaultSearchEngine: data.defaultSearchEngine ?? undefined,
+			defaultVolume: data.defaultVolume ?? 100,
+			searchFallback: data.searchFallback
+				? {
+					enable: data.searchFallback.enable == true ? true : false,
+					engine:
               data.searchFallback.engine !== null && data.searchFallback.engine !== undefined
-                ? data.searchFallback.engine
-                : 'soundcloud',
-          }
-        : {
-            enable: false,
-            engine: 'soundcloud',
-          },
-      resume: data.resume ?? false,
-      userAgent: data.userAgent ?? `@discord/@bot/@project${metadata.name}/${metadata.version}`,
-      nodeResolver: data.nodeResolver ?? undefined,
-      structures: data.structures ?? {
-        player: undefined,
-        rest: undefined,
-      },
-      resumeTimeout: data.resumeTimeout ?? 300,
-    };
-  }
+              	? data.searchFallback.engine
+              	: 'soundcloud',
+				}
+				: {
+					enable: false,
+					engine: 'soundcloud',
+				},
+			resume: data.resume ?? false,
+			userAgent: data.userAgent ?? `Discord/Bot/${metadata.name}/${metadata.version} (${metadata.github})`,
+			nodeResolver: data.nodeResolver ?? undefined,
+			structures: {
+				player: data.structures && data.structures.player ? data.structures.player : undefined,
+				rest: data.structures && data.structures.rest ? data.structures.rest : undefined,
+			},
+			resumeTimeout: data.resumeTimeout ?? 300,
+		};
+	}
 }
