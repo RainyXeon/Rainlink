@@ -1,20 +1,20 @@
-import { PlayOptions, VoiceChannelOptions } from '../Interface/Player';
-import { Rainlink } from '../Rainlink';
-import { RainlinkNode } from '../Node/RainlinkNode';
-import { RainlinkQueue } from './RainlinkQueue';
-import { RainlinkVoiceManager } from '../Manager/RainlinkVoiceManager';
+import { PlayOptions, VoiceChannelOptions } from '../Interface/Player.js';
+import { Rainlink } from '../Rainlink.js';
+import { RainlinkNode } from '../Node/RainlinkNode.js';
+import { RainlinkQueue } from './RainlinkQueue.js';
+import { RainlinkVoiceManager } from '../Manager/RainlinkVoiceManager.js';
 import {
 	RainlinkDriver,
 	RainlinkEvents,
 	RainlinkFilterData,
 	RainlinkLoopMode,
 	RainlinkPlayerState,
-} from '../Interface/Constants';
-import { RainlinkTrack } from './RainlinkTrack';
-import { UpdatePlayerInfo, UpdatePlayerOptions } from '../Interface/Rest';
+} from '../Interface/Constants.js';
+import { RainlinkTrack } from './RainlinkTrack.js';
+import { UpdatePlayerInfo, UpdatePlayerOptions } from '../Interface/Rest.js';
 import { Snowflake } from 'discord.js';
-import { RainlinkSearchOptions, RainlinkSearchResult } from '../Interface/Manager';
-import { RainlinkPlugin } from '../Plugin/VoiceReceiver/Plugin';
+import { RainlinkSearchOptions, RainlinkSearchResult } from '../Interface/Manager.js';
+import { RainlinkPlugin } from '../Plugin/VoiceReceiver/Plugin.js';
 
 export class RainlinkPlayer {
 	/**
@@ -82,6 +82,10 @@ export class RainlinkPlayer {
    */
 	public mute: boolean;
 	/**
+   * ID of the current track
+   */
+	public track: string | null;
+	/**
    * Player's voice manager
    */
 	public voiceManager: RainlinkVoiceManager;
@@ -121,6 +125,7 @@ export class RainlinkPlayer {
 		this.mute = voiceOptions.mute ?? false;
 		this.voiceManager = voiceManager;
 		this.sudoDestroy = false;
+		this.track = null;
 		this.functions = new Map<string, (...args: any) => unknown>();
 		if (this.node.driver.functions.size !== 0) {
 			this.node.driver.functions.forEach((functionCode, key) => {
@@ -214,6 +219,7 @@ export class RainlinkPlayer {
 		}
 
 		this.playing = true;
+		this.track = current.encoded;
 
 		const playerOptions: UpdatePlayerOptions = {
 			track: {
@@ -461,6 +467,7 @@ export class RainlinkPlayer {
 		this.volume = this.voiceOptions.volume ?? this.manager.rainlinkOptions!.options!.defaultVolume ?? 100;
 		this.paused = true;
 		this.playing = false;
+		this.track = null;
 		this.data.clear();
 		this.position = 0;
 		if (emitEmpty) this.manager.emit(RainlinkEvents.QueueEmpty, this);

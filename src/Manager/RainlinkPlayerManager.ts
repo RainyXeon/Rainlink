@@ -55,7 +55,7 @@ export class RainlinkPlayerManager extends Map<string, RainlinkPlayer> {
 			this.set(player.guildId, player);
 			player.state = RainlinkPlayerState.CONNECTED;
 			this.debug('Player created at ' + options.guildId);
-			this.manager.emit(RainlinkEvents.PlayerCreate, this);
+			this.manager.emit(RainlinkEvents.PlayerCreate, player);
 			const voiceReceiver = this.manager.plugins.get('rainlink-voiceReceiver') as RainlinkPlugin;
 			if (voiceManager && node.options.driver == RainlinkDriver.Nodelink2) voiceReceiver.open(node, options);
 			return player;
