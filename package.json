@@ -1,6 +1,6 @@
 {
   "name": "rainlink",
-  "version": "0.5.1-beta4",
+  "version": "0.5.2-beta4",
   "description": "Another lavalink wrapper but focus on stability and rich features",
   "repository": {
     "type": "git",
@@ -46,7 +46,6 @@
     "undici-types": "^6.7.1"
   },
   "dependencies": {
-    "cheerio": "^1.0.0-rc.12",
     "node-html-parser": "^6.1.12",
     "simple-json-db": "^2.0.0",
     "undici": "^6.7.1",
