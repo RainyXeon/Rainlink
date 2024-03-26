@@ -31,7 +31,7 @@ export type AppleOptions = {
 
 const credentials = {
 	APPLE_TOKEN:
-    'eyJhbGciOiJFUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6IldlYlBsYXlLaWQifQ.eyJpc3MiOiJBTVBXZWJQbGF5IiwiaWF0IjoxNzA5Njg5NTM4LCJleHAiOjE3MTY5NDcxMzgsInJvb3RfaHR0cHNfb3JpZ2luIjpbImFwcGxlLmNvbSJdfQ.QuL8x1Wb-EjFfRUKmaUlAX4TchI4EmeqYt1tVm2OMvM5Lbmuv45ON5qIDYOPQEPALfaElh1lh3_6g5BNToJh6A',
+    'eyJhbGciOiJFUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6IldlYlBsYXlLaWQifQ.eyJpc3MiOiJBTVBXZWJQbGF5IiwiaWF0IjoxNzEwNzg0MTQxLCJleHAiOjE3MTgwNDE3NDEsInJvb3RfaHR0cHNfb3JpZ2luIjpbImFwcGxlLmNvbSJdfQ.7VbsddF5LyEdvyjVK92TUZ4f9_UyM2He0jvL28YkgpKZIbyHhIJWkkKtd44g5mJwwt63cBoboDZ7kFGGhabb1Q',
 };
 
 export class RainlinkPlugin extends SourceRainlinkPlugin {
@@ -121,8 +121,8 @@ export class RainlinkPlugin extends SourceRainlinkPlugin {
 	}
 
 	protected async search(query: string, options?: RainlinkSearchOptions): Promise<RainlinkSearchResult> {
-		const res = await this.searchDirect(query, options);
-		if (res.tracks.length == 0) return this._search!(query, options);
+		const res = await this._search!(query, options);
+		if (res.tracks.length == 0) return this.searchDirect(query, options);
 		else return res;
 	}
 
