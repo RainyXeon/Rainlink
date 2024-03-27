@@ -95,8 +95,8 @@ export class RainlinkPlugin extends SourceRainlinkPlugin {
 	}
 
 	private async search(query: string, options?: RainlinkSearchOptions): Promise<RainlinkSearchResult> {
-		const res = await this.searchDirect(query, options);
-		if (res.tracks.length == 0) return this._search!(query, options);
+		const res = await this._search!(query, options);
+		if (res.tracks.length == 0) return this.searchDirect(query, options);
 		else return res;
 	}
 
