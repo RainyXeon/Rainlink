@@ -31,5 +31,11 @@ export * from './Interface/Track';
 export * from './Plugin/RainlinkPlugin';
 export * from './Plugin/SourceRainlinkPlugin';
 export { Plugin };
-// Export version
+// Export driver/
+export * from './Drivers/AbstractDriver';
+export * from './Drivers/Lavalink3';
+export * from './Drivers/Lavalink4';
+export * from './Drivers/Nodelink2';
+// Export metadata
+export * from './metadata';
 export const version = metadata.version;
