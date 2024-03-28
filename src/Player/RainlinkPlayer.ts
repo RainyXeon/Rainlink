@@ -440,6 +440,8 @@ export class RainlinkPlayer {
 			return this;
 		}
 
+		this.clear(false);
+
 		await this.node.rest.updatePlayer({
 			guildId: this.guildId,
 			playerOptions: {
@@ -449,7 +451,6 @@ export class RainlinkPlayer {
 			},
 		});
 		this.manager.emit(RainlinkEvents.TrackEnd, this, this.queue.current);
-		this.clear(true);
 
 		return this;
 	}
