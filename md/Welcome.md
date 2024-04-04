@@ -37,7 +37,7 @@
 ```js
 const {Client, GatewayIntentBits} = require('discord.js');
 const {Guilds, GuildVoiceStates, GuildMessages, MessageContent} = GatewayIntentBits;
-const {Rainlink, Library, Plugin, RainlinkDriver} = require("./dist");
+const {Rainlink, Library, Plugin, RainlinkDriver} = require("rainlink");
 
 const Nodes = [{
     name: 'owo',
