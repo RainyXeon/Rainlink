@@ -12,6 +12,14 @@ Another lavalink wrapper but focus on stability and rich features
 
 Here: [https://rainlink.netlify.app/](https://rainlink.netlify.app/)
 
+# Used by
+
+| Name                                                 | Creator      | Variants          |
+| ---------------------------------------------------- | ------------ | ----------------- |
+| [ByteBlaze](https://github.com/RainyXeon/ByteBlaze)  | RainyXeon    | Modded / Built in |
+
+If you want to add your own bot create a pull request with your bot added. Please add your full name.
+
 # Example bot:
 
 ```js
