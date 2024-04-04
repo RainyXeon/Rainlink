@@ -115,7 +115,7 @@ export class Nodelink2 extends AbstractDriver {
 		}
 		if (res.statusCode !== 200) {
 			this.debug(
-				'Something went wrong with lavalink server.' +
+				'Something went wrong with lavalink server. ' +
           `Status code: ${res.statusCode}\n Headers: ${util.inspect(options.headers)}`,
 			);
 			return undefined;
@@ -128,6 +128,8 @@ export class Nodelink2 extends AbstractDriver {
 			finalData = this.convertV4trackResponse(finalData) as D;
 		}
 
+		this.debug(`${options.method} ${options.path}`);
+
 		return finalData;
 	}
 
@@ -137,7 +139,7 @@ export class Nodelink2 extends AbstractDriver {
 	}
 
 	private debug(logs: string) {
-		this.manager.emit(RainlinkEvents.Debug, `[Rainlink v4 Plugin]: ${logs}`);
+		this.manager.emit(RainlinkEvents.Debug, `[Nodelink2 Driver]: ${logs}`);
 	}
 
 	public wsClose(): void {

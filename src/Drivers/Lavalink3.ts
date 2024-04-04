@@ -97,7 +97,7 @@ export class Lavalink3 extends AbstractDriver {
 		}
 		if (res.statusCode !== 200) {
 			this.debug(
-				'Something went wrong with lavalink server.' +
+				'Something went wrong with lavalink server. ' +
           `Status code: ${res.statusCode}\n Headers: ${util.inspect(options.headers)}`,
 			);
 			return undefined;
@@ -114,6 +114,8 @@ export class Lavalink3 extends AbstractDriver {
 		if (finalData.guildId && finalData.track && finalData.track.encoded) {
 			finalData.track = this.buildV4track(finalData.track);
 		}
+
+		this.debug(`${options.method} ${options.path}`);
 
 		return finalData;
 	}
@@ -147,7 +149,7 @@ export class Lavalink3 extends AbstractDriver {
 
 	/** @ignore */
 	private debug(logs: string) {
-		this.manager.emit(RainlinkEvents.Debug, `[Rainlink v3 Plugin]: ${logs}`);
+		this.manager.emit(RainlinkEvents.Debug, `[Lavalink3 Driver]: ${logs}`);
 	}
 
 	/** @ignore */

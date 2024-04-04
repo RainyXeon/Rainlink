@@ -1,23 +1,37 @@
-# ⚠️⚠️⚠️ Warning!!
-
-⚠️⚠️ This lavalink wrapper is just in the development stage, you will take full responsibility for any errors or bugs!!
-
-⚠️ Update 3: Rainlink now in stage 15 of development (Release beta 3 product)
-
 # 🌦️ Rainlink
 
 Another lavalink wrapper but focus on stability and rich features
 
+# ⚠️ Warning!!
+
+⚠️ This lavalink wrapper is just in the beta stage, it will have some bug so please report it on github!
+
+⚠️ Update 4: Rainlink now in stage 20 of development (Release beta 4 product / Near stable)
+
+# Installation
+
+```
+npm i rainlink
+```
+
 # Document:
 
 Here: [https://rainlink.netlify.app/](https://rainlink.netlify.app/)
+
+# Used by
+
+| Name                                                 | Creator      | Variants          |
+| ---------------------------------------------------- | ------------ | ----------------- |
+| [ByteBlaze](https://github.com/RainyXeon/ByteBlaze)  | RainyXeon    | Modded / Built in |
+
+If you want to add your own bot create a pull request with your bot added. Please add your full name.
 
 # Example bot:
 
 ```js
 const {Client, GatewayIntentBits} = require('discord.js');
 const {Guilds, GuildVoiceStates, GuildMessages, MessageContent} = GatewayIntentBits;
-const {Rainlink, Library, Plugin, RainlinkDriver} = require("./dist");
+const {Rainlink, Library, Plugin, RainlinkDriver} = require("rainlink");
 
 const Nodes = [{
     name: 'owo',
