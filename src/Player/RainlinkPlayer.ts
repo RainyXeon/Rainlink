@@ -218,7 +218,7 @@ export class RainlinkPlayer {
 			return null;
 		});
 
-		if (!resolveResult) {
+		if (!resolveResult || (resolveResult && !resolveResult.isPlayable)) {
 			this.manager.emit(RainlinkEvents.TrackResolveError, this, current, errorMessage);
 			this.debug(`Player ${this.guildId} resolve error: ${errorMessage}`);
 			this.queue.current = null;
