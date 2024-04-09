@@ -26,6 +26,17 @@ Here: [https://rainlink.netlify.app/](https://rainlink.netlify.app/)
 
 If you want to add your own bot create a pull request with your bot added. Please add your full name.
 
+# Plugins
+
+This is the list of all rainlink plugin currently supported
+
+| Name               | Type     | Link                                                                                                                          | Author    |
+| ------------------ | -------- | ----------------------------------------------------------------------------------------------------------------------------- | --------- |
+| rainlink-nico      | Official | [npmjs](https://www.npmjs.com/package/rainlink-nico) / [github](https://github.com/RainyProduction/rainlink-nico)             | RainyXeon |
+| rainlink-deezer    | Official | [npmjs](https://www.npmjs.com/package/rainlink-deezer) / [github](https://github.com/RainyProduction/rainlink-deezer)         | RainyXeon | 
+| rainlink-apple     | Official | [npmjs](https://www.npmjs.com/package/rainlink-apple) / [github](https://github.com/RainyProduction/rainlink-apple)           | RainyXeon | 
+| rainlink-spotify   | Official | [npmjs](https://www.npmjs.com/package/rainlink-spotify) / [github](https://github.com/RainyProduction/rainlink-spotify)       | RainyXeon | 
+
 # Example bot:
 
 ```js
@@ -45,27 +56,7 @@ const Nodes = [{
 const client = new Client({intents: [Guilds, GuildVoiceStates, GuildMessages, MessageContent]});
 const rainlink = new Rainlink({
     library: new Library.DiscordJS(client),
-    nodes: Nodes,
-    plugins: [
-        new Plugin.Deezer(),
-        new Plugin.Nico({
-            searchLimit: 10,
-        }),
-        new Plugin.Apple({
-            countryCode: "us",
-            imageWidth: 600,
-            imageHeight: 900,
-         }),
-        new Plugin.Spotify({
-            clientId: "your_spotify_client_id",
-            clientSecret: "your_spotify_client_secret",
-            playlistPageLimit: 1,
-            albumPageLimit: 1,
-            searchLimit: 20,
-            searchMarket: "US"
-         }),
-        new Plugin.PlayerMoved(client),
-    ],
+    nodes: Nodes
 });
 
 client.on("ready", () => console.log(client.user.tag + " Ready!"));
@@ -119,7 +110,7 @@ client.on("messageCreate", async msg => {
         if (result.type === "PLAYLIST") for (let track of result.tracks) player.queue.add(track);
         else player.queue.add(result.tracks[0]);
 
-        if (!player.playing && !player.paused) player.play();
+        if (!player.playing && player.paused) player.play();
         return msg.reply({content: result.type === "PLAYLIST" ? `Queued ${result.tracks.length} from ${result.playlistName}` : `Queued ${result.tracks[0].title}`});
     }
 })

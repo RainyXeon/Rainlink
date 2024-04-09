@@ -1,6 +1,6 @@
 {
   "name": "rainlink",
-  "version": "0.6.2-beta5",
+  "version": "0.6.3-beta5",
   "description": "Another lavalink wrapper but focus on stability and rich features",
   "repository": {
     "type": "git",
@@ -42,8 +42,5 @@
     "prettier": "^3.2.5",
     "typedoc": "^0.25.12",
     "typescript": "^5.4.4"
-  },
-  "dependencies": {
-    "node-html-parser": "^6.1.13"
   }
 }
