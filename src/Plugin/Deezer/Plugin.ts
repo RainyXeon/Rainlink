@@ -7,7 +7,6 @@ import { Rainlink } from '../../Rainlink';
 import { RainlinkTrack } from '../../Player/RainlinkTrack';
 import { SourceRainlinkPlugin } from '../SourceRainlinkPlugin';
 import { RainlinkEvents, RainlinkPluginType } from '../../Interface/Constants';
-import { fetch, request } from 'undici';
 
 const API_URL = 'https://api.deezer.com/';
 const REGEX = /^https?:\/\/(?:www\.)?deezer\.com\/[a-z]+\/(track|album|playlist)\/(\d+)$/;
@@ -104,8 +103,8 @@ export class RainlinkPlugin extends SourceRainlinkPlugin {
 
 		if (SHORT_REGEX.test(query)) {
 			const url = new URL(query);
-			const res = await request(url.origin + url.pathname, { method: 'HEAD' });
-			query = String(res.headers.location);
+			const res = await fetch(url.origin + url.pathname, { method: 'HEAD' });
+			query = String(res.headers.get('location'));
 		}
 
 		const [, type, id] = REGEX.exec(query) || [];

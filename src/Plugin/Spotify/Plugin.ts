@@ -1,4 +1,3 @@
-import { request } from 'undici';
 import { RainlinkPluginType } from '../../Interface/Constants.js';
 import {
 	RainlinkSearchOptions,
@@ -135,8 +134,8 @@ export class RainlinkPlugin extends SourceRainlinkPlugin {
 		const isUrl = /^https?:\/\//.test(query);
 
 		if (SHORT_REGEX.test(query)) {
-			const res = await request(query, { method: 'HEAD' });
-			query = String(res.headers.location);
+			const res = await fetch(query, { method: 'HEAD' });
+			query = String(res.headers.get('location'));
 		}
 
 		const [, type, id] = REGEX.exec(query) || [];

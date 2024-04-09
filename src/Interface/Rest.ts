@@ -1,12 +1,12 @@
 import { FilterOptions } from './Player';
 import { LavalinkLoadType } from './Constants';
 import { Exception } from './LavalinkEvents';
-import { Dispatcher } from 'undici';
 
-export interface RainlinkRequesterOptions extends Dispatcher.RequestOptions {
+export interface RainlinkRequesterOptions extends RequestInit {
   params?: string | Record<string, string>;
   useSessionId?: boolean;
   data?: Record<string, unknown>;
+  path: string;
 }
 
 export interface LavalinkPlayer {

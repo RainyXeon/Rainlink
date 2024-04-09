@@ -1,18 +1,17 @@
-import { WebSocket } from 'ws';
 import { RainlinkNodeOptions } from '../Interface/Manager';
 import { Rainlink } from '../Rainlink';
 import { RainlinkConnectState, RainlinkEvents, RainlinkDriver } from '../Interface/Constants';
 import { RainlinkRest } from './RainlinkRest';
 import { setTimeout } from 'node:timers/promises';
-import { RainlinkWebsocket } from './RainlinkWebsocket';
+import { RainlinkPlayerEvents } from './RainlinkPlayerEvents';
 import { LavalinkEventsEnum } from '../Interface/LavalinkEvents';
 import { LavalinkNodeStatsResponse, NodeStats } from '../Interface/Node';
-import { RainlinkPlugin as SaveSessionPlugin } from '../Plugin/SaveSession/Plugin';
 import { AbstractDriver } from '../Drivers/AbstractDriver';
 // Drivers
 import { Lavalink4 } from '../Drivers/Lavalink4';
 import { Lavalink3 } from '../Drivers/Lavalink3';
 import { Nodelink2 } from '../Drivers/Nodelink2';
+import { RainlinkWebsocket } from './RainlinkWebsocket';
 
 export class RainlinkNode {
 	/** The rainlink manager */
@@ -32,9 +31,7 @@ export class RainlinkNode {
 	/** @ignore */
 	private sudoDisconnect = false;
 	/** @ignore */
-	private wsEvent: RainlinkWebsocket;
-	/** @ignore */
-	private sessionPlugin?: SaveSessionPlugin | null;
+	private wsEvent: RainlinkPlayerEvents;
 	/** Driver for connect to current version of Nodelink/Lavalink */
 	public driver: AbstractDriver;
 
@@ -70,7 +67,7 @@ export class RainlinkNode {
 		this.rest = customRest
 			? new customRest(manager, options, this)
 			: new RainlinkRest(manager, options, this);
-		this.wsEvent = new RainlinkWebsocket();
+		this.wsEvent = new RainlinkPlayerEvents();
 		this.stats = {
 			players: 0,
 			playingPlayers: 0,
@@ -95,7 +92,7 @@ export class RainlinkNode {
 	}
 
 	/** Connect this lavalink server */
-	public connect(): WebSocket {
+	public connect(): RainlinkWebsocket {
 		return this.driver.connect();
 	}
 
@@ -122,10 +119,6 @@ export class RainlinkNode {
 				: new RainlinkRest(this.manager, this.options, this);
 			if (isResume && timeout) {
 				this.driver.updateSession(data.sessionId, isResume, timeout);
-				if (this.sessionPlugin) {
-					this.sessionPlugin.deleteSession(this.options.host);
-					this.sessionPlugin.setSession(this.options.host, data.sessionId);
-				}
 			}
 			break;
 		}

@@ -7,7 +7,6 @@ import { Rainlink } from '../../Rainlink';
 import { RainlinkTrack } from '../../Player/RainlinkTrack';
 import { SourceRainlinkPlugin } from '../SourceRainlinkPlugin';
 import { RainlinkEvents, RainlinkPluginType } from '../../Interface/Constants';
-import { fetch } from 'undici';
 
 const REGEX =
   /(?:https:\/\/music\.apple\.com\/)(?:.+)?(artist|album|music-video|playlist)\/([\w\-\.]+(\/)+[\w\-\.]+|[^&]+)\/([\w\-\.]+(\/)+[\w\-\.]+|[^&]+)/;

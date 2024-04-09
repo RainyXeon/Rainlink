@@ -1,16 +1,16 @@
 import { RainlinkPlugin as Plugin } from '../RainlinkPlugin';
 import { Rainlink } from '../../Rainlink';
 import { RainlinkDriver, RainlinkEvents, RainlinkPluginType } from '../../Interface/Constants';
-import { RawData, WebSocket } from 'ws';
 import { RainlinkNode } from '../../Node/RainlinkNode';
 import { metadata } from '../../metadata';
 import { VoiceChannelOptions } from '../../Interface/Player';
+import { RainlinkWebsocket } from '../../Node/RainlinkWebsocket';
 
 export class RainlinkPlugin extends Plugin {
 	protected manager?: Rainlink;
 	/** Whenever the plugin is enabled or not */
 	public enabled: boolean = false;
-	protected runningWs: Map<string, WebSocket> = new Map<string, WebSocket>();
+	protected runningWs: Map<string, RainlinkWebsocket> = new Map<string, RainlinkWebsocket>();
 
 	constructor() {
 		super();
@@ -32,7 +32,7 @@ export class RainlinkPlugin extends Plugin {
 		if (node.options.driver !== RainlinkDriver.Nodelink2)
 			throw new Error('This node not support voice receiver, please use Nodelink2 to use this feature!');
 		const wsUrl = `${node.options.secure ? 'wss' : 'ws'}://${node.options.host}:${node.options.port}`;
-		const ws = new WebSocket(wsUrl + '/connection/data', {
+		const ws = new RainlinkWebsocket(wsUrl + '/connection/data', {
 			headers: {
 				Authorization: node.options.auth,
 				'User-Id': this.manager!.id,
@@ -46,7 +46,7 @@ export class RainlinkPlugin extends Plugin {
 			this.debug('Connected to nodelink\'s voice receive server!');
 			this.manager?.emit(RainlinkEvents.VoiceConnect, node);
 		});
-		ws.on('message', (data: RawData) => this.wsMessageEvent(node, data));
+		ws.on('message', (data: string) => this.wsMessageEvent(node, data));
 		ws.on('error', err => {
 			this.debug('Errored at nodelink\'s voice receive server!');
 			this.manager?.emit(RainlinkEvents.VoiceError, node, err);
@@ -62,13 +62,13 @@ export class RainlinkPlugin extends Plugin {
 	public close(guildId: string): void {
 		const targetWs = this.runningWs.get(guildId);
 		if (!targetWs) return;
-		targetWs.close();
+		targetWs.close(1006, 'Self closed');
 		this.runningWs.delete(guildId);
 		this.debug('Destroy connection to nodelink\'s voice receive server!');
 		return;
 	}
 
-	protected wsMessageEvent(node: RainlinkNode, data: RawData) {
+	protected wsMessageEvent(node: RainlinkNode, data: string) {
 		const wsData = JSON.parse(data.toString());
 		this.debug(String(data));
 		switch (wsData.type) {

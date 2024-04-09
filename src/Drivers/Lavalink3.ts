@@ -1,15 +1,13 @@
 import { RainlinkNodeOptions } from '../Interface/Manager';
 import { Rainlink } from '../Rainlink';
 import { metadata } from '../metadata';
-import { RainlinkPlugin as SaveSessionPlugin } from '../Plugin/SaveSession/Plugin';
-import { RawData, WebSocket } from 'ws';
 import { LavalinkLoadType, RainlinkEvents } from '../Interface/Constants';
 import { RainlinkRequesterOptions } from '../Interface/Rest';
 import { RainlinkNode } from '../Node/RainlinkNode';
 import { AbstractDriver } from './AbstractDriver';
-import { request } from 'undici';
 import util from 'node:util';
 import { RainlinkPlayer } from '../Player/RainlinkPlayer';
+import { RainlinkWebsocket } from '../Node/RainlinkWebsocket';
 
 export enum Lavalink3loadType {
   TRACK_LOADED = 'TRACK_LOADED',
@@ -22,10 +20,9 @@ export enum Lavalink3loadType {
 export class Lavalink3 extends AbstractDriver {
 	public wsUrl: string;
 	public httpUrl: string;
-	public sessionPlugin?: SaveSessionPlugin | null;
 	public sessionId: string | null;
 	public functions: Map<string, (player: RainlinkPlayer, ...args: any) => unknown>;
-	private wsClient?: WebSocket;
+	private wsClient?: RainlinkWebsocket;
 
 	constructor(
     public manager: Rainlink,
@@ -39,15 +36,9 @@ export class Lavalink3 extends AbstractDriver {
 		this.sessionId = null;
 	}
 
-	public connect(): WebSocket {
+	public connect(): RainlinkWebsocket {
 		const isResume = this.manager.rainlinkOptions.options!.resume;
-		if (this.sessionPlugin) {
-			this.sessionId =
-        this.sessionId == null && isResume
-        	? this.sessionPlugin.getSession(this.options.host).sessionId
-        	: this.sessionId;
-		}
-		const ws = new WebSocket(this.wsUrl, {
+		const ws = new RainlinkWebsocket(this.wsUrl, {
 			headers: {
 				Authorization: this.options.auth,
 				'User-Id': this.manager.id,
@@ -60,7 +51,7 @@ export class Lavalink3 extends AbstractDriver {
 		ws.on('open', () => {
 			this.node.wsOpenEvent();
 		});
-		ws.on('message', (data: RawData) => this.wsMessageEvent(data));
+		ws.on('message', (data: string) => this.wsMessageEvent(data));
 		ws.on('error', err => this.node.wsErrorEvent(err));
 		ws.on('close', (code: number, reason: Buffer) => {
 			this.node.wsCloseEvent(code, reason);
@@ -90,23 +81,21 @@ export class Lavalink3 extends AbstractDriver {
 		options.headers = lavalinkHeaders;
 		options.path = url.pathname + url.search;
 
-		const res = await request(url.origin, options);
+		const res = await fetch(url.origin + options.path, options);
 
-		// this.debug(`Request URL: ${url.origin}${options.path}`);
-
-		if (res.statusCode == 204) {
+		if (res.status == 204) {
 			this.debug('Player now destroyed');
 			return undefined;
 		}
-		if (res.statusCode !== 200) {
+		if (res.status !== 200) {
 			this.debug(
 				'Something went wrong with lavalink server. ' +
-          `Status code: ${res.statusCode}\n Headers: ${util.inspect(options.headers)}`,
+          `Status code: ${res.status}\n Headers: ${util.inspect(options.headers)}`,
 			);
 			return undefined;
 		}
 
-		const preFinalData = await res.body.json();
+		const preFinalData = await res.json();
 
 		let finalData: any = preFinalData;
 
@@ -123,7 +112,7 @@ export class Lavalink3 extends AbstractDriver {
 		return finalData;
 	}
 
-	protected wsMessageEvent(data: RawData) {
+	protected wsMessageEvent(data: string) {
 		const wsData = JSON.parse(data.toString());
 		if (wsData.reason) wsData.reason = (wsData.reason as string).toLowerCase();
 		if (wsData.reason == 'LOAD_FAILED') wsData.reason = 'loadFailed';
@@ -157,7 +146,7 @@ export class Lavalink3 extends AbstractDriver {
 
 	/** @ignore */
 	public wsClose(): void {
-		if (this.wsClient) this.wsClient.close();
+		if (this.wsClient) this.wsClient.close(1006, 'Self closed');
 	}
 
 	/** @ignore */
