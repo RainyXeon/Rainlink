@@ -1,12 +1,10 @@
 {
   "out": "docs",
-  "entryPoints": ["src/*"],
+  "entryPoints": ["src/index.ts"],
   "readme": "./md/Welcome.md",
   "excludeProtected": true,
   "excludePrivate": true,
-  "entryPointStrategy": "expand",
-  "plugin": ["typedoc-material-theme"],
-  "themeColor": "#2da4ed",
+  "entryPointStrategy": "resolve",
   "sort": ["kind"],
   "exclude": [
     "src/Plugin/Nico/NicoSearchConst.ts",
@@ -21,7 +19,6 @@
     "src/Drivers/Lavalink4.ts",
     "src/Drivers/Lavalink3.ts",
     "src/Drivers/Nodelink2.ts",
-    "src/index.ts",
     "src/metadata.ts",
     "src/Node/RainlinkWebsocket.ts"
   ],

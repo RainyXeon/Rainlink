@@ -52,6 +52,7 @@ export class RainlinkPlugin extends Plugin {
 			this.manager?.emit(RainlinkEvents.VoiceError, node, err);
 		});
 		ws.on('close', (code: number, reason: Buffer) => {
+			ws.removeAllListeners();
 			this.debug(`Disconnected to nodelink's voice receive server! Code: ${code} Reason: ${reason}`);
 			this.manager?.emit(RainlinkEvents.VoiceDisconnect, node, code, reason);
 		});
