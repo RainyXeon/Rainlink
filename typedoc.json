@@ -20,7 +20,8 @@
     "src/Drivers/Lavalink3.ts",
     "src/Drivers/Nodelink2.ts",
     "src/metadata.ts",
-    "src/Node/RainlinkWebsocket.ts"
+    "src/Node/RainlinkWebsocket.ts",
+    "src/Node/RainlinkPlayerEvents.ts"
   ],
   "kindSortOrder": [
     "Class",

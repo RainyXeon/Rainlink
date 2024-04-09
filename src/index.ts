@@ -11,7 +11,7 @@ export * from './Player/RainlinkTrack';
 // Export node class
 export * from './Node/RainlinkNode';
 export * from './Node/RainlinkRest';
-export * from './Node/RainlinkWebsocket';
+export * from './Node/RainlinkPlayerEvents';
 // Export manager class
 export * from './Manager/RainlinkNodeManager';
 export * from './Manager/RainlinkPlayerManager';

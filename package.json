@@ -1,6 +1,6 @@
 {
   "name": "rainlink",
-  "version": "0.6.1-beta5",
+  "version": "0.6.3-beta5",
   "description": "Another lavalink wrapper but focus on stability and rich features",
   "repository": {
     "type": "git",
@@ -33,7 +33,7 @@
   "license": "GPL-3.0",
   "devDependencies": {
     "@types/node": "^20.12.5",
-    "@types/ws": "^8.5.10",
+    "@types/node-fetch": "^2.6.11",
     "@typescript-eslint/eslint-plugin": "^7.5.0",
     "@typescript-eslint/parser": "^7.5.0",
     "discord.js": "^14.14.1",
@@ -41,13 +41,6 @@
     "eslint": "^8.57.0",
     "prettier": "^3.2.5",
     "typedoc": "^0.25.12",
-    "typescript": "^5.4.4",
-    "undici-types": "^6.11.1"
-  },
-  "dependencies": {
-    "node-html-parser": "^6.1.13",
-    "simple-json-db": "^2.0.0",
-    "undici": "^6.7.1",
-    "ws": "^8.16.0"
+    "typescript": "^5.4.4"
   }
 }
