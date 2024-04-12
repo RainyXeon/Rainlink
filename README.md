@@ -110,7 +110,9 @@ client.on("messageCreate", async msg => {
         if (result.type === "PLAYLIST") for (let track of result.tracks) player.queue.add(track);
         else player.queue.add(result.tracks[0]);
 
-        if (!player.playing && player.paused) player.play();
+
+        if (!player.playing || !player.paused) player.play();
+
         return msg.reply({content: result.type === "PLAYLIST" ? `Queued ${result.tracks.length} from ${result.playlistName}` : `Queued ${result.tracks[0].title}`});
     }
 })
