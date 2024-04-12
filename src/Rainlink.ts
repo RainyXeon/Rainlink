@@ -603,6 +603,7 @@ export class Rainlink extends EventEmitter {
 	/** @ignore */
 	protected get defaultOptions(): RainlinkAdditionalOptions {
 		return {
+			additionalDriver: [],
 			retryTimeout: 3000,
 			retryCount: 15,
 			voiceConnectionTimeout: 15000,

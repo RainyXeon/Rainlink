@@ -1,3 +1,7 @@
+import { AbstractDriver } from '../Drivers/AbstractDriver';
+import { Lavalink3 } from '../Drivers/Lavalink3';
+import { Lavalink4 } from '../Drivers/Lavalink4';
+import { Nodelink2 } from '../Drivers/Nodelink2';
 import { RainlinkConnectState } from '../Interface/Constants';
 import { RainlinkNodeOptions } from '../Interface/Manager';
 import { RainlinkNode } from '../Node/RainlinkNode';
@@ -5,7 +9,9 @@ import { Rainlink } from '../Rainlink';
 
 export class RainlinkNodeManager extends Map<string, RainlinkNode> {
 	/** The rainlink manager */
-	manager: Rainlink;
+	public manager: Rainlink;
+	/** The rainlink manager */
+	public drivers: AbstractDriver[];
 
 	/**
    * The main class for handling lavalink servers
@@ -14,6 +20,7 @@ export class RainlinkNodeManager extends Map<string, RainlinkNode> {
 	constructor(manager: Rainlink) {
 		super();
 		this.manager = manager;
+		this.drivers = [new Lavalink3(), new Nodelink2(), new Lavalink4()];
 	}
 
 	/**

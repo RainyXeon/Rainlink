@@ -6,7 +6,7 @@ import { RainlinkNodeManager } from '../Manager/RainlinkNodeManager';
 import { RainlinkNode } from '../Node/RainlinkNode';
 import { RainlinkRest } from '../Node/RainlinkRest';
 import { RainlinkPlayer } from '../Player/RainlinkPlayer';
-import { RainlinkDriver } from './Constants';
+import { AbstractDriver } from '../Drivers/AbstractDriver';
 
 /**
  * A structure interface
@@ -39,13 +39,15 @@ export interface RainlinkNodeOptions {
   /** Whenever lavalink user ssl or not */
   secure: boolean;
   /** The driver class for handling lavalink response */
-  driver?: RainlinkDriver;
+  driver?: string;
 }
 
 /**
  * Some rainlink additional config option
  */
 export interface RainlinkAdditionalOptions {
+  /** Additional custom driver for rainlink */
+  additionalDriver?: AbstractDriver[];
   /** Timeout before trying to reconnect (ms) */
   retryTimeout?: number;
   /** Number of times to try and reconnect to Lavalink before giving up */

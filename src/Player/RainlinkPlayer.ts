@@ -4,7 +4,6 @@ import { RainlinkNode } from '../Node/RainlinkNode.js';
 import { RainlinkQueue } from './RainlinkQueue.js';
 import { RainlinkVoiceManager } from '../Manager/RainlinkVoiceManager.js';
 import {
-	RainlinkDriver,
 	RainlinkEvents,
 	RainlinkFilterData,
 	RainlinkLoopMode,
@@ -167,8 +166,7 @@ export class RainlinkPlayer {
 			this.manager.voiceManagers.delete(this.guildId);
 		}
 		const voiceReceiver = this.manager.plugins.get('rainlink-voiceReceiver') as RainlinkPlugin;
-		if (voiceManager && this.node.options.driver == RainlinkDriver.Nodelink2)
-			voiceReceiver.close(this.guildId);
+		if (voiceManager && this.node.driver.id.includes('nodelink')) voiceReceiver.close(this.guildId);
 		await this.node.rest.updatePlayer({
 			guildId: this.guildId,
 			playerOptions: {
