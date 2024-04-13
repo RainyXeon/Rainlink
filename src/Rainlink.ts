@@ -20,6 +20,10 @@ import { SourceRainlinkPlugin } from './Plugin/SourceRainlinkPlugin';
 import { RainlinkQueue } from './Player/RainlinkQueue';
 import { metadata } from './metadata';
 import { RainlinkPlugin } from './Plugin/RainlinkPlugin';
+import { AbstractDriver } from './Drivers/AbstractDriver';
+import { Lavalink3 } from './Drivers/Lavalink3';
+import { Nodelink2 } from './Drivers/Nodelink2';
+import { Lavalink4 } from './Drivers/Lavalink4';
 
 export declare interface Rainlink {
   /* tslint:disable:unified-signatures */
@@ -419,6 +423,10 @@ export class Rainlink extends EventEmitter {
    * All plugins (include resolver plugins)
    */
 	public plugins: Map<string, RainlinkPlugin>;
+	/**
+   * The rainlink manager
+   */
+	public drivers: AbstractDriver[];
 
 	/**
    * The main class that handle all works in lavalink server.
@@ -427,15 +435,20 @@ export class Rainlink extends EventEmitter {
    */
 	constructor(options: RainlinkOptions) {
 		super();
-		this.debug('Start the client.');
 		if (!options.library)
 			throw new Error('Please set an new lib to connect, example: \nlibrary: new Library.DiscordJS(client) ');
 		this.library = options.library.set(this);
+		this.drivers = [new Lavalink3(), new Nodelink2(), new Lavalink4()];
 		this.rainlinkOptions = options;
 		this.rainlinkOptions.options = this.mergeDefault<RainlinkAdditionalOptions>(
 			this.defaultOptions,
 			this.rainlinkOptions.options ?? {},
 		);
+		if (
+			this.rainlinkOptions.options.additionalDriver &&
+      this.rainlinkOptions.options.additionalDriver?.length !== 0
+		)
+			this.drivers.push(...this.rainlinkOptions.options.additionalDriver);
 		this.voiceManagers = new Map();
 		this.nodes = new RainlinkNodeManager(this);
 		this.library.listen(this.rainlinkOptions.nodes);
@@ -603,6 +616,7 @@ export class Rainlink extends EventEmitter {
 	/** @ignore */
 	protected get defaultOptions(): RainlinkAdditionalOptions {
 		return {
+			additionalDriver: [],
 			retryTimeout: 3000,
 			retryCount: 15,
 			voiceConnectionTimeout: 15000,

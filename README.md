@@ -8,17 +8,29 @@ Another lavalink wrapper but focus on stability and rich features
 
 ⚠️ Update 4: Rainlink now in stage 20 of development (Release beta 4 product / Near stable)
 
-# Installation
+# 🌟 Features
+ - Stable client
+ - Support TypeScript
+ - 100% Compatible with Lavalink
+ - Object-oriented
+ - Easy to setup
+ - Inbuilt Queue System
+ - Extendable Player, Queue, Rest class
+ - Backward compatible (Can run lavalink version 3.7.x)
+ - Driver based (avaliable to run Nodelink v3 and port older lavalink version)
+ - Plugin system
+
+# 🛠️ Installation
 
 ```
 npm i rainlink
 ```
 
-# Document:
+# 📘 Document:
 
 Here: [https://rainlink.netlify.app/](https://rainlink.netlify.app/)
 
-# Used by
+# 💿 Used by
 
 | Name                                                 | Creator      | Variants          |
 | ---------------------------------------------------- | ------------ | ----------------- |
@@ -26,7 +38,7 @@ Here: [https://rainlink.netlify.app/](https://rainlink.netlify.app/)
 
 If you want to add your own bot create a pull request with your bot added. Please add your full name.
 
-# Plugins
+# ➕ Plugins
 
 This is the list of all rainlink plugin currently supported
 
@@ -37,7 +49,7 @@ This is the list of all rainlink plugin currently supported
 | rainlink-apple     | Official | [npmjs](https://www.npmjs.com/package/rainlink-apple) / [github](https://github.com/RainyProduction/rainlink-apple)           | RainyXeon | 
 | rainlink-spotify   | Official | [npmjs](https://www.npmjs.com/package/rainlink-spotify) / [github](https://github.com/RainyProduction/rainlink-spotify)       | RainyXeon | 
 
-# Example bot:
+# 💾 Example bot:
 
 ```js
 const {Client, GatewayIntentBits} = require('discord.js');
@@ -50,7 +62,10 @@ const Nodes = [{
     port: 2333,
     auth: 'youshallnotpass',
     secure: false,
-    driver: RainlinkDriver.Lavalink4
+    // You don't have to add this properties if you're using lavalink v4.
+    // About using lavalink v3.7.x, you can change to lavalink@3
+    // About using nodelink v2, you can change to nodelink@2
+    driver: "lavalink@4"
 }];
 
 const client = new Client({intents: [Guilds, GuildVoiceStates, GuildMessages, MessageContent]});
@@ -121,7 +136,7 @@ client.on("messageCreate", async msg => {
 client.login('');
 ```
 
-# 💫 Special thanks
+# ✨ Special thanks
 
 - [@Deivu](https://github.com/Deivu): Founder of [@shipgirlproject](https://github.com/shipgirlproject) and creator of [Shoukaku](https://www.npmjs.com/package/shoukaku) / **inspired**
 - [@0t4u](https://github.com/0t4u): Member of [@shipgirlproject](https://github.com/shipgirlproject) / **inspired**

@@ -1,6 +1,6 @@
 import { RainlinkPlugin as Plugin } from '../RainlinkPlugin';
 import { Rainlink } from '../../Rainlink';
-import { RainlinkDriver, RainlinkEvents, RainlinkPluginType } from '../../Interface/Constants';
+import { RainlinkEvents, RainlinkPluginType } from '../../Interface/Constants';
 import { RainlinkNode } from '../../Node/RainlinkNode';
 import { metadata } from '../../metadata';
 import { VoiceChannelOptions } from '../../Interface/Player';
@@ -29,7 +29,7 @@ export class RainlinkPlugin extends Plugin {
 	/** Open the ws voice reciver client */
 	public open(node: RainlinkNode, voiceOptions: VoiceChannelOptions): void {
 		if (!this.enabled) throw new Error('This plugin is unloaded!');
-		if (node.options.driver !== RainlinkDriver.Nodelink2)
+		if (!node.driver.id.includes('nodelink'))
 			throw new Error('This node not support voice receiver, please use Nodelink2 to use this feature!');
 		const wsUrl = `${node.options.secure ? 'wss' : 'ws'}://${node.options.host}:${node.options.port}`;
 		const ws = new RainlinkWebsocket(wsUrl + '/connection/data', {

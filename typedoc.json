@@ -1,7 +1,7 @@
 {
   "out": "docs",
   "entryPoints": ["src/index.ts"],
-  "readme": "./md/Welcome.md",
+  "readme": "./README.md",
   "excludeProtected": true,
   "excludePrivate": true,
   "entryPointStrategy": "resolve",

@@ -1,6 +1,6 @@
 import { RainlinkNodeOptions } from '../Interface/Manager';
 import { Rainlink } from '../Rainlink';
-import { RainlinkConnectState, RainlinkEvents, RainlinkDriver } from '../Interface/Constants';
+import { RainlinkConnectState, RainlinkEvents } from '../Interface/Constants';
 import { RainlinkRest } from './RainlinkRest';
 import { setTimeout } from 'node:timers/promises';
 import { RainlinkPlayerEvents } from './RainlinkPlayerEvents';
@@ -9,8 +9,6 @@ import { LavalinkNodeStatsResponse, NodeStats } from '../Interface/Node';
 import { AbstractDriver } from '../Drivers/AbstractDriver';
 // Drivers
 import { Lavalink4 } from '../Drivers/Lavalink4';
-import { Lavalink3 } from '../Drivers/Lavalink3';
-import { Nodelink2 } from '../Drivers/Nodelink2';
 import { RainlinkWebsocket } from './RainlinkWebsocket';
 
 export class RainlinkNode {
@@ -43,24 +41,15 @@ export class RainlinkNode {
 	constructor(manager: Rainlink, options: RainlinkNodeOptions) {
 		this.manager = manager;
 		this.options = options;
-		switch (options.driver) {
-		case RainlinkDriver.Nodelink2: {
-			this.driver = new Nodelink2(this.manager, options, this);
-			break;
+		const getDriver = this.manager.drivers.filter(driver => driver.id === options.driver);
+		if (!getDriver || getDriver.length == 0) {
+			this.debug('No driver was found, using lavalink v4 driver instead');
+			this.driver = new Lavalink4();
+		} else {
+			this.debug(`Now using driver: ${getDriver[0].id}`);
+			this.driver = getDriver[0];
 		}
-		case RainlinkDriver.Lavalink3: {
-			this.driver = new Lavalink3(this.manager, options, this);
-			break;
-		}
-		case RainlinkDriver.Lavalink4: {
-			this.driver = new Lavalink4(this.manager, options, this);
-			break;
-		}
-		default: {
-			this.driver = new Lavalink4(this.manager, options, this);
-			break;
-		}
-		}
+		this.driver.initial(manager, options, this);
 		const customRest =
       this.manager.rainlinkOptions.options!.structures &&
       this.manager.rainlinkOptions.options!.structures.rest;

@@ -5,7 +5,7 @@ import { Rainlink } from '../Rainlink';
 
 export class RainlinkNodeManager extends Map<string, RainlinkNode> {
 	/** The rainlink manager */
-	manager: Rainlink;
+	public manager: Rainlink;
 
 	/**
    * The main class for handling lavalink servers

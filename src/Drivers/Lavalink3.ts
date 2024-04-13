@@ -18,50 +18,68 @@ export enum Lavalink3loadType {
 }
 
 export class Lavalink3 extends AbstractDriver {
-	public wsUrl: string;
-	public httpUrl: string;
+	public id: string = 'lavalink@3';
+	public wsUrl: string = '';
+	public httpUrl: string = '';
 	public sessionId: string | null;
 	public functions: Map<string, (player: RainlinkPlayer, ...args: any) => unknown>;
 	private wsClient?: RainlinkWebsocket;
+	public manager: Rainlink | null = null;
+	public options: RainlinkNodeOptions | null = null;
+	public node: RainlinkNode | null = null;
 
-	constructor(
-    public manager: Rainlink,
-    public options: RainlinkNodeOptions,
-    public node: RainlinkNode,
-	) {
+	constructor() {
 		super();
-		this.wsUrl = `${options.secure ? 'wss' : 'ws'}://${options.host}:${options.port}/v3/websocket`;
-		this.httpUrl = `${options.secure ? 'https://' : 'http://'}${options.host}:${options.port}/v3`;
 		this.functions = new Map<string, (player: RainlinkPlayer, ...args: any) => unknown>();
 		this.sessionId = null;
 	}
 
+	public get isRegistered(): boolean {
+		return (
+			this.manager !== null &&
+      this.options !== null &&
+      this.node !== null &&
+      this.wsUrl.length !== 0 &&
+      this.httpUrl.length !== 0
+		);
+	}
+
+	public initial(manager: Rainlink, options: RainlinkNodeOptions, node: RainlinkNode): void {
+		this.manager = manager;
+		this.options = options;
+		this.node = node;
+		this.wsUrl = `${options.secure ? 'wss' : 'ws'}://${options.host}:${options.port}/v3/websocket`;
+		this.httpUrl = `${options.secure ? 'https://' : 'http://'}${options.host}:${options.port}/v3`;
+	}
+
 	public connect(): RainlinkWebsocket {
-		const isResume = this.manager.rainlinkOptions.options!.resume;
+		if (!this.isRegistered) throw new Error(`Driver ${this.id} not registered by using initial()`);
+		const isResume = this.manager!.rainlinkOptions.options!.resume;
 		const ws = new RainlinkWebsocket(this.wsUrl, {
 			headers: {
-				Authorization: this.options.auth,
-				'User-Id': this.manager.id,
+				Authorization: this.options!.auth,
+				'User-Id': this.manager!.id,
 				'Client-Name': `${metadata.name}/${metadata.version} (${metadata.github})`,
 				'Session-Id': this.sessionId !== null && isResume ? this.sessionId : '',
-				'user-agent': this.manager.rainlinkOptions.options!.userAgent!,
+				'user-agent': this.manager!.rainlinkOptions.options!.userAgent!,
 			},
 		});
 
 		ws.on('open', () => {
-			this.node.wsOpenEvent();
+      this.node!.wsOpenEvent();
 		});
 		ws.on('message', (data: string) => this.wsMessageEvent(data));
-		ws.on('error', err => this.node.wsErrorEvent(err));
+		ws.on('error', err => this.node!.wsErrorEvent(err));
 		ws.on('close', (code: number, reason: Buffer) => {
-			this.node.wsCloseEvent(code, reason);
-			ws.removeAllListeners();
+      this.node!.wsCloseEvent(code, reason);
+      ws.removeAllListeners();
 		});
 		this.wsClient = ws;
 		return ws;
 	}
 
 	public async requester<D = any>(options: RainlinkRequesterOptions): Promise<D | undefined> {
+		if (!this.isRegistered) throw new Error(`Driver ${this.id} not registered by using initial()`);
 		if (options.useSessionId && this.sessionId == null)
 			throw new Error('sessionId not initalized! Please wait for lavalink get connected!');
 		const url = new URL(`${this.httpUrl}${options.path}`);
@@ -73,8 +91,8 @@ export class Lavalink3 extends AbstractDriver {
 		}
 
 		const lavalinkHeaders = {
-			Authorization: this.options.auth,
-			'User-Agent': this.manager.rainlinkOptions.options!.userAgent!,
+			Authorization: this.options!.auth,
+			'User-Agent': this.manager!.rainlinkOptions.options!.userAgent!,
 			...options.headers,
 		};
 
@@ -113,10 +131,11 @@ export class Lavalink3 extends AbstractDriver {
 	}
 
 	protected wsMessageEvent(data: string) {
+		if (!this.isRegistered) throw new Error(`Driver ${this.id} not registered by using initial()`);
 		const wsData = JSON.parse(data.toString());
 		if (wsData.reason) wsData.reason = (wsData.reason as string).toLowerCase();
 		if (wsData.reason == 'LOAD_FAILED') wsData.reason = 'loadFailed';
-		this.node.wsMessageEvent(wsData);
+    this.node!.wsMessageEvent(wsData);
 	}
 
 	/**
@@ -141,7 +160,8 @@ export class Lavalink3 extends AbstractDriver {
 
 	/** @ignore */
 	private debug(logs: string) {
-		this.manager.emit(RainlinkEvents.Debug, `[Lavalink3 Driver]: ${logs}`);
+		if (!this.isRegistered) throw new Error(`Driver ${this.id} not registered by using initial()`);
+    this.manager!.emit(RainlinkEvents.Debug, `[Lavalink3 Driver]: ${logs}`);
 	}
 
 	/** @ignore */
