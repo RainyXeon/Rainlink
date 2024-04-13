@@ -1,7 +1,7 @@
-name: npm publish
+name: build test
 
 on:
-  push:
+  pull_request:
     branches: ["main"]
 
 jobs: 
@@ -27,8 +27,3 @@ jobs:
           npm ci
       - name: "Build packages"
         run: npm run build
-      - name: "publish package"
-        uses: JS-DevTools/npm-publish@v3
-        with:
-          token: ${{ secrets.NPM_TOKEN }}
-          provenance: true
