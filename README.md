@@ -28,7 +28,7 @@ npm i rainlink
 
 # 📘 Document:
 
-Here: [https://rainlink.netlify.app/](https://rainlink.netlify.app/)
+Here: [https://rainlinkjs.vercel.app/](https://rainlinkjs.vercel.app/)
 
 # 💿 Used by
 
