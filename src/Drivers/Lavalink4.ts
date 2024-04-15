@@ -1,4 +1,3 @@
-import { RainlinkNodeOptions } from '../Interface/Manager';
 import { Rainlink } from '../Rainlink';
 import { metadata } from '../metadata';
 import { RainlinkEvents } from '../Interface/Constants';
@@ -17,7 +16,6 @@ export class Lavalink4 extends AbstractDriver {
 	public functions: Map<string, (player: RainlinkPlayer, ...args: any) => unknown>;
 	private wsClient?: RainlinkWebsocket;
 	public manager: Rainlink | null = null;
-	public options: RainlinkNodeOptions | null = null;
 	public node: RainlinkNode | null = null;
 
 	constructor() {
@@ -28,20 +26,15 @@ export class Lavalink4 extends AbstractDriver {
 
 	public get isRegistered(): boolean {
 		return (
-			this.manager !== null &&
-      this.options !== null &&
-      this.node !== null &&
-      this.wsUrl.length !== 0 &&
-      this.httpUrl.length !== 0
+			this.manager !== null && this.node !== null && this.wsUrl.length !== 0 && this.httpUrl.length !== 0
 		);
 	}
 
-	public initial(manager: Rainlink, options: RainlinkNodeOptions, node: RainlinkNode): void {
+	public initial(manager: Rainlink, node: RainlinkNode): void {
 		this.manager = manager;
-		this.options = options;
 		this.node = node;
-		this.wsUrl = `${options.secure ? 'wss' : 'ws'}://${options.host}:${options.port}/v4/websocket`;
-		this.httpUrl = `${options.secure ? 'https://' : 'http://'}${options.host}:${options.port}/v4`;
+		this.wsUrl = `${this.node.options.secure ? 'wss' : 'ws'}://${this.node.options.host}:${this.node.options.port}/v4/websocket`;
+		this.httpUrl = `${this.node.options.secure ? 'https://' : 'http://'}${this.node.options.host}:${this.node.options.port}/v4`;
 	}
 
 	public connect(): RainlinkWebsocket {
@@ -49,7 +42,7 @@ export class Lavalink4 extends AbstractDriver {
 		const isResume = this.manager!.rainlinkOptions.options!.resume;
 		const ws = new RainlinkWebsocket(this.wsUrl, {
 			headers: {
-				Authorization: this.options!.auth,
+				Authorization: this.node!.options.auth,
 				'User-Id': this.manager!.id,
 				'Client-Name': `${metadata.name}/${metadata.version} (${metadata.github})`,
 				'Session-Id': this.sessionId !== null && isResume ? this.sessionId : '',
@@ -82,7 +75,7 @@ export class Lavalink4 extends AbstractDriver {
 		}
 
 		const lavalinkHeaders = {
-			Authorization: this.options!.auth,
+			Authorization: this.node!.options.auth,
 			'User-Agent': this.manager!.rainlinkOptions.options!.userAgent!,
 			...options.headers,
 		};

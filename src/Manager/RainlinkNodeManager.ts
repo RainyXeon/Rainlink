@@ -20,7 +20,7 @@ export class RainlinkNodeManager extends Map<string, RainlinkNode> {
    * Add a new Node.
    * @returns RainlinkNode
    */
-	add(node: RainlinkNodeOptions) {
+	public add(node: RainlinkNodeOptions) {
 		const newNode = new RainlinkNode(this.manager, node);
 		newNode.connect();
 		this.set(node.name, newNode);
@@ -56,10 +56,18 @@ export class RainlinkNodeManager extends Map<string, RainlinkNode> {
 	}
 
 	/**
+   * Get all current nodes
+   * @returns RainlinkNode[]
+   */
+	public all(): RainlinkNode[] {
+		return [...this.values()];
+	}
+
+	/**
    * Remove a node.
    * @returns void
    */
-	remove(name: string): void {
+	public remove(name: string): void {
 		const node = this.get(name);
 		if (node) {
 			node.disconnect();
