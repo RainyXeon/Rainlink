@@ -49,7 +49,7 @@ export class RainlinkNode {
 			this.debug(`Now using driver: ${getDriver[0].id}`);
 			this.driver = getDriver[0];
 		}
-		this.driver.initial(manager, options, this);
+		this.driver.initial(manager, this);
 		const customRest =
       this.manager.rainlinkOptions.options!.structures &&
       this.manager.rainlinkOptions.options!.structures.rest;

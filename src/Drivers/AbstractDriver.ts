@@ -1,4 +1,3 @@
-import { RainlinkNodeOptions } from '../Interface/Manager';
 import { RainlinkRequesterOptions } from '../Interface/Rest';
 import { RainlinkNode } from '../Node/RainlinkNode';
 import { RainlinkWebsocket } from '../Node/RainlinkWebsocket';
@@ -16,11 +15,16 @@ export abstract class AbstractDriver {
   abstract sessionId: string | null;
   /** All function to extend support driver */
   abstract functions: Map<string, (player: RainlinkPlayer, ...args: any) => unknown>;
+  /** Rainlink manager class */
+  abstract manager: Rainlink | null;
+  /** Rainlink reuqested lavalink/nodelink server */
+  abstract node: RainlinkNode | null;
+
   /**
    * Setup data and credentials for connect to lavalink/nodelink server
    * @returns void
    */
-  abstract initial(manager: Rainlink, options: RainlinkNodeOptions, node: RainlinkNode): void;
+  abstract initial(manager: Rainlink, node: RainlinkNode): void;
   /**
    * Connect to lavalink/nodelink server
    * @returns WebSocket
