@@ -15,7 +15,6 @@ export * from './Node/RainlinkPlayerEvents';
 // Export manager class
 export * from './Manager/RainlinkNodeManager';
 export * from './Manager/RainlinkPlayerManager';
-export * from './Manager/RainlinkVoiceManager';
 //// Export library class
 export * from './Library/AbstractLibrary';
 export { Library };
