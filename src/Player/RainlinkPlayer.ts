@@ -23,10 +23,6 @@ export class RainlinkPlayer extends EventEmitter {
    */
 	public manager: Rainlink;
 	/**
-   * Voice option of player
-   */
-	public voiceOptions: VoiceChannelOptions;
-	/**
    * Player's current using lavalink server
    */
 	public node: RainlinkNode;
@@ -143,11 +139,10 @@ export class RainlinkPlayer extends EventEmitter {
 		this.lastRegion = null;
 		this.serverUpdate = null;
 		this.voiceState = VoiceConnectState.DISCONNECTED;
-		this.voiceOptions = voiceOptions;
 		this.node = node;
-		this.guildId = this.voiceOptions.guildId;
-		this.voiceId = this.voiceOptions.voiceId;
-		this.textId = this.voiceOptions.textId;
+		this.guildId = voiceOptions.guildId;
+		this.voiceId = voiceOptions.voiceId;
+		this.textId = voiceOptions.textId;
 		const customQueue =
       this.manager.rainlinkOptions.options!.structures &&
       this.manager.rainlinkOptions.options!.structures.queue;
@@ -504,7 +499,7 @@ export class RainlinkPlayer extends EventEmitter {
 		this.queue.clear();
 		this.queue.current = undefined;
 		this.queue.previous.length = 0;
-		this.volume = this.voiceOptions.volume ?? this.manager.rainlinkOptions!.options!.defaultVolume ?? 100;
+		this.volume = this.manager.rainlinkOptions!.options!.defaultVolume ?? 100;
 		this.paused = true;
 		this.playing = false;
 		this.track = null;

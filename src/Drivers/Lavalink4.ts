@@ -91,16 +91,20 @@ export class Lavalink4 extends AbstractDriver {
 		}
 		if (res.status !== 200) {
 			this.debug(
+				`${options.method ?? 'GET'} ${options.path} payload=${options.body ? String(options.body) : '{}'}`,
+			);
+			this.debug(
 				'Something went wrong with lavalink server. ' +
           `Status code: ${res.status}\n Headers: ${util.inspect(options.headers)}`,
 			);
-			this.debug(`${options.method} ${options.path} payload=${options.body ? String(options.body) : '{}'}`);
 			return undefined;
 		}
 
 		const finalData = await res.json();
 
-		this.debug(`${options.method} ${options.path} payload=${options.body ? String(options.body) : '{}'}`);
+		this.debug(
+			`${options.method ?? 'GET'} ${options.path} payload=${options.body ? String(options.body) : '{}'}`,
+		);
 
 		return finalData as D;
 	}

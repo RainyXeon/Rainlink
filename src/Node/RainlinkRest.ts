@@ -9,8 +9,10 @@ import {
 	LavalinkPlayer,
 	LavalinkResponse,
 	RainlinkRequesterOptions,
+	RoutePlanner,
 	UpdatePlayerInfo,
 } from '../Interface/Rest';
+import { NodeInfo } from '../Interface/Node';
 
 export class RainlinkRest {
 	/** The rainlink manager */
@@ -106,6 +108,42 @@ export class RainlinkRest {
 				data: {},
 			};
 		} else return resData;
+	}
+
+	/**
+   * Get routeplanner status from Lavalink
+   * @returns Promise that resolves to a routeplanner response
+   */
+	public async getRoutePlannerStatus(): Promise<RoutePlanner | undefined> {
+		const options = {
+			path: '/routeplanner/status',
+			options: {},
+		};
+		return await this.nodeManager.driver.requester<RoutePlanner>(options);
+	}
+
+	/**
+   * Release blacklisted IP address into pool of IPs
+   * @param address IP address
+   */
+	public async unmarkFailedAddress(address: string): Promise<void> {
+		const options = {
+			path: '/routeplanner/free/address',
+			method: 'POST',
+			data: { address },
+		};
+		await this.nodeManager.driver.requester(options);
+	}
+
+	/**
+   * Get Lavalink info
+   */
+	public getLavalinkInfo(): Promise<NodeInfo | undefined> {
+		const options = {
+			path: '/info',
+			headers: { 'Content-Type': 'application/json' },
+		};
+		return this.nodeManager.driver.requester(options);
 	}
 
 	/** @ignore */

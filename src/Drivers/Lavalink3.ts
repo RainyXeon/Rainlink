@@ -100,10 +100,12 @@ export class Lavalink3 extends AbstractDriver {
 		}
 		if (res.status !== 200) {
 			this.debug(
+				`${options.method ?? 'GET'} ${options.path} payload=${options.body ? String(options.body) : '{}'}`,
+			);
+			this.debug(
 				'Something went wrong with lavalink server. ' +
           `Status code: ${res.status}\n Headers: ${util.inspect(options.headers)}`,
 			);
-			this.debug(`${options.method} ${options.path} payload=${options.body ? String(options.body) : '{}'}`);
 			return undefined;
 		}
 
@@ -119,7 +121,9 @@ export class Lavalink3 extends AbstractDriver {
 			finalData.track = this.buildV4track(finalData.track);
 		}
 
-		this.debug(`${options.method} ${options.path} payload=${options.body ? String(options.body) : '{}'}`);
+		this.debug(
+			`${options.method ?? 'GET'} ${options.path} payload=${options.body ? String(options.body) : '{}'}`,
+		);
 
 		return finalData;
 	}
