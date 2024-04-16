@@ -103,6 +103,7 @@ export class Lavalink3 extends AbstractDriver {
 				'Something went wrong with lavalink server. ' +
           `Status code: ${res.status}\n Headers: ${util.inspect(options.headers)}`,
 			);
+			this.debug(`${options.method} ${options.path} payload=${options.body ? String(options.body) : '{}'}`);
 			return undefined;
 		}
 
@@ -118,7 +119,7 @@ export class Lavalink3 extends AbstractDriver {
 			finalData.track = this.buildV4track(finalData.track);
 		}
 
-		this.debug(`${options.method} ${options.path}`);
+		this.debug(`${options.method} ${options.path} payload=${options.body ? String(options.body) : '{}'}`);
 
 		return finalData;
 	}
@@ -154,7 +155,7 @@ export class Lavalink3 extends AbstractDriver {
 	/** @ignore */
 	private debug(logs: string) {
 		if (!this.isRegistered) throw new Error(`Driver ${this.id} not registered by using initial()`);
-    this.manager!.emit(RainlinkEvents.Debug, `[Lavalink3 Driver]: ${logs}`);
+    this.manager!.emit(RainlinkEvents.Debug, `[Rainlink] -> [Driver] -> [Lavalink3] | ${logs}`);
 	}
 
 	/** @ignore */

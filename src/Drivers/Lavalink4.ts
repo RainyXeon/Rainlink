@@ -85,8 +85,6 @@ export class Lavalink4 extends AbstractDriver {
 
 		const res = await fetch(url.origin + options.path, options);
 
-		// this.debug(`Request URL: ${url.origin}${options.path}`);
-
 		if (res.status == 204) {
 			this.debug('Player now destroyed');
 			return undefined;
@@ -96,12 +94,13 @@ export class Lavalink4 extends AbstractDriver {
 				'Something went wrong with lavalink server. ' +
           `Status code: ${res.status}\n Headers: ${util.inspect(options.headers)}`,
 			);
+			this.debug(`${options.method} ${options.path} payload=${options.body ? String(options.body) : '{}'}`);
 			return undefined;
 		}
 
 		const finalData = await res.json();
 
-		this.debug(`${options.method} ${options.path}`);
+		this.debug(`${options.method} ${options.path} payload=${options.body ? String(options.body) : '{}'}`);
 
 		return finalData as D;
 	}
@@ -114,7 +113,7 @@ export class Lavalink4 extends AbstractDriver {
 
 	private debug(logs: string) {
 		if (!this.isRegistered) throw new Error(`Driver ${this.id} not registered by using initial()`);
-    this.manager!.emit(RainlinkEvents.Debug, `[Lavalink4 Driver]: ${logs}`);
+    this.manager!.emit(RainlinkEvents.Debug, `[Rainlink] -> [Driver] -> [Lavalink4] | ${logs}`);
 	}
 
 	public wsClose(): void {

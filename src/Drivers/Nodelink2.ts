@@ -112,8 +112,6 @@ export class Nodelink2 extends AbstractDriver {
 
 		const res = await fetch(url.origin + options.path, options);
 
-		// this.debug(`Request URL: ${url.origin}${options.path}`);
-
 		if (res.status == 204) {
 			this.debug('Player now destroyed');
 			return undefined;
@@ -123,6 +121,7 @@ export class Nodelink2 extends AbstractDriver {
 				'Something went wrong with lavalink server. ' +
           `Status code: ${res.status}\n Headers: ${util.inspect(options.headers)}`,
 			);
+			this.debug(`${options.method} ${options.path} payload=${options.body ? String(options.body) : '{}'}`);
 			return undefined;
 		}
 
@@ -133,7 +132,7 @@ export class Nodelink2 extends AbstractDriver {
 			finalData = this.convertV4trackResponse(finalData) as D;
 		}
 
-		this.debug(`${options.method} ${options.path}`);
+		this.debug(`${options.method} ${options.path} payload=${options.body ? String(options.body) : '{}'}`);
 
 		return finalData;
 	}
@@ -146,7 +145,7 @@ export class Nodelink2 extends AbstractDriver {
 
 	private debug(logs: string) {
 		if (!this.isRegistered) throw new Error(`Driver ${this.id} not registered by using initial()`);
-    this.manager!.emit(RainlinkEvents.Debug, `[Nodelink2 Driver]: ${logs}`);
+    this.manager!.emit(RainlinkEvents.Debug, `[Rainlink] -> [Driver] -> [Nodelink2] | ${logs}`);
 	}
 
 	public wsClose(): void {
@@ -194,7 +193,7 @@ export class Nodelink2 extends AbstractDriver {
 	// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	public async updateSession(sessionId: string, mode: boolean, timeout: number): Promise<void> {
 		this.debug(
-			'[WARNING]: Nodelink doesn\'t support resuming, set resume to true is useless in Nodelink2 driver',
+			'WARNING: Nodelink doesn\'t support resuming, set resume to true is useless in Nodelink2 driver',
 		);
 		return;
 	}

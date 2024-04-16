@@ -5,9 +5,8 @@ import {
 	RainlinkSearchResult,
 	RainlinkSearchResultType,
 } from './Interface/Manager';
-import { EventEmitter } from 'events';
+import { EventEmitter } from 'node:events';
 import { RainlinkNode } from './Node/RainlinkNode';
-import { RainlinkVoiceManager } from './Manager/RainlinkVoiceManager';
 import { AbstractLibrary } from './Library/AbstractLibrary';
 import { VoiceChannelOptions } from './Interface/Player';
 import { RainlinkPlayerManager } from './Manager/RainlinkPlayerManager';
@@ -392,10 +391,6 @@ export class Rainlink extends EventEmitter {
    */
 	public readonly library: AbstractLibrary;
 	/**
-   * Voice voice managers being handled
-   */
-	public readonly voiceManagers: Map<string, RainlinkVoiceManager>;
-	/**
    * Lavalink server that has been configured
    */
 	public nodes: RainlinkNodeManager;
@@ -449,10 +444,9 @@ export class Rainlink extends EventEmitter {
       this.rainlinkOptions.options.additionalDriver?.length !== 0
 		)
 			this.drivers.push(...this.rainlinkOptions.options.additionalDriver);
-		this.voiceManagers = new Map();
 		this.nodes = new RainlinkNodeManager(this);
 		this.library.listen(this.rainlinkOptions.nodes);
-		this.players = new RainlinkPlayerManager(this, this.voiceManagers);
+		this.players = new RainlinkPlayerManager(this);
 		this.searchEngines = new Map<string, string>();
 		this.searchPlugins = new Map<string, SourceRainlinkPlugin>();
 		this.plugins = new Map<string, RainlinkPlugin>();
@@ -479,9 +473,6 @@ export class Rainlink extends EventEmitter {
 					this.searchPlugins.set(sourceName, newPlugin);
 				}
 			}
-			this.debug(
-				`Registered ${this.rainlinkOptions.plugins.length} plugins, including ${this.searchPlugins.size}`,
-			);
 		}
 	}
 
@@ -584,7 +575,7 @@ export class Rainlink extends EventEmitter {
 		}
 		}
 
-		this.debug(`Searched ${query}; Track results: ${normalizedData.tracks.length}`);
+		this.debug(`-> [Search] | Searched ${query}; Track results: ${normalizedData.tracks.length}`);
 
 		return this.buildSearch(
 			normalizedData.playlistName ?? undefined,
@@ -610,7 +601,7 @@ export class Rainlink extends EventEmitter {
 
 	/** @ignore */
 	protected debug(logs: string) {
-		this.emit(RainlinkEvents.Debug, `[Rainlink]: ${logs}`);
+		this.emit(RainlinkEvents.Debug, `[Rainlink] ${logs}`);
 	}
 
 	/** @ignore */
