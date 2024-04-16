@@ -71,6 +71,8 @@ export class Nodelink2 extends AbstractDriver {
 			headers: {
 				Authorization: this.node!.options.auth,
 				'User-Id': this.manager!.id,
+				'Content-Encoding': "brotli, gzip, deflate",
+				"accept-encoding": "brotli, gzip, deflate",
 				'Client-Name': `${metadata.name}/${metadata.version} (${metadata.github})`,
 				'Session-Id': this.sessionId !== null && isResume ? this.sessionId : '',
 				'user-agent': this.manager!.rainlinkOptions.options!.userAgent!,
@@ -104,6 +106,8 @@ export class Nodelink2 extends AbstractDriver {
 		const lavalinkHeaders = {
 			Authorization: this.node!.options.auth,
 			'User-Agent': this.manager!.rainlinkOptions.options!.userAgent!,
+			'Content-Encoding': "brotli, gzip, deflate",
+			"accept-encoding": "brotli, gzip, deflate",
 			...options.headers,
 		};
 
