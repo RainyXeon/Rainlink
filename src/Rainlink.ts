@@ -5,7 +5,7 @@ import {
 	RainlinkSearchResult,
 	RainlinkSearchResultType,
 } from './Interface/Manager';
-import { EventEmitter } from 'events';
+import { EventEmitter } from 'node:events';
 import { RainlinkNode } from './Node/RainlinkNode';
 import { AbstractLibrary } from './Library/AbstractLibrary';
 import { VoiceChannelOptions } from './Interface/Player';
@@ -473,9 +473,6 @@ export class Rainlink extends EventEmitter {
 					this.searchPlugins.set(sourceName, newPlugin);
 				}
 			}
-			this.debug(
-				`Registered ${this.rainlinkOptions.plugins.length} plugins, including ${this.searchPlugins.size}`,
-			);
 		}
 	}
 
@@ -578,7 +575,7 @@ export class Rainlink extends EventEmitter {
 		}
 		}
 
-		this.debug(`Searched ${query}; Track results: ${normalizedData.tracks.length}`);
+		this.debug(`-> [Search] | Searched ${query}; Track results: ${normalizedData.tracks.length}`);
 
 		return this.buildSearch(
 			normalizedData.playlistName ?? undefined,
@@ -604,7 +601,7 @@ export class Rainlink extends EventEmitter {
 
 	/** @ignore */
 	protected debug(logs: string) {
-		this.emit(RainlinkEvents.Debug, `[Rainlink]: ${logs}`);
+		this.emit(RainlinkEvents.Debug, `[Rainlink] ${logs}`);
 	}
 
 	/** @ignore */

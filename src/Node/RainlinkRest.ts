@@ -83,7 +83,7 @@ export class RainlinkRest {
 
 	/** @ignore */
 	private debug(logs: string) {
-		this.manager.emit(RainlinkEvents.Debug, `[Rainlink Rest]: ${logs}`);
+		this.manager.emit(RainlinkEvents.Debug, `[Rainlink] -> [Rest] | ${logs}`);
 	}
 
 	/**

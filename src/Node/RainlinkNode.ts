@@ -189,6 +189,6 @@ export class RainlinkNode {
 
 	/** @ignore */
 	private debug(logs: string) {
-		this.manager.emit(RainlinkEvents.Debug, `[Rainlink Node]: ${logs}`);
+		this.manager.emit(RainlinkEvents.Debug, `[Rainlink] -> [Node] | ${logs}`);
 	}
 }

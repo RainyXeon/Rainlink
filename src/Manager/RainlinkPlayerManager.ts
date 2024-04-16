@@ -67,6 +67,6 @@ export class RainlinkPlayerManager extends Map<string, RainlinkPlayer> {
 
 	/** @ignore */
 	private debug(logs: string) {
-		this.manager.emit(RainlinkEvents.Debug, `[Rainlink Player]: ${logs}`);
+		this.manager.emit(RainlinkEvents.Debug, `[Rainlink] -> [Player] | ${logs}`);
 	}
 }

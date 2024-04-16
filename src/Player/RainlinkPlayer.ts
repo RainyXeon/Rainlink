@@ -15,7 +15,7 @@ import { UpdatePlayerInfo, UpdatePlayerOptions } from '../Interface/Rest.js';
 import { RainlinkSearchOptions, RainlinkSearchResult } from '../Interface/Manager.js';
 import { RainlinkPlugin } from '../Plugin/VoiceReceiver/Plugin.js';
 import { ServerUpdate, StateUpdatePartial } from '../Interface/Connection.js';
-import { EventEmitter } from 'events';
+import { EventEmitter } from 'node:events';
 
 export class RainlinkPlayer extends EventEmitter {
 	/**
@@ -650,12 +650,12 @@ export class RainlinkPlayer extends EventEmitter {
 
 	/** @ignore */
 	private debug(logs: string): void {
-		this.manager.emit(RainlinkEvents.Debug, `[Rainlink Player]: ${logs}`);
+		this.manager.emit(RainlinkEvents.Debug, `[Rainlink] -> [Player] | ${logs}`);
 	}
 
 	/** @ignore */
 	private debugDiscord(logs: string): void {
-		this.manager.emit(RainlinkEvents.Debug, `[Rainlink Player] -> [Voice Manager]: ${logs}`);
+		this.manager.emit(RainlinkEvents.Debug, `[Rainlink] -> [Player] -> [Voice] | ${logs}`);
 	}
 
 	/** @ignore */
