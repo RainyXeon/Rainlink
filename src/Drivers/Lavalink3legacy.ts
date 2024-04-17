@@ -116,10 +116,6 @@ export class Lavalink3legacy extends AbstractDriver {
 			finalData = this.convertV4trackResponse(finalData) as D;
 		}
 
-		if (finalData.guildId && finalData.track && finalData.track.encoded) {
-			finalData.track = this.buildV4track(finalData.track);
-		}
-
 		this.debug(
 			`${options.method ?? 'GET'} ${options.path} payload=${options.body ? String(options.body) : '{}'}`,
 		);
@@ -232,9 +228,7 @@ export class Lavalink3legacy extends AbstractDriver {
 
 	// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	public async updateSession(sessionId: string, mode: boolean, timeout: number): Promise<void> {
-		this.debug(
-			'WARNING: Lavalink v3 legacy doesn\'t support resuming, set resume to true is useless in Nodelink2 driver',
-		);
+		this.debug('WARNING: Lavalink v3 legacy doesn\'t support resuming, set resume to true is useless');
 		return;
 	}
 
@@ -273,22 +267,21 @@ export class Lavalink3legacy extends AbstractDriver {
 
 	protected convertV4trackResponse(v3data: Record<string, any>): Record<string, any> {
 		if (!v3data) return {};
-		switch (v3data.loadType) {
-		case Lavalink3loadType.LOAD_FAILED: {
-			v3data.loadType = LavalinkLoadType.ERROR;
-			break;
-		}
-		case Lavalink3loadType.PLAYLIST_LOADED: {
+		if (v3data.loadType == Lavalink3loadType.LOAD_FAILED) v3data.loadType = LavalinkLoadType.ERROR;
+		if (v3data.loadType.includes('PLAYLIST_LOADED')) {
 			v3data.loadType = LavalinkLoadType.PLAYLIST;
-			v3data.data.tracks = v3data.tracks;
-			v3data.data.info = v3data.playlistInfo;
+			const convertedArray = [];
 			for (let i = 0; i < v3data.tracks.length; i++) {
-				v3data.data.tracks[i] = this.buildV4track(v3data.tracks[i]);
+				convertedArray.push(this.buildV4track(v3data.tracks[i]));
 			}
+			v3data.data = {
+				info: v3data.playlistInfo,
+				tracks: convertedArray,
+			};
 			delete v3data.tracks;
-			break;
+			return v3data;
 		}
-		case Lavalink3loadType.SEARCH_RESULT: {
+		if (v3data.loadType == Lavalink3loadType.SEARCH_RESULT) {
 			v3data.loadType = LavalinkLoadType.SEARCH;
 			v3data.data = v3data.tracks;
 			for (let i = 0; i < v3data.data.length; i++) {
@@ -296,19 +289,13 @@ export class Lavalink3legacy extends AbstractDriver {
 			}
 			delete v3data.tracks;
 			delete v3data.playlistInfo;
-			break;
 		}
-		case Lavalink3loadType.TRACK_LOADED: {
+		if (v3data.loadType == Lavalink3loadType.TRACK_LOADED) {
 			v3data.loadType = LavalinkLoadType.TRACK;
 			v3data.data = this.buildV4track(v3data.tracks[0]);
 			delete v3data.tracks;
-			break;
 		}
-		case Lavalink3loadType.NO_MATCHES: {
-			v3data.loadType = LavalinkLoadType.EMPTY;
-			break;
-		}
-		}
+		if (v3data.loadType == Lavalink3loadType.NO_MATCHES) v3data.loadType = LavalinkLoadType.EMPTY;
 		return v3data;
 	}
 
