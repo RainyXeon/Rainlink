@@ -182,7 +182,7 @@ export class RainlinkPlayer extends EventEmitter {
 				},
 			},
 		};
-		await this.node.rest.updatePlayer(playerUpdate);
+		this.node.rest.updatePlayer(playerUpdate);
 	}
 
 	/**
@@ -732,6 +732,12 @@ export class RainlinkPlayer extends EventEmitter {
 		this.deaf = self_deaf;
 		this.mute = self_mute;
 		this.sessionId = session_id || null;
+		if (
+			this.node.driver.id.includes('legacy') &&
+      this.node.driver.id.includes('lavalink') &&
+      this.serverUpdate?.token
+		)
+			this.sendServerUpdate();
 		this.debugDiscord(
 			`State Update Received | Channel: ${this.voiceId} Session ID: ${session_id} Guild: ${this.guildId}`,
 		);

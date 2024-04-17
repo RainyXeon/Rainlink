@@ -16,8 +16,8 @@ export enum Lavalink3loadType {
   LOAD_FAILED = 'LOAD_FAILED',
 }
 
-export class Lavalink3 extends AbstractDriver {
-	public id: string = 'lavalink@3.6';
+export class Lavalink3legacy extends AbstractDriver {
+	public id: string = 'legacy6@lavalink@3';
 	public wsUrl: string = '';
 	public httpUrl: string = '';
 	public sessionId: string | null;
@@ -41,20 +41,17 @@ export class Lavalink3 extends AbstractDriver {
 	public initial(manager: Rainlink, node: RainlinkNode): void {
 		this.manager = manager;
 		this.node = node;
-		this.wsUrl = `${this.node.options.secure ? 'wss' : 'ws'}://${this.node.options.host}:${this.node.options.port}`;
+		this.wsUrl = `${this.node.options.secure ? 'wss' : 'ws'}://${this.node.options.host}:${this.node.options.port}/`;
 		this.httpUrl = `${this.node.options.secure ? 'https://' : 'http://'}${this.node.options.host}:${this.node.options.port}`;
 	}
 
 	public connect(): RainlinkWebsocket {
 		if (!this.isRegistered) throw new Error(`Driver ${this.id} not registered by using initial()`);
-		const isResume = this.manager!.rainlinkOptions.options!.resume;
 		const ws = new RainlinkWebsocket(this.wsUrl, {
 			headers: {
 				Authorization: this.node!.options.auth,
 				'User-Id': this.manager!.id,
 				'Client-Name': `${metadata.name}/${metadata.version} (${metadata.github})`,
-				'Session-Id': this.sessionId !== null && isResume ? this.sessionId : '',
-				'user-agent': this.manager!.rainlinkOptions.options!.userAgent!,
 			},
 		});
 
@@ -75,7 +72,7 @@ export class Lavalink3 extends AbstractDriver {
 		if (!this.isRegistered) throw new Error(`Driver ${this.id} not registered by using initial()`);
 		const url = new URL(`${this.httpUrl}${options.path}`);
 		if (options.params) url.search = new URLSearchParams(options.params).toString();
-		if (options.rawReqData) {
+		if (options.rawReqData && options.useSessionId) {
 			this.convertToV3websocket(options.rawReqData);
 			return;
 		}
@@ -83,6 +80,7 @@ export class Lavalink3 extends AbstractDriver {
 			this.convertToV3request(options.data as Record<string, any>);
 			options.body = JSON.stringify(options.data);
 		}
+		if (options.path == '/sessions//players') return undefined;
 
 		const lavalinkHeaders = {
 			Authorization: this.node!.options.auth,
@@ -172,7 +170,7 @@ export class Lavalink3 extends AbstractDriver {
 				guildId: data.guildId,
 			});
 
-		if (isPlaySent) return
+		if (isPlaySent) return;
 
 		// Pause player
 		if (data.playerOptions.paused === false || data.playerOptions.paused === true)
@@ -185,25 +183,25 @@ export class Lavalink3 extends AbstractDriver {
 		// Seek player
 		if (data.playerOptions.position)
 			this.wsSendData({
-				op: "seek",
+				op: 'seek',
 				guildId: data.guildId,
-				position: data.playerOptions.position
+				position: data.playerOptions.position,
 			});
 
 		// Voice player
 		if (data.playerOptions.position)
 			this.wsSendData({
-				op: "volume",
+				op: 'volume',
 				guildId: data.guildId,
-				volume: data.playerOptions.volume
+				volume: data.playerOptions.volume,
 			});
 
 		// Filter player
 		if (data.playerOptions.filters)
 			this.wsSendData({
-				op: "filters",
+				op: 'filters',
 				guildId: data.guildId,
-				...data.playerOptions.filters
+				...data.playerOptions.filters,
 			});
 	}
 
@@ -320,7 +318,7 @@ export class Lavalink3 extends AbstractDriver {
 
 	protected buildV4track(v3data: Record<string, any>) {
 		return {
-			encoded: v3data.encoded,
+			encoded: v3data.track,
 			info: {
 				sourceName: v3data.info.sourceName,
 				identifier: v3data.info.identifier,
