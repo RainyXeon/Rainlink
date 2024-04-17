@@ -16,8 +16,8 @@ export enum Lavalink3loadType {
   LOAD_FAILED = 'LOAD_FAILED',
 }
 
-export class Lavalink3legacy extends AbstractDriver {
-	public id: string = 'legacy6@lavalink@3';
+export class Lavalink3koto extends AbstractDriver {
+	public id: string = 'lavalink/v3/koto';
 	public wsUrl: string = '';
 	public httpUrl: string = '';
 	public sessionId: string | null;

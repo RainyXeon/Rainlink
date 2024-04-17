@@ -17,7 +17,7 @@ export enum Lavalink3loadType {
 }
 
 export class Lavalink3 extends AbstractDriver {
-	public id: string = 'lavalink@3';
+	public id: string = 'lavalink/v3/yagi';
 	public wsUrl: string = '';
 	public httpUrl: string = '';
 	public sessionId: string | null;

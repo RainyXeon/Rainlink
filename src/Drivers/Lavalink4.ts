@@ -9,7 +9,7 @@ import { RainlinkPlayer } from '../Player/RainlinkPlayer';
 import { RainlinkWebsocket } from '../Node/RainlinkWebsocket';
 
 export class Lavalink4 extends AbstractDriver {
-	public id: string = 'lavalink@4';
+	public id: string = 'lavalink/v4/koinu';
 	public wsUrl: string = '';
 	public httpUrl: string = '';
 	public sessionId: string | null;

@@ -35,7 +35,7 @@ export interface NodelinkGetLyricsInterface {
 }
 
 export class Nodelink2 extends AbstractDriver {
-	public id: string = 'nodelink@2';
+	public id: string = 'nodelink/v2/nari';
 	public wsUrl: string = '';
 	public httpUrl: string = '';
 	public sessionId: string | null;
