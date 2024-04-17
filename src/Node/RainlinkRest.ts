@@ -3,7 +3,7 @@
 
 import { RainlinkNodeOptions } from '../Interface/Manager';
 import { Rainlink } from '../Rainlink';
-import { LavalinkLoadType, RainlinkEvents } from '../Interface/Constants';
+import { LavalinkLoadType } from '../Interface/Constants';
 import { RainlinkNode } from './RainlinkNode';
 import {
 	LavalinkPlayer,
@@ -56,7 +56,7 @@ export class RainlinkRest {
    * Updates a Lavalink player
    * @returns Promise that resolves to a Lavalink player
    */
-	public async updatePlayer(data: UpdatePlayerInfo): Promise<LavalinkPlayer | undefined> {
+	public updatePlayer(data: UpdatePlayerInfo): void {
 		const options: RainlinkRequesterOptions = {
 			path: `/sessions/${this.sessionId}/players/${data.guildId}`,
 			params: { noReplace: data.noReplace?.toString() || 'false' },
@@ -64,8 +64,9 @@ export class RainlinkRest {
 			headers: { 'Content-Type': 'application/json' },
 			method: 'PATCH',
 			data: data.playerOptions as Record<string, unknown>,
+			rawReqData: data,
 		};
-		return await this.nodeManager.driver.requester<LavalinkPlayer>(options);
+		this.nodeManager.driver.requester<LavalinkPlayer>(options);
 	}
 
 	/**
@@ -80,12 +81,7 @@ export class RainlinkRest {
 			headers: { 'Content-Type': 'application/json' },
 			method: 'DELETE',
 		};
-		return this.nodeManager.driver.requester(options);
-	}
-
-	/** @ignore */
-	private debug(logs: string) {
-		this.manager.emit(RainlinkEvents.Debug, `[Rainlink] -> [Rest] | ${logs}`);
+		this.nodeManager.driver.requester(options);
 	}
 
 	/**

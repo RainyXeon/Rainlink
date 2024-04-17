@@ -1,0 +1,339 @@
+import { Rainlink } from '../Rainlink';
+import { metadata } from '../metadata';
+import { LavalinkLoadType, RainlinkEvents } from '../Interface/Constants';
+import { RainlinkRequesterOptions, UpdatePlayerInfo } from '../Interface/Rest';
+import { RainlinkNode } from '../Node/RainlinkNode';
+import { AbstractDriver } from './AbstractDriver';
+import util from 'node:util';
+import { RainlinkPlayer } from '../Player/RainlinkPlayer';
+import { RainlinkWebsocket } from '../Node/RainlinkWebsocket';
+
+export enum Lavalink3loadType {
+  TRACK_LOADED = 'TRACK_LOADED',
+  PLAYLIST_LOADED = 'PLAYLIST_LOADED',
+  SEARCH_RESULT = 'SEARCH_RESULT',
+  NO_MATCHES = 'NO_MATCHES',
+  LOAD_FAILED = 'LOAD_FAILED',
+}
+
+export class Lavalink3 extends AbstractDriver {
+	public id: string = 'lavalink@3.6';
+	public wsUrl: string = '';
+	public httpUrl: string = '';
+	public sessionId: string | null;
+	public functions: Map<string, (player: RainlinkPlayer, ...args: any) => unknown>;
+	private wsClient?: RainlinkWebsocket;
+	public manager: Rainlink | null = null;
+	public node: RainlinkNode | null = null;
+
+	constructor() {
+		super();
+		this.functions = new Map<string, (player: RainlinkPlayer, ...args: any) => unknown>();
+		this.sessionId = null;
+	}
+
+	public get isRegistered(): boolean {
+		return (
+			this.manager !== null && this.node !== null && this.wsUrl.length !== 0 && this.httpUrl.length !== 0
+		);
+	}
+
+	public initial(manager: Rainlink, node: RainlinkNode): void {
+		this.manager = manager;
+		this.node = node;
+		this.wsUrl = `${this.node.options.secure ? 'wss' : 'ws'}://${this.node.options.host}:${this.node.options.port}`;
+		this.httpUrl = `${this.node.options.secure ? 'https://' : 'http://'}${this.node.options.host}:${this.node.options.port}`;
+	}
+
+	public connect(): RainlinkWebsocket {
+		if (!this.isRegistered) throw new Error(`Driver ${this.id} not registered by using initial()`);
+		const isResume = this.manager!.rainlinkOptions.options!.resume;
+		const ws = new RainlinkWebsocket(this.wsUrl, {
+			headers: {
+				Authorization: this.node!.options.auth,
+				'User-Id': this.manager!.id,
+				'Client-Name': `${metadata.name}/${metadata.version} (${metadata.github})`,
+				'Session-Id': this.sessionId !== null && isResume ? this.sessionId : '',
+				'user-agent': this.manager!.rainlinkOptions.options!.userAgent!,
+			},
+		});
+
+		ws.on('open', () => {
+      this.node!.wsOpenEvent();
+		});
+		ws.on('message', (data: string) => this.wsMessageEvent(data));
+		ws.on('error', err => this.node!.wsErrorEvent(err));
+		ws.on('close', (code: number, reason: Buffer) => {
+      this.node!.wsCloseEvent(code, reason);
+      ws.removeAllListeners();
+		});
+		this.wsClient = ws;
+		return ws;
+	}
+
+	public async requester<D = any>(options: RainlinkRequesterOptions): Promise<D | undefined> {
+		if (!this.isRegistered) throw new Error(`Driver ${this.id} not registered by using initial()`);
+		const url = new URL(`${this.httpUrl}${options.path}`);
+		if (options.params) url.search = new URLSearchParams(options.params).toString();
+		if (options.rawReqData) {
+			this.convertToV3websocket(options.rawReqData);
+			return;
+		}
+		if (options.data) {
+			this.convertToV3request(options.data as Record<string, any>);
+			options.body = JSON.stringify(options.data);
+		}
+
+		const lavalinkHeaders = {
+			Authorization: this.node!.options.auth,
+			'User-Agent': this.manager!.rainlinkOptions.options!.userAgent!,
+			...options.headers,
+		};
+
+		options.headers = lavalinkHeaders;
+		options.path = url.pathname + url.search;
+
+		const res = await fetch(url.origin + options.path, options);
+
+		if (res.status == 204) {
+			this.debug('Player now destroyed');
+			return undefined;
+		}
+		if (res.status !== 200) {
+			this.debug(
+				`${options.method ?? 'GET'} ${options.path} payload=${options.body ? String(options.body) : '{}'}`,
+			);
+			this.debug(
+				'Something went wrong with lavalink server. ' +
+          `Status code: ${res.status}\n Headers: ${util.inspect(options.headers)}`,
+			);
+			return undefined;
+		}
+
+		const preFinalData = await res.json();
+
+		let finalData: any = preFinalData;
+
+		if (finalData.loadType) {
+			finalData = this.convertV4trackResponse(finalData) as D;
+		}
+
+		if (finalData.guildId && finalData.track && finalData.track.encoded) {
+			finalData.track = this.buildV4track(finalData.track);
+		}
+
+		this.debug(
+			`${options.method ?? 'GET'} ${options.path} payload=${options.body ? String(options.body) : '{}'}`,
+		);
+
+		return finalData;
+	}
+
+	protected convertToV3websocket(data: UpdatePlayerInfo) {
+		let isPlaySent = false;
+		if (!data) return;
+
+		// Voice update
+		if (data.playerOptions.voice)
+			this.wsSendData({
+				op: 'voiceUpdate',
+				guildId: data.guildId,
+				sessionId: '66ddc123021f78575c10be048030f937',
+				event: {
+					token: 'a28978bfe85792b1',
+					guild_id: '1027945618347397220',
+					endpoint: 'hongkong11030.discord.media:443',
+				},
+			});
+
+		// Play track
+		if (
+			data.playerOptions.track &&
+      data.playerOptions.track.encoded &&
+      data.playerOptions.track.length !== 0
+		) {
+			isPlaySent = true;
+			this.wsSendData({
+				op: 'play',
+				guildId: data.guildId,
+				track: data.playerOptions.track.encoded,
+				startTime: data.playerOptions.position,
+				endTime: data.playerOptions.track.length,
+				volume: data.playerOptions.volume,
+				noReplace: data.noReplace,
+				pause: data.playerOptions.paused,
+			});
+		}
+
+		// Destroy player
+		if (data.playerOptions.track && data.playerOptions.track.encoded == null)
+			this.wsSendData({
+				op: 'destroy',
+				guildId: data.guildId,
+			});
+
+		if (isPlaySent) return
+
+		// Pause player
+		if (data.playerOptions.paused === false || data.playerOptions.paused === true)
+			this.wsSendData({
+				op: 'pause',
+				guildId: data.guildId,
+				pause: data.playerOptions.paused,
+			});
+
+		// Seek player
+		if (data.playerOptions.position)
+			this.wsSendData({
+				op: "seek",
+				guildId: data.guildId,
+				position: data.playerOptions.position
+			});
+
+		// Voice player
+		if (data.playerOptions.position)
+			this.wsSendData({
+				op: "volume",
+				guildId: data.guildId,
+				volume: data.playerOptions.volume
+			});
+
+		// Filter player
+		if (data.playerOptions.filters)
+			this.wsSendData({
+				op: "filters",
+				guildId: data.guildId,
+				...data.playerOptions.filters
+			});
+	}
+
+	protected checkUpdateExist(data: Record<string, any>) {
+		return (
+			data.track ||
+      data.identifier ||
+      data.position ||
+      data.endTime ||
+      data.volume ||
+      data.paused ||
+      data.filters ||
+      data.voice
+		);
+	}
+
+	protected wsSendData(data: Record<string, unknown>): void {
+		if (!this.isRegistered) throw new Error(`Driver ${this.id} not registered by using initial()`);
+		if (!this.wsClient) return;
+		const jsonData = JSON.stringify(data);
+		this.wsClient.send(jsonData);
+		return;
+	}
+
+	protected wsMessageEvent(data: string) {
+		if (!this.isRegistered) throw new Error(`Driver ${this.id} not registered by using initial()`);
+		const wsData = JSON.parse(data.toString());
+		if (wsData.reason) wsData.reason = (wsData.reason as string).toLowerCase();
+		if (wsData.reason == 'LOAD_FAILED') wsData.reason = 'loadFailed';
+    this.node!.wsMessageEvent(wsData);
+	}
+
+	// eslint-disable-next-line @typescript-eslint/no-unused-vars
+	public async updateSession(sessionId: string, mode: boolean, timeout: number): Promise<void> {
+		this.debug(
+			'WARNING: Lavalink v3 legacy doesn\'t support resuming, set resume to true is useless in Nodelink2 driver',
+		);
+		return;
+	}
+
+	/** @ignore */
+	private debug(logs: string) {
+		if (!this.isRegistered) throw new Error(`Driver ${this.id} not registered by using initial()`);
+    this.manager!.emit(RainlinkEvents.Debug, `[Rainlink] -> [Driver] -> [Lavalink3] -> [legacy] | ${logs}`);
+	}
+
+	/** @ignore */
+	public wsClose(): void {
+		if (this.wsClient) this.wsClient.close(1006, 'Self closed');
+	}
+
+	/** @ignore */
+	protected testJSON(text: string) {
+		if (typeof text !== 'string') {
+			return false;
+		}
+		try {
+			JSON.parse(text);
+			return true;
+		} catch (error) {
+			return false;
+		}
+	}
+
+	protected convertToV3request(data?: Record<string, any>) {
+		if (!data) return;
+		if (data.track && data.track.encoded !== undefined) {
+			data.encodedTrack = data.track.encoded;
+			delete data.track;
+		}
+		return;
+	}
+
+	protected convertV4trackResponse(v3data: Record<string, any>): Record<string, any> {
+		if (!v3data) return {};
+		switch (v3data.loadType) {
+		case Lavalink3loadType.LOAD_FAILED: {
+			v3data.loadType = LavalinkLoadType.ERROR;
+			break;
+		}
+		case Lavalink3loadType.PLAYLIST_LOADED: {
+			v3data.loadType = LavalinkLoadType.PLAYLIST;
+			v3data.data.tracks = v3data.tracks;
+			v3data.data.info = v3data.playlistInfo;
+			for (let i = 0; i < v3data.data.tracks.length; i++) {
+				v3data.data.tracks[i] = this.buildV4track(v3data.data.tracks[i]);
+			}
+			delete v3data.tracks;
+			break;
+		}
+		case Lavalink3loadType.SEARCH_RESULT: {
+			v3data.loadType = LavalinkLoadType.SEARCH;
+			v3data.data = v3data.tracks;
+			for (let i = 0; i < v3data.data.length; i++) {
+				v3data.data[i] = this.buildV4track(v3data.data[i]);
+			}
+			delete v3data.tracks;
+			delete v3data.playlistInfo;
+			break;
+		}
+		case Lavalink3loadType.TRACK_LOADED: {
+			v3data.loadType = LavalinkLoadType.TRACK;
+			v3data.data = this.buildV4track(v3data.tracks[0]);
+			delete v3data.tracks;
+			break;
+		}
+		case Lavalink3loadType.NO_MATCHES: {
+			v3data.loadType = LavalinkLoadType.EMPTY;
+			break;
+		}
+		}
+		return v3data;
+	}
+
+	protected buildV4track(v3data: Record<string, any>) {
+		return {
+			encoded: v3data.encoded,
+			info: {
+				sourceName: v3data.info.sourceName,
+				identifier: v3data.info.identifier,
+				isSeekable: v3data.info.isSeekable,
+				author: v3data.info.author,
+				length: v3data.info.length,
+				isStream: v3data.info.isStream,
+				position: v3data.info.position,
+				title: v3data.info.title,
+				uri: v3data.info.uri,
+				artworkUrl: undefined,
+			},
+			pluginInfo: undefined,
+		};
+	}
+}

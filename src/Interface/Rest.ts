@@ -7,6 +7,7 @@ export interface RainlinkRequesterOptions extends RequestInit {
   useSessionId?: boolean;
   data?: Record<string, unknown>;
   path: string;
+  rawReqData?: UpdatePlayerInfo;
 }
 
 export interface LavalinkPlayer {
@@ -59,6 +60,7 @@ export interface UpdatePlayerTrack {
   encoded?: string | null;
   identifier?: string;
   userData?: Record<string, any>;
+  length: number;
 }
 
 export interface UpdatePlayerOptions {

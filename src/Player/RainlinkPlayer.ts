@@ -196,11 +196,12 @@ export class RainlinkPlayer extends EventEmitter {
 		this.disconnect();
 		const voiceReceiver = this.manager.plugins.get('rainlink-voiceReceiver') as RainlinkPlugin;
 		if (this.node.driver.id.includes('nodelink')) voiceReceiver.close(this.guildId);
-		await this.node.rest.updatePlayer({
+		this.node.rest.updatePlayer({
 			guildId: this.guildId,
 			playerOptions: {
 				track: {
 					encoded: null,
+					length: 0,
 				},
 			},
 		});
@@ -259,6 +260,7 @@ export class RainlinkPlayer extends EventEmitter {
 		const playerOptions: UpdatePlayerOptions = {
 			track: {
 				encoded: current.encoded,
+				length: current.duration,
 			},
 			...options,
 			volume: this.volume,
@@ -270,7 +272,7 @@ export class RainlinkPlayer extends EventEmitter {
 		}
 		if (playerOptions.position) this.position = playerOptions.position;
 
-		await this.node.rest.updatePlayer({
+		this.node.rest.updatePlayer({
 			guildId: this.guildId,
 			noReplace: options?.noReplace ?? false,
 			playerOptions,
@@ -393,11 +395,12 @@ export class RainlinkPlayer extends EventEmitter {
    */
 	public async skip(): Promise<RainlinkPlayer> {
 		this.checkDestroyed();
-		await this.node.rest.updatePlayer({
+		this.node.rest.updatePlayer({
 			guildId: this.guildId,
 			playerOptions: {
 				track: {
 					encoded: null,
+					length: 0,
 				},
 			},
 		});
@@ -476,11 +479,12 @@ export class RainlinkPlayer extends EventEmitter {
 
 		this.clear(false);
 
-		await this.node.rest.updatePlayer({
+		this.node.rest.updatePlayer({
 			guildId: this.guildId,
 			playerOptions: {
 				track: {
 					encoded: null,
+					length: 0,
 				},
 			},
 		});
