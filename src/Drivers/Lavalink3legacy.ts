@@ -80,7 +80,7 @@ export class Lavalink3legacy extends AbstractDriver {
 			this.convertToV3request(options.data as Record<string, any>);
 			options.body = JSON.stringify(options.data);
 		}
-		if (options.path == '/sessions//players') return undefined;
+		if (options.path.includes('/sessions//players')) return undefined;
 
 		const lavalinkHeaders = {
 			Authorization: this.node!.options.auth,
@@ -128,7 +128,7 @@ export class Lavalink3legacy extends AbstractDriver {
 	}
 
 	protected convertToV3websocket(data: UpdatePlayerInfo) {
-		let isPlaySent = false;
+		let isPlaySent;
 		if (!data) return;
 
 		// Voice update
@@ -136,12 +136,8 @@ export class Lavalink3legacy extends AbstractDriver {
 			this.wsSendData({
 				op: 'voiceUpdate',
 				guildId: data.guildId,
-				sessionId: '66ddc123021f78575c10be048030f937',
-				event: {
-					token: 'a28978bfe85792b1',
-					guild_id: '1027945618347397220',
-					endpoint: 'hongkong11030.discord.media:443',
-				},
+				sessionId: data.playerOptions.voice.sessionId,
+				event: data.playerOptions.voice,
 			});
 
 		// Play track
@@ -170,7 +166,7 @@ export class Lavalink3legacy extends AbstractDriver {
 				guildId: data.guildId,
 			});
 
-		if (isPlaySent) return;
+		if (isPlaySent) return (isPlaySent = false);
 
 		// Pause player
 		if (data.playerOptions.paused === false || data.playerOptions.paused === true)
@@ -189,7 +185,7 @@ export class Lavalink3legacy extends AbstractDriver {
 			});
 
 		// Voice player
-		if (data.playerOptions.position)
+		if (data.playerOptions.volume)
 			this.wsSendData({
 				op: 'volume',
 				guildId: data.guildId,
@@ -286,8 +282,8 @@ export class Lavalink3legacy extends AbstractDriver {
 			v3data.loadType = LavalinkLoadType.PLAYLIST;
 			v3data.data.tracks = v3data.tracks;
 			v3data.data.info = v3data.playlistInfo;
-			for (let i = 0; i < v3data.data.tracks.length; i++) {
-				v3data.data.tracks[i] = this.buildV4track(v3data.data.tracks[i]);
+			for (let i = 0; i < v3data.tracks.length; i++) {
+				v3data.data.tracks[i] = this.buildV4track(v3data.tracks[i]);
 			}
 			delete v3data.tracks;
 			break;

@@ -329,7 +329,7 @@ export class RainlinkPlayer extends EventEmitter {
 	public async resume(): Promise<RainlinkPlayer> {
 		this.checkDestroyed();
 		if (this.paused == false) return this;
-		await this.node.rest.updatePlayer({
+		this.node.rest.updatePlayer({
 			guildId: this.guildId,
 			playerOptions: {
 				paused: false,
