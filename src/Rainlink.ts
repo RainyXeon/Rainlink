@@ -23,7 +23,6 @@ import { AbstractDriver } from './Drivers/AbstractDriver';
 import { Lavalink3 } from './Drivers/Lavalink3';
 import { Nodelink2 } from './Drivers/Nodelink2';
 import { Lavalink4 } from './Drivers/Lavalink4';
-import { Lavalink3koto } from './Drivers/Lavalink3koto';
 
 export declare interface Rainlink {
   /* tslint:disable:unified-signatures */
@@ -423,6 +422,10 @@ export class Rainlink extends EventEmitter {
    * The rainlink manager
    */
 	public drivers: AbstractDriver[];
+	/**
+   * The current bott's shard count
+   */
+	public shardCount: number = 1;
 
 	/**
    * The main class that handle all works in lavalink server.
@@ -434,7 +437,7 @@ export class Rainlink extends EventEmitter {
 		if (!options.library)
 			throw new Error('Please set an new lib to connect, example: \nlibrary: new Library.DiscordJS(client) ');
 		this.library = options.library.set(this);
-		this.drivers = [new Lavalink3(), new Nodelink2(), new Lavalink4(), new Lavalink3koto()];
+		this.drivers = [new Lavalink3(), new Nodelink2(), new Lavalink4()];
 		this.rainlinkOptions = options;
 		this.rainlinkOptions.options = this.mergeDefault<RainlinkAdditionalOptions>(
 			this.defaultOptions,

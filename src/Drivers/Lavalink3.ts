@@ -1,7 +1,7 @@
 import { Rainlink } from '../Rainlink';
 import { metadata } from '../metadata';
 import { LavalinkLoadType, RainlinkEvents } from '../Interface/Constants';
-import { RainlinkRequesterOptions } from '../Interface/Rest';
+import { RainlinkRequesterOptions, UpdatePlayerInfo } from '../Interface/Rest';
 import { RainlinkNode } from '../Node/RainlinkNode';
 import { AbstractDriver } from './AbstractDriver';
 import util from 'node:util';
@@ -17,7 +17,7 @@ export enum Lavalink3loadType {
 }
 
 export class Lavalink3 extends AbstractDriver {
-	public id: string = 'lavalink/v3/yagi';
+	public id: string = 'lavalink/v3/koto';
 	public wsUrl: string = '';
 	public httpUrl: string = '';
 	public sessionId: string | null;
@@ -41,8 +41,8 @@ export class Lavalink3 extends AbstractDriver {
 	public initial(manager: Rainlink, node: RainlinkNode): void {
 		this.manager = manager;
 		this.node = node;
-		this.wsUrl = `${this.node.options.secure ? 'wss' : 'ws'}://${this.node.options.host}:${this.node.options.port}/v3/websocket`;
-		this.httpUrl = `${this.node.options.secure ? 'https://' : 'http://'}${this.node.options.host}:${this.node.options.port}/v3`;
+		this.wsUrl = `${this.node.options.secure ? 'wss' : 'ws'}://${this.node.options.host}:${this.node.options.port}/`;
+		this.httpUrl = `${this.node.options.secure ? 'https://' : 'http://'}${this.node.options.host}:${this.node.options.port}`;
 	}
 
 	public connect(): RainlinkWebsocket {
@@ -55,6 +55,7 @@ export class Lavalink3 extends AbstractDriver {
 				'Client-Name': `${metadata.name}/${metadata.version} (${metadata.github})`,
 				'Session-Id': this.sessionId !== null && isResume ? this.sessionId : '',
 				'user-agent': this.manager!.rainlinkOptions.options!.userAgent!,
+				'Num-Shards': this.manager!.shardCount,
 			},
 		});
 
@@ -73,15 +74,22 @@ export class Lavalink3 extends AbstractDriver {
 
 	public async requester<D = any>(options: RainlinkRequesterOptions): Promise<D | undefined> {
 		if (!this.isRegistered) throw new Error(`Driver ${this.id} not registered by using initial()`);
-		if (options.useSessionId && this.sessionId == null)
-			throw new Error('sessionId not initalized! Please wait for lavalink get connected!');
 		const url = new URL(`${this.httpUrl}${options.path}`);
 		if (options.params) url.search = new URLSearchParams(options.params).toString();
-
+		if (options.rawReqData && options.useSessionId) {
+			this.convertToV3websocket(options.rawReqData);
+			return;
+		}
 		if (options.data) {
 			this.convertToV3request(options.data as Record<string, any>);
 			options.body = JSON.stringify(options.data);
 		}
+		if (options.path.includes('/sessions//')) return undefined;
+		if (
+			/\/sessions\/(.*)\/players\/(.*)/.test(options.path) ||
+      (options.method && options.method == 'DELETE')
+		)
+			return undefined;
 
 		const lavalinkHeaders = {
 			Authorization: this.node!.options.auth,
@@ -90,6 +98,7 @@ export class Lavalink3 extends AbstractDriver {
 		};
 
 		options.headers = lavalinkHeaders;
+		if (this.sessionId) url.pathname = '/v3' + url.pathname;
 		options.path = url.pathname + url.search;
 
 		const res = await fetch(url.origin + options.path, options);
@@ -117,15 +126,106 @@ export class Lavalink3 extends AbstractDriver {
 			finalData = this.convertV4trackResponse(finalData) as D;
 		}
 
-		if (finalData.guildId && finalData.track && finalData.track.encoded) {
-			finalData.track = this.buildV4track(finalData.track);
-		}
-
 		this.debug(
 			`${options.method ?? 'GET'} ${options.path} payload=${options.body ? String(options.body) : '{}'}`,
 		);
 
 		return finalData;
+	}
+
+	protected convertToV3websocket(data: UpdatePlayerInfo) {
+		let isPlaySent;
+		if (!data) return;
+
+		// Voice update
+		if (data.playerOptions.voice)
+			this.wsSendData({
+				op: 'voiceUpdate',
+				guildId: data.guildId,
+				sessionId: data.playerOptions.voice.sessionId,
+				event: data.playerOptions.voice,
+			});
+
+		// Play track
+		if (
+			data.playerOptions.track &&
+      data.playerOptions.track.encoded &&
+      data.playerOptions.track.length !== 0
+		) {
+			isPlaySent = true;
+			this.wsSendData({
+				op: 'play',
+				guildId: data.guildId,
+				track: data.playerOptions.track.encoded,
+				startTime: data.playerOptions.position,
+				endTime: data.playerOptions.track.length,
+				volume: data.playerOptions.volume,
+				noReplace: data.noReplace,
+				pause: data.playerOptions.paused,
+			});
+		}
+
+		// Destroy player
+		if (data.playerOptions.track && data.playerOptions.track.encoded == null)
+			this.wsSendData({
+				op: 'destroy',
+				guildId: data.guildId,
+			});
+
+		if (isPlaySent) return (isPlaySent = false);
+
+		// Pause player
+		if (data.playerOptions.paused === false || data.playerOptions.paused === true)
+			this.wsSendData({
+				op: 'pause',
+				guildId: data.guildId,
+				pause: data.playerOptions.paused,
+			});
+
+		// Seek player
+		if (data.playerOptions.position)
+			this.wsSendData({
+				op: 'seek',
+				guildId: data.guildId,
+				position: data.playerOptions.position,
+			});
+
+		// Voice player
+		if (data.playerOptions.volume)
+			this.wsSendData({
+				op: 'volume',
+				guildId: data.guildId,
+				volume: data.playerOptions.volume,
+			});
+
+		// Filter player
+		if (data.playerOptions.filters)
+			this.wsSendData({
+				op: 'filters',
+				guildId: data.guildId,
+				...data.playerOptions.filters,
+			});
+	}
+
+	protected checkUpdateExist(data: Record<string, any>) {
+		return (
+			data.track ||
+      data.identifier ||
+      data.position ||
+      data.endTime ||
+      data.volume ||
+      data.paused ||
+      data.filters ||
+      data.voice
+		);
+	}
+
+	protected wsSendData(data: Record<string, unknown>): void {
+		if (!this.isRegistered) throw new Error(`Driver ${this.id} not registered by using initial()`);
+		if (!this.wsClient) return;
+		const jsonData = JSON.stringify(data);
+		this.wsClient.send(jsonData);
+		return;
 	}
 
 	protected wsMessageEvent(data: string) {
@@ -136,11 +236,17 @@ export class Lavalink3 extends AbstractDriver {
     this.node!.wsMessageEvent(wsData);
 	}
 
-	/**
-   * Update a season to resume able or not
-   * @returns LavalinkResponse
-   */
+	// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	public async updateSession(sessionId: string, mode: boolean, timeout: number): Promise<void> {
+		if (!sessionId) {
+			this.wsSendData({
+				op: 'configureResuming',
+				key: 'rainlink/lavalink/v3/koto/legacy',
+				timeout: 60,
+			});
+			this.debug(`Session updated! resume: ${mode}, timeout: ${timeout}`);
+			return;
+		}
 		const options: RainlinkRequesterOptions = {
 			path: `/sessions/${sessionId}`,
 			headers: { 'Content-Type': 'application/json' },
@@ -191,22 +297,21 @@ export class Lavalink3 extends AbstractDriver {
 
 	protected convertV4trackResponse(v3data: Record<string, any>): Record<string, any> {
 		if (!v3data) return {};
-		switch (v3data.loadType) {
-		case Lavalink3loadType.LOAD_FAILED: {
-			v3data.loadType = LavalinkLoadType.ERROR;
-			break;
-		}
-		case Lavalink3loadType.PLAYLIST_LOADED: {
+		if (v3data.loadType == Lavalink3loadType.LOAD_FAILED) v3data.loadType = LavalinkLoadType.ERROR;
+		if (v3data.loadType.includes('PLAYLIST_LOADED')) {
 			v3data.loadType = LavalinkLoadType.PLAYLIST;
-			v3data.data.tracks = v3data.tracks;
-			v3data.data.info = v3data.playlistInfo;
-			for (let i = 0; i < v3data.data.tracks.length; i++) {
-				v3data.data.tracks[i] = this.buildV4track(v3data.data.tracks[i]);
+			const convertedArray = [];
+			for (let i = 0; i < v3data.tracks.length; i++) {
+				convertedArray.push(this.buildV4track(v3data.tracks[i]));
 			}
+			v3data.data = {
+				info: v3data.playlistInfo,
+				tracks: convertedArray,
+			};
 			delete v3data.tracks;
-			break;
+			return v3data;
 		}
-		case Lavalink3loadType.SEARCH_RESULT: {
+		if (v3data.loadType == Lavalink3loadType.SEARCH_RESULT) {
 			v3data.loadType = LavalinkLoadType.SEARCH;
 			v3data.data = v3data.tracks;
 			for (let i = 0; i < v3data.data.length; i++) {
@@ -214,25 +319,19 @@ export class Lavalink3 extends AbstractDriver {
 			}
 			delete v3data.tracks;
 			delete v3data.playlistInfo;
-			break;
 		}
-		case Lavalink3loadType.TRACK_LOADED: {
+		if (v3data.loadType == Lavalink3loadType.TRACK_LOADED) {
 			v3data.loadType = LavalinkLoadType.TRACK;
 			v3data.data = this.buildV4track(v3data.tracks[0]);
 			delete v3data.tracks;
-			break;
 		}
-		case Lavalink3loadType.NO_MATCHES: {
-			v3data.loadType = LavalinkLoadType.EMPTY;
-			break;
-		}
-		}
+		if (v3data.loadType == Lavalink3loadType.NO_MATCHES) v3data.loadType = LavalinkLoadType.EMPTY;
 		return v3data;
 	}
 
 	protected buildV4track(v3data: Record<string, any>) {
 		return {
-			encoded: v3data.encoded,
+			encoded: v3data.track,
 			info: {
 				sourceName: v3data.info.sourceName,
 				identifier: v3data.info.identifier,

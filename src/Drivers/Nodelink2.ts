@@ -76,6 +76,7 @@ export class Nodelink2 extends AbstractDriver {
 				'Client-Name': `${metadata.name}/${metadata.version} (${metadata.github})`,
 				'Session-Id': this.sessionId !== null && isResume ? this.sessionId : '',
 				'user-agent': this.manager!.rainlinkOptions.options!.userAgent!,
+				'Num-Shards': this.manager!.shardCount,
 			},
 		});
 
@@ -200,9 +201,7 @@ export class Nodelink2 extends AbstractDriver {
 	}
 	// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	public async updateSession(sessionId: string, mode: boolean, timeout: number): Promise<void> {
-		this.debug(
-			'WARNING: Nodelink doesn\'t support resuming, set resume to true is useless in Nodelink2 driver',
-		);
+		this.debug('WARNING: Nodelink doesn\'t support resuming, set resume to true is useless');
 		return;
 	}
 

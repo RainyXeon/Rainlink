@@ -47,6 +47,7 @@ export class Lavalink4 extends AbstractDriver {
 				'Client-Name': `${metadata.name}/${metadata.version} (${metadata.github})`,
 				'Session-Id': this.sessionId !== null && isResume ? this.sessionId : '',
 				'user-agent': this.manager!.rainlinkOptions.options!.userAgent!,
+				'Num-Shards': this.manager!.shardCount,
 			},
 		});
 

@@ -15,6 +15,7 @@ export abstract class AbstractLibrary {
 
 	protected ready(nodes: RainlinkNodeOptions[]): void {
     this.manager!.id = this.getId();
+    this.manager!.shardCount = this.getShardCount();
     for (const node of nodes) this.manager?.nodes.add(node);
 	}
 
@@ -24,6 +25,8 @@ export abstract class AbstractLibrary {
 	}
 
   abstract getId(): string;
+
+  abstract getShardCount(): number;
 
   abstract sendPacket(shardId: number, payload: any, important: boolean): void;
 

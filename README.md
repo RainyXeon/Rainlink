@@ -56,8 +56,7 @@ This is the list of all rainlink driver currently supported (codename is made up
 | Driver Name       | Voice Server | Language   | Supported Version | Codename |
 | ----------------- | ------------ | ---------- | ----------------- | -------- |
 | lavalink/v4/koinu | Lavalink     | Java       | v4.0.0 - v4.x.x   | koinu    |
-| lavalink/v3/yagi  | Lavalink     | Java       | v3.7.0 - v3.7.x   | yagi     |
-| lavalink/v3/koto  | Lavalink     | Java       | v3.4.0 - v3.6.2   | koto     |
+| lavalink/v3/koto  | Lavalink     | Java       | v3.0.0 - v3.7.x   | koto     |
 | nodelink/v2/nari  | Nodelink     | Javascript | v2.0.0 - v2.x.x   | nari     |
 
 # 💾 Example bot:
