@@ -6,7 +6,7 @@ Another lavalink wrapper but focus on stability and rich features
 
 ⚠️ This lavalink wrapper is just in the beta stage, it will have some bug so please report it on github!
 
-⚠️ Update 4: Rainlink now in stage 20 of development (Release beta 4 product / Near stable)
+⚠️ Update 5: Rainlink now in stage 25 of development (Near stable)
 
 # 🌟 Features
  - Stable client
@@ -53,11 +53,11 @@ This is the list of all rainlink plugin currently supported
 
 This is the list of all rainlink driver currently supported (codename is made up by me)
 
-| Driver Name       | Voice Server | Language   | Supported Version | Codename |
-| ----------------- | ------------ | ---------- | ----------------- | -------- |
-| lavalink/v4/koinu | Lavalink     | Java       | v4.0.0 - v4.x.x   | koinu    |
-| lavalink/v3/koto  | Lavalink     | Java       | v3.0.0 - v3.7.x   | koto     |
-| nodelink/v2/nari  | Nodelink     | Javascript | v2.0.0 - v2.x.x   | nari     |
+| Driver Name       | Voice Server | Language   | Supported Version | Codename | Notes                                       |
+| ----------------- | ------------ | ---------- | ----------------- | -------- | ------------------------------------------- | 
+| lavalink/v4/koinu | Lavalink     | Java       | v4.0.0 - v4.x.x   | koinu    |                                             |
+| lavalink/v3/koto  | Lavalink     | Java       | v3.0.0 - v3.7.x   | koto     | `filter` lavalink below v3.4 not supported  |
+| nodelink/v2/nari  | Nodelink     | Javascript | v2.0.0 - v2.x.x   | nari     | Some filter mode in nodelink not supported  |
 
 # 💾 Example bot:
 
