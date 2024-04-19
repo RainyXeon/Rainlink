@@ -235,7 +235,7 @@ export class RainlinkWebsocket extends EventEmitter {
 		return true;
 	}
 
-	sendData(data: Buffer, options: { len: number; fin: boolean; opcode: number; mask?: Buffer }) {
+	sendData(data: Buffer, options: { len: number; fin?: boolean; opcode: number; mask?: Buffer | boolean }) {
 		let payloadStartIndex = 2;
 		let payloadLength = options.len;
 		let mask = null;
@@ -283,7 +283,12 @@ export class RainlinkWebsocket extends EventEmitter {
     return true;
 	}
 
-	close(code: number, reason: string) {
+	send(data: string) {
+		const payload = Buffer.from(data, 'utf-8');
+		return this.sendData(payload, { len: payload.length, fin: true, opcode: 0x01, mask: true });
+	}
+
+	close(code?: number, reason?: string) {
 		const data = Buffer.allocUnsafe(2 + Buffer.byteLength(reason ?? 'normal close'));
 		data.writeUInt16BE(code ?? 1000);
 		data.write(reason ?? 'normal close', 2);

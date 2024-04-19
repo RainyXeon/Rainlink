@@ -422,6 +422,10 @@ export class Rainlink extends EventEmitter {
    * The rainlink manager
    */
 	public drivers: AbstractDriver[];
+	/**
+   * The current bott's shard count
+   */
+	public shardCount: number = 1;
 
 	/**
    * The main class that handle all works in lavalink server.

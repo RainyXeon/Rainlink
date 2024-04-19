@@ -23,10 +23,6 @@ export class RainlinkPlayer extends EventEmitter {
    */
 	public manager: Rainlink;
 	/**
-   * Voice option of player
-   */
-	public voiceOptions: VoiceChannelOptions;
-	/**
    * Player's current using lavalink server
    */
 	public node: RainlinkNode;
@@ -143,11 +139,10 @@ export class RainlinkPlayer extends EventEmitter {
 		this.lastRegion = null;
 		this.serverUpdate = null;
 		this.voiceState = VoiceConnectState.DISCONNECTED;
-		this.voiceOptions = voiceOptions;
 		this.node = node;
-		this.guildId = this.voiceOptions.guildId;
-		this.voiceId = this.voiceOptions.voiceId;
-		this.textId = this.voiceOptions.textId;
+		this.guildId = voiceOptions.guildId;
+		this.voiceId = voiceOptions.voiceId;
+		this.textId = voiceOptions.textId;
 		const customQueue =
       this.manager.rainlinkOptions.options!.structures &&
       this.manager.rainlinkOptions.options!.structures.queue;
@@ -187,7 +182,7 @@ export class RainlinkPlayer extends EventEmitter {
 				},
 			},
 		};
-		await this.node.rest.updatePlayer(playerUpdate);
+		this.node.rest.updatePlayer(playerUpdate);
 	}
 
 	/**
@@ -201,11 +196,12 @@ export class RainlinkPlayer extends EventEmitter {
 		this.disconnect();
 		const voiceReceiver = this.manager.plugins.get('rainlink-voiceReceiver') as RainlinkPlugin;
 		if (this.node.driver.id.includes('nodelink')) voiceReceiver.close(this.guildId);
-		await this.node.rest.updatePlayer({
+		this.node.rest.updatePlayer({
 			guildId: this.guildId,
 			playerOptions: {
 				track: {
 					encoded: null,
+					length: 0,
 				},
 			},
 		});
@@ -264,6 +260,7 @@ export class RainlinkPlayer extends EventEmitter {
 		const playerOptions: UpdatePlayerOptions = {
 			track: {
 				encoded: current.encoded,
+				length: current.duration,
 			},
 			...options,
 			volume: this.volume,
@@ -275,7 +272,7 @@ export class RainlinkPlayer extends EventEmitter {
 		}
 		if (playerOptions.position) this.position = playerOptions.position;
 
-		await this.node.rest.updatePlayer({
+		this.node.rest.updatePlayer({
 			guildId: this.guildId,
 			noReplace: options?.noReplace ?? false,
 			playerOptions,
@@ -332,7 +329,7 @@ export class RainlinkPlayer extends EventEmitter {
 	public async resume(): Promise<RainlinkPlayer> {
 		this.checkDestroyed();
 		if (this.paused == false) return this;
-		await this.node.rest.updatePlayer({
+		this.node.rest.updatePlayer({
 			guildId: this.guildId,
 			playerOptions: {
 				paused: false,
@@ -398,11 +395,12 @@ export class RainlinkPlayer extends EventEmitter {
    */
 	public async skip(): Promise<RainlinkPlayer> {
 		this.checkDestroyed();
-		await this.node.rest.updatePlayer({
+		this.node.rest.updatePlayer({
 			guildId: this.guildId,
 			playerOptions: {
 				track: {
 					encoded: null,
+					length: 0,
 				},
 			},
 		});
@@ -481,11 +479,12 @@ export class RainlinkPlayer extends EventEmitter {
 
 		this.clear(false);
 
-		await this.node.rest.updatePlayer({
+		this.node.rest.updatePlayer({
 			guildId: this.guildId,
 			playerOptions: {
 				track: {
 					encoded: null,
+					length: 0,
 				},
 			},
 		});
@@ -504,7 +503,7 @@ export class RainlinkPlayer extends EventEmitter {
 		this.queue.clear();
 		this.queue.current = undefined;
 		this.queue.previous.length = 0;
-		this.volume = this.voiceOptions.volume ?? this.manager.rainlinkOptions!.options!.defaultVolume ?? 100;
+		this.volume = this.manager.rainlinkOptions!.options!.defaultVolume ?? 100;
 		this.paused = true;
 		this.playing = false;
 		this.track = null;
@@ -733,6 +732,12 @@ export class RainlinkPlayer extends EventEmitter {
 		this.deaf = self_deaf;
 		this.mute = self_mute;
 		this.sessionId = session_id || null;
+		if (
+			this.node.driver.id.includes('legacy') &&
+      this.node.driver.id.includes('lavalink') &&
+      this.serverUpdate?.token
+		)
+			this.sendServerUpdate();
 		this.debugDiscord(
 			`State Update Received | Channel: ${this.voiceId} Session ID: ${session_id} Guild: ${this.guildId}`,
 		);

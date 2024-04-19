@@ -44,3 +44,34 @@ export interface LavalinkNodeStatsResponse {
   };
   uptime: number;
 }
+
+export type NodeInfo = {
+  version: NodeInfoVersion;
+  buildTime: number;
+  git: NodeInfoGit;
+  jvm: string;
+  lavaplayer: string;
+  sourceManagers: string[];
+  filters: string[];
+  plugins: NodeInfoPlugin[];
+};
+
+type NodeInfoVersion = {
+  semver: string;
+  major: number;
+  minor: number;
+  patch: number;
+  preRelease?: string;
+  build?: string;
+};
+
+type NodeInfoGit = {
+  branch: string;
+  commit: string;
+  commitTime: number;
+};
+
+type NodeInfoPlugin = {
+  name: string;
+  version: string;
+};

@@ -6,7 +6,7 @@ Another lavalink wrapper but focus on stability and rich features
 
 ⚠️ This lavalink wrapper is just in the beta stage, it will have some bug so please report it on github!
 
-⚠️ Update 4: Rainlink now in stage 20 of development (Release beta 4 product / Near stable)
+⚠️ Update 5: Rainlink now in stage 25 of development (Near stable)
 
 # 🌟 Features
  - Stable client
@@ -49,6 +49,16 @@ This is the list of all rainlink plugin currently supported
 | rainlink-apple     | Official | [npmjs](https://www.npmjs.com/package/rainlink-apple) / [github](https://github.com/RainyProduction/rainlink-apple)           | RainyXeon | 
 | rainlink-spotify   | Official | [npmjs](https://www.npmjs.com/package/rainlink-spotify) / [github](https://github.com/RainyProduction/rainlink-spotify)       | RainyXeon | 
 
+# ⚙ Drivers
+
+This is the list of all rainlink driver currently supported (codename is made up by me)
+
+| Driver Name       | Voice Server | Language   | Supported Version | Codename | Notes                                                      |
+| ----------------- | ------------ | ---------- | ----------------- | -------- | ---------------------------------------------------------- | 
+| lavalink/v4/koinu | Lavalink     | Java       | v4.0.0 - v4.x.x   | koinu    |                                                            |
+| lavalink/v3/koto  | Lavalink     | Java       | v3.0.0 - v3.7.x   | koto     | `filter` and `resume` in lavalink below v3.4 not supported |
+| nodelink/v2/nari  | Nodelink     | Javascript | v2.0.0 - v2.x.x   | nari     | Some `filter` mode in nodelink not supported               |
+
 # 💾 Example bot:
 
 ```js
@@ -63,9 +73,8 @@ const Nodes = [{
     auth: 'youshallnotpass',
     secure: false,
     // You don't have to add this properties if you're using lavalink v4.
-    // About using lavalink v3.7.x, you can change to lavalink@3
-    // About using nodelink v2, you can change to nodelink@2
-    driver: "lavalink@4"
+    // If you use a version other than lavalink, you can refer to the Drivers section above
+    driver: "lavalink/v4/koinu"
 }];
 
 const client = new Client({intents: [Guilds, GuildVoiceStates, GuildMessages, MessageContent]});

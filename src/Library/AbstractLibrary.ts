@@ -15,6 +15,7 @@ export abstract class AbstractLibrary {
 
 	protected ready(nodes: RainlinkNodeOptions[]): void {
     this.manager!.id = this.getId();
+    this.manager!.shardCount = this.getShardCount();
     for (const node of nodes) this.manager?.nodes.add(node);
 	}
 
@@ -25,6 +26,8 @@ export abstract class AbstractLibrary {
 
   abstract getId(): string;
 
+  abstract getShardCount(): number;
+
   abstract sendPacket(shardId: number, payload: any, important: boolean): void;
 
   abstract listen(nodes: RainlinkNodeOptions[]): void;
@@ -32,11 +35,11 @@ export abstract class AbstractLibrary {
   protected raw(packet: any): void {
   	if (!AllowedPackets.includes(packet.t)) return;
   	const guildId = packet.d.guild_id;
-  	const connection = this.manager!.players.get(guildId);
-  	if (!connection) return;
-  	if (packet.t === 'VOICE_SERVER_UPDATE') return connection.setServerUpdate(packet.d);
+  	const players = this.manager!.players.get(guildId);
+  	if (!players) return;
+  	if (packet.t === 'VOICE_SERVER_UPDATE') return players.setServerUpdate(packet.d);
   	const userId = packet.d.user_id;
   	if (userId !== this.manager!.id) return;
-  	connection.setStateUpdate(packet.d);
+  	players.setStateUpdate(packet.d);
   }
 }

@@ -35,7 +35,7 @@ export interface NodelinkGetLyricsInterface {
 }
 
 export class Nodelink2 extends AbstractDriver {
-	public id: string = 'nodelink@2';
+	public id: string = 'nodelink/v2/nari';
 	public wsUrl: string = '';
 	public httpUrl: string = '';
 	public sessionId: string | null;
@@ -71,9 +71,12 @@ export class Nodelink2 extends AbstractDriver {
 			headers: {
 				Authorization: this.node!.options.auth,
 				'User-Id': this.manager!.id,
+				'Content-Encoding': 'brotli, gzip, deflate',
+				'accept-encoding': 'brotli, gzip, deflate',
 				'Client-Name': `${metadata.name}/${metadata.version} (${metadata.github})`,
 				'Session-Id': this.sessionId !== null && isResume ? this.sessionId : '',
 				'user-agent': this.manager!.rainlinkOptions.options!.userAgent!,
+				'Num-Shards': this.manager!.shardCount,
 			},
 		});
 
@@ -104,6 +107,8 @@ export class Nodelink2 extends AbstractDriver {
 		const lavalinkHeaders = {
 			Authorization: this.node!.options.auth,
 			'User-Agent': this.manager!.rainlinkOptions.options!.userAgent!,
+			'Content-Encoding': 'brotli, gzip, deflate',
+			'accept-encoding': 'brotli, gzip, deflate',
 			...options.headers,
 		};
 
@@ -118,10 +123,12 @@ export class Nodelink2 extends AbstractDriver {
 		}
 		if (res.status !== 200) {
 			this.debug(
+				`${options.method ?? 'GET'} ${options.path} payload=${options.body ? String(options.body) : '{}'}`,
+			);
+			this.debug(
 				'Something went wrong with lavalink server. ' +
           `Status code: ${res.status}\n Headers: ${util.inspect(options.headers)}`,
 			);
-			this.debug(`${options.method} ${options.path} payload=${options.body ? String(options.body) : '{}'}`);
 			return undefined;
 		}
 
@@ -132,7 +139,9 @@ export class Nodelink2 extends AbstractDriver {
 			finalData = this.convertV4trackResponse(finalData) as D;
 		}
 
-		this.debug(`${options.method} ${options.path} payload=${options.body ? String(options.body) : '{}'}`);
+		this.debug(
+			`${options.method ?? 'GET'} ${options.path} payload=${options.body ? String(options.body) : '{}'}`,
+		);
 
 		return finalData;
 	}
@@ -192,9 +201,7 @@ export class Nodelink2 extends AbstractDriver {
 	}
 	// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	public async updateSession(sessionId: string, mode: boolean, timeout: number): Promise<void> {
-		this.debug(
-			'WARNING: Nodelink doesn\'t support resuming, set resume to true is useless in Nodelink2 driver',
-		);
+		this.debug('WARNING: Nodelink doesn\'t support resuming, set resume to true is useless');
 		return;
 	}
 
