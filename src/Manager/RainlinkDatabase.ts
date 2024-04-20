@@ -53,7 +53,7 @@ export class RainlinkDatabase<G = unknown> {
    * Get all current values of current database
    * @returns unknown[]
    */
-	get values(): unknown[] {
+	get values(): G[] {
 		return Object.values(this.cache);
 	}
 

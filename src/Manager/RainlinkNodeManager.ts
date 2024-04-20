@@ -2,8 +2,9 @@ import { RainlinkConnectState } from '../Interface/Constants';
 import { RainlinkNodeOptions } from '../Interface/Manager';
 import { RainlinkNode } from '../Node/RainlinkNode';
 import { Rainlink } from '../Rainlink';
+import { RainlinkDatabase } from './RainlinkDatabase';
 
-export class RainlinkNodeManager extends Map<string, RainlinkNode> {
+export class RainlinkNodeManager extends RainlinkDatabase<RainlinkNode> {
 	/** The rainlink manager */
 	public manager: Rainlink;
 
@@ -36,7 +37,7 @@ export class RainlinkNodeManager extends Map<string, RainlinkNode> {
 			const resolverData = await this.manager.rainlinkOptions.options!.nodeResolver(this);
 			if (resolverData) return resolverData;
 		}
-		const nodes: RainlinkNode[] = [...this.values()];
+		const nodes: RainlinkNode[] = this.values;
 
 		const onlineNodes = nodes.filter(node => node.state === RainlinkConnectState.Connected);
 		if (!onlineNodes.length) throw new Error('No nodes are online');
@@ -60,7 +61,7 @@ export class RainlinkNodeManager extends Map<string, RainlinkNode> {
    * @returns RainlinkNode[]
    */
 	public all(): RainlinkNode[] {
-		return [...this.values()];
+		return this.values;
 	}
 
 	/**

@@ -56,7 +56,7 @@ export type NodeInfo = {
   plugins: NodeInfoPlugin[];
 };
 
-type NodeInfoVersion = {
+export type NodeInfoVersion = {
   semver: string;
   major: number;
   minor: number;
@@ -65,13 +65,13 @@ type NodeInfoVersion = {
   build?: string;
 };
 
-type NodeInfoGit = {
+export type NodeInfoGit = {
   branch: string;
   commit: string;
   commitTime: number;
 };
 
-type NodeInfoPlugin = {
+export type NodeInfoPlugin = {
   name: string;
   version: string;
 };
