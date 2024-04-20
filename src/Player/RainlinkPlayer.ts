@@ -400,7 +400,6 @@ export class RainlinkPlayer extends EventEmitter {
 			playerOptions: {
 				track: {
 					encoded: null,
-					length: 0,
 				},
 			},
 		});
@@ -484,7 +483,6 @@ export class RainlinkPlayer extends EventEmitter {
 			playerOptions: {
 				track: {
 					encoded: null,
-					length: 0,
 				},
 			},
 		});
