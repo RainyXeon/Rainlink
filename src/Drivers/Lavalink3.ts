@@ -166,9 +166,20 @@ export class Lavalink3 extends AbstractDriver {
 		}
 
 		// Destroy player
-		if (data.playerOptions.track && data.playerOptions.track.encoded == null)
+		if (
+			data.playerOptions.track &&
+      data.playerOptions.track.encoded == null &&
+      data.playerOptions.track.length === 0
+		)
 			this.wsSendData({
 				op: 'destroy',
+				guildId: data.guildId,
+			});
+
+		// Destroy player
+		if (data.playerOptions.track && data.playerOptions.track.encoded == null)
+			this.wsSendData({
+				op: 'stop',
 				guildId: data.guildId,
 			});
 

@@ -60,7 +60,7 @@ export interface UpdatePlayerTrack {
   encoded?: string | null;
   identifier?: string;
   userData?: Record<string, any>;
-  length: number;
+  length?: number;
 }
 
 export interface UpdatePlayerOptions {
