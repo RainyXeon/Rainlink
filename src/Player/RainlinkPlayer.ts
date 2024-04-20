@@ -16,6 +16,7 @@ import { RainlinkSearchOptions, RainlinkSearchResult } from '../Interface/Manage
 import { RainlinkPlugin } from '../Plugin/VoiceReceiver/Plugin.js';
 import { ServerUpdate, StateUpdatePartial } from '../Interface/Connection.js';
 import { EventEmitter } from 'node:events';
+import { RainlinkDatabase } from '../Manager/RainlinkDatabase.js';
 
 export class RainlinkPlayer extends EventEmitter {
 	/**
@@ -45,7 +46,7 @@ export class RainlinkPlayer extends EventEmitter {
 	/**
    * The temporary database of player, u can set any thing here and us like Map class!
    */
-	public readonly data: Map<string, any>;
+	public readonly data: RainlinkDatabase<unknown>;
 	/**
    * Whether the player is paused or not
    */
@@ -85,7 +86,7 @@ export class RainlinkPlayer extends EventEmitter {
 	/**
    * All function to extend support driver
    */
-	public functions: Map<string, (...args: any) => unknown>;
+	public functions: RainlinkDatabase<(...args: any) => unknown>;
 	/**
    * ID of the Shard that contains the guild that contains the connected voice channel
    */
@@ -147,7 +148,7 @@ export class RainlinkPlayer extends EventEmitter {
       this.manager.rainlinkOptions.options!.structures &&
       this.manager.rainlinkOptions.options!.structures.queue;
 		this.queue = customQueue ? new customQueue(this.manager, this) : new RainlinkQueue(this.manager, this);
-		this.data = new Map<string, any>();
+		this.data = new RainlinkDatabase<unknown>();
 		this.paused = true;
 		this.position = 0;
 		this.volume = this.manager.rainlinkOptions.options!.defaultVolume!;
@@ -158,10 +159,10 @@ export class RainlinkPlayer extends EventEmitter {
 		this.mute = voiceOptions.mute ?? false;
 		this.sudoDestroy = false;
 		this.track = null;
-		this.functions = new Map<string, (...args: any) => unknown>();
-		if (this.node.driver.functions.size !== 0) {
-			this.node.driver.functions.forEach((functionCode, key) => {
-				this.functions.set(key, functionCode.bind(null, this));
+		this.functions = new RainlinkDatabase<(...args: any) => unknown>();
+		if (this.node.driver.playerFunctions.size !== 0) {
+			this.node.driver.playerFunctions.full.forEach(data => {
+				this.functions.set(data[0], data[1].bind(null, this));
 			});
 		}
 		if (voiceOptions.volume && voiceOptions.volume !== this.volume) this.volume = voiceOptions.volume;

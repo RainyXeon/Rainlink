@@ -7,6 +7,7 @@ import { AbstractDriver } from './AbstractDriver';
 import { RainlinkPlayer } from '../Player/RainlinkPlayer';
 import util from 'node:util';
 import { RainlinkWebsocket } from '../Node/RainlinkWebsocket';
+import { RainlinkDatabase } from '../Manager/RainlinkDatabase';
 
 export enum Nodelink2loadType {
   SHORTS = 'shorts',
@@ -39,7 +40,8 @@ export class Nodelink2 extends AbstractDriver {
 	public wsUrl: string = '';
 	public httpUrl: string = '';
 	public sessionId: string | null;
-	public functions: Map<string, (player: RainlinkPlayer, ...args: any) => unknown>;
+	public playerFunctions: RainlinkDatabase<(player: RainlinkPlayer, ...args: any) => unknown>;
+	public globalFunctions: RainlinkDatabase<(manager: Rainlink, ...args: any) => unknown>;
 	private wsClient?: RainlinkWebsocket;
 	public manager: Rainlink | null = null;
 	public node: RainlinkNode | null = null;
@@ -47,8 +49,9 @@ export class Nodelink2 extends AbstractDriver {
 	constructor() {
 		super();
 		this.sessionId = null;
-		this.functions = new Map<string, (player: RainlinkPlayer, ...args: any) => unknown>();
-		this.functions.set('getLyric', this.getLyric);
+		this.playerFunctions = new RainlinkDatabase<(player: RainlinkPlayer, ...args: any) => unknown>();
+		this.globalFunctions = new RainlinkDatabase<(manager: Rainlink, ...args: any) => unknown>();
+		this.playerFunctions.set('getLyric', this.getLyric);
 	}
 
 	public get isRegistered(): boolean {

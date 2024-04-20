@@ -23,6 +23,7 @@ import { AbstractDriver } from './Drivers/AbstractDriver';
 import { Lavalink3 } from './Drivers/Lavalink3';
 import { Nodelink2 } from './Drivers/Nodelink2';
 import { Lavalink4 } from './Drivers/Lavalink4';
+import { RainlinkDatabase } from './Manager/RainlinkDatabase';
 
 export declare interface Rainlink {
   /* tslint:disable:unified-signatures */
@@ -409,15 +410,15 @@ export class Rainlink extends EventEmitter {
 	/**
    * All search engine
    */
-	public searchEngines: Map<string, string>;
+	public searchEngines: RainlinkDatabase<string>;
 	/**
    * All search plugins (resolver plugins)
    */
-	public searchPlugins: Map<string, SourceRainlinkPlugin>;
+	public searchPlugins: RainlinkDatabase<SourceRainlinkPlugin>;
 	/**
    * All plugins (include resolver plugins)
    */
-	public plugins: Map<string, RainlinkPlugin>;
+	public plugins: RainlinkDatabase<RainlinkPlugin>;
 	/**
    * The rainlink manager
    */
@@ -426,6 +427,10 @@ export class Rainlink extends EventEmitter {
    * The current bott's shard count
    */
 	public shardCount: number = 1;
+	/**
+   * All function to extend support driver
+   */
+	public functions: RainlinkDatabase<(...args: any) => unknown>;
 
 	/**
    * The main class that handle all works in lavalink server.
@@ -451,9 +456,10 @@ export class Rainlink extends EventEmitter {
 		this.nodes = new RainlinkNodeManager(this);
 		this.library.listen(this.rainlinkOptions.nodes);
 		this.players = new RainlinkPlayerManager(this);
-		this.searchEngines = new Map<string, string>();
-		this.searchPlugins = new Map<string, SourceRainlinkPlugin>();
-		this.plugins = new Map<string, RainlinkPlugin>();
+		this.searchEngines = new RainlinkDatabase<string>();
+		this.searchPlugins = new RainlinkDatabase<SourceRainlinkPlugin>();
+		this.plugins = new RainlinkDatabase<RainlinkPlugin>();
+		this.functions = new RainlinkDatabase<(...args: any) => unknown>();
 		this.initialSearchEngines();
 		if (
 			!this.rainlinkOptions.options.defaultSearchEngine ||
