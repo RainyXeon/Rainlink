@@ -1,4 +1,5 @@
 import { RainlinkRequesterOptions } from '../Interface/Rest';
+import { RainlinkDatabase } from '../Manager/RainlinkDatabase';
 import { RainlinkNode } from '../Node/RainlinkNode';
 import { RainlinkWebsocket } from '../Node/RainlinkWebsocket';
 import { RainlinkPlayer } from '../Player/RainlinkPlayer';
@@ -13,8 +14,10 @@ export abstract class AbstractDriver {
   abstract httpUrl: string;
   /** The lavalink server season id to resume */
   abstract sessionId: string | null;
-  /** All function to extend support driver */
-  abstract functions: Map<string, (player: RainlinkPlayer, ...args: any) => unknown>;
+  /** All function to extend support driver on RainlinkPlayer class */
+  abstract playerFunctions: RainlinkDatabase<(player: RainlinkPlayer, ...args: any) => unknown>;
+  /** All function to extend support driver on Rainlink class */
+  abstract globalFunctions: RainlinkDatabase<(manager: Rainlink, ...args: any) => unknown>;
   /** Rainlink manager class */
   abstract manager: Rainlink | null;
   /** Rainlink reuqested lavalink/nodelink server */

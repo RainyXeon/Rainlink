@@ -17,8 +17,9 @@ Another lavalink wrapper but focus on stability and rich features
  - Inbuilt Queue System
  - Extendable Player, Queue, Rest class
  - Backward compatible (Can run lavalink version 3.7.x)
- - Driver based (avaliable to run Nodelink v3 and port older lavalink version)
+ - Driver based (avaliable to run Nodelink v2 and port older lavalink version)
  - Plugin system
+ - Using [PWSL](https://github.com/PerformanC/internals) by [The PerformanC Organization](https://github.com/PerformanC) for better WS implementation
 
 # 🛠️ Installation
 

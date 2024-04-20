@@ -3,8 +3,9 @@ import { VoiceChannelOptions } from '../Interface/Player';
 import { RainlinkPlayer } from '../Player/RainlinkPlayer';
 import { Rainlink } from '../Rainlink';
 import { RainlinkPlugin } from '../Plugin/VoiceReceiver/Plugin';
+import { RainlinkDatabase } from './RainlinkDatabase';
 
-export class RainlinkPlayerManager extends Map<string, RainlinkPlayer> {
+export class RainlinkPlayerManager extends RainlinkDatabase<RainlinkPlayer> {
 	/** The rainlink manager */
 	public manager: Rainlink;
 
@@ -24,7 +25,7 @@ export class RainlinkPlayerManager extends Map<string, RainlinkPlayer> {
    * @internal
    */
 	async create(options: VoiceChannelOptions): Promise<RainlinkPlayer> {
-		if (this.has(options.guildId)) throw new Error('This guild already have an existing player');
+		if (this.get(options.guildId)) throw new Error('This guild already have an existing player');
 		const getCustomNode = this.manager.nodes.get(String(options.nodeName ? options.nodeName : ''));
 		const node = getCustomNode ? getCustomNode : await this.manager.nodes.getLeastUsed();
 		if (!node) throw new Error('Can\'t find any nodes to connect on');

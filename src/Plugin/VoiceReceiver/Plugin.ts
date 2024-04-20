@@ -5,12 +5,13 @@ import { RainlinkNode } from '../../Node/RainlinkNode';
 import { metadata } from '../../metadata';
 import { VoiceChannelOptions } from '../../Interface/Player';
 import { RainlinkWebsocket } from '../../Node/RainlinkWebsocket';
+import { RainlinkDatabase } from '../../Manager/RainlinkDatabase';
 
 export class RainlinkPlugin extends Plugin {
 	protected manager?: Rainlink;
 	/** Whenever the plugin is enabled or not */
 	public enabled: boolean = false;
-	protected runningWs: Map<string, RainlinkWebsocket> = new Map<string, RainlinkWebsocket>();
+	protected runningWs: RainlinkDatabase<RainlinkWebsocket> = new RainlinkDatabase<RainlinkWebsocket>();
 
 	constructor() {
 		super();

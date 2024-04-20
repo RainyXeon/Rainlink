@@ -7,6 +7,7 @@ import { AbstractDriver } from './AbstractDriver';
 import util from 'node:util';
 import { RainlinkPlayer } from '../Player/RainlinkPlayer';
 import { RainlinkWebsocket } from '../Node/RainlinkWebsocket';
+import { RainlinkDatabase } from '../Manager/RainlinkDatabase';
 
 export enum Lavalink3loadType {
   TRACK_LOADED = 'TRACK_LOADED',
@@ -21,14 +22,16 @@ export class Lavalink3 extends AbstractDriver {
 	public wsUrl: string = '';
 	public httpUrl: string = '';
 	public sessionId: string | null;
-	public functions: Map<string, (player: RainlinkPlayer, ...args: any) => unknown>;
+	public playerFunctions: RainlinkDatabase<(player: RainlinkPlayer, ...args: any) => unknown>;
+	public globalFunctions: RainlinkDatabase<(manager: Rainlink, ...args: any) => unknown>;
 	private wsClient?: RainlinkWebsocket;
 	public manager: Rainlink | null = null;
 	public node: RainlinkNode | null = null;
 
 	constructor() {
 		super();
-		this.functions = new Map<string, (player: RainlinkPlayer, ...args: any) => unknown>();
+		this.playerFunctions = new RainlinkDatabase<(player: RainlinkPlayer, ...args: any) => unknown>();
+		this.globalFunctions = new RainlinkDatabase<(manager: Rainlink, ...args: any) => unknown>();
 		this.sessionId = null;
 	}
 
