@@ -4,8 +4,8 @@ import { RainlinkEvents, RainlinkPluginType } from '../../Interface/Constants';
 import { RainlinkNode } from '../../Node/RainlinkNode';
 import { metadata } from '../../metadata';
 import { VoiceChannelOptions } from '../../Interface/Player';
-import { RainlinkWebsocket } from '../../Node/RainlinkWebsocket';
-import { RainlinkDatabase } from '../../Manager/RainlinkDatabase';
+import { RainlinkWebsocket } from '../../Utilities/RainlinkWebsocket';
+import { RainlinkDatabase } from '../../Utilities/RainlinkDatabase';
 
 export class RainlinkPlugin extends Plugin {
 	protected manager?: Rainlink;
@@ -103,7 +103,7 @@ export class RainlinkPlugin extends Plugin {
 		this.enabled = false;
 	}
 
-	private debug(logs: string) {
+	protected debug(logs: string) {
 		this.manager ? this.manager.emit(RainlinkEvents.Debug, `[Plugin] -> [Voice Receiver]: ${logs}`) : true;
 	}
 }

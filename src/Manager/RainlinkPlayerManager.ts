@@ -3,7 +3,7 @@ import { VoiceChannelOptions } from '../Interface/Player';
 import { RainlinkPlayer } from '../Player/RainlinkPlayer';
 import { Rainlink } from '../Rainlink';
 import { RainlinkPlugin } from '../Plugin/VoiceReceiver/Plugin';
-import { RainlinkDatabase } from './RainlinkDatabase';
+import { RainlinkDatabase } from '../Utilities/RainlinkDatabase';
 
 export class RainlinkPlayerManager extends RainlinkDatabase<RainlinkPlayer> {
 	/** The rainlink manager */
@@ -66,8 +66,7 @@ export class RainlinkPlayerManager extends RainlinkDatabase<RainlinkPlayer> {
 		if (player) await player.destroy();
 	}
 
-	/** @ignore */
-	private debug(logs: string) {
+	protected debug(logs: string) {
 		this.manager.emit(RainlinkEvents.Debug, `[Rainlink] -> [Player] | ${logs}`);
 	}
 }

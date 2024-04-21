@@ -17,11 +17,9 @@ import { NodeInfo } from '../Interface/Node';
 export class RainlinkRest {
 	/** The rainlink manager */
 	public manager: Rainlink;
-	/** @ignore */
 	protected options: RainlinkNodeOptions;
 	/** The node manager (RainlinkNode class) */
 	public nodeManager: RainlinkNode;
-	/** @ignore */
 	protected sessionId: string | null;
 
 	/**
@@ -142,7 +140,6 @@ export class RainlinkRest {
 		return this.nodeManager.driver.requester(options);
 	}
 
-	/** @ignore */
 	protected testJSON(text: string) {
 		if (typeof text !== 'string') {
 			return false;

@@ -3,7 +3,7 @@ import { Rainlink } from '../../Rainlink';
 import { RainlinkPlugin as Plugin } from './../RainlinkPlugin';
 
 export class RainlinkPlugin extends Plugin {
-	private rainlink: Rainlink | null = null;
+	protected rainlink: Rainlink | null = null;
 
 	/**
    * Initialize the plugin.
@@ -46,7 +46,7 @@ export class RainlinkPlugin extends Plugin {
 		this.rainlink = null;
 	}
 
-	private onVoiceStateUpdate(oldState: any, newState: any): void {
+	protected onVoiceStateUpdate(oldState: any, newState: any): void {
 		if (!this.rainlink || oldState.id !== this.client.user.id) return;
 
 		const newChannelId = newState.channelID || newState.channelId;

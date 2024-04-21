@@ -6,8 +6,8 @@ import { RainlinkNode } from '../Node/RainlinkNode';
 import { AbstractDriver } from './AbstractDriver';
 import util from 'node:util';
 import { RainlinkPlayer } from '../Player/RainlinkPlayer';
-import { RainlinkWebsocket } from '../Node/RainlinkWebsocket';
-import { RainlinkDatabase } from '../Manager/RainlinkDatabase';
+import { RainlinkWebsocket } from '../Utilities/RainlinkWebsocket';
+import { RainlinkDatabase } from '../Utilities/RainlinkDatabase';
 
 export enum Lavalink3loadType {
   TRACK_LOADED = 'TRACK_LOADED',
@@ -24,7 +24,7 @@ export class Lavalink3 extends AbstractDriver {
 	public sessionId: string | null;
 	public playerFunctions: RainlinkDatabase<(player: RainlinkPlayer, ...args: any) => unknown>;
 	public globalFunctions: RainlinkDatabase<(manager: Rainlink, ...args: any) => unknown>;
-	private wsClient?: RainlinkWebsocket;
+	protected wsClient?: RainlinkWebsocket;
 	public manager: Rainlink | null = null;
 	public node: RainlinkNode | null = null;
 
@@ -276,18 +276,15 @@ export class Lavalink3 extends AbstractDriver {
 		return;
 	}
 
-	/** @ignore */
-	private debug(logs: string) {
+	protected debug(logs: string) {
 		if (!this.isRegistered) throw new Error(`Driver ${this.id} not registered by using initial()`);
     this.manager!.emit(RainlinkEvents.Debug, `[Rainlink] -> [Driver] -> [Lavalink3] | ${logs}`);
 	}
 
-	/** @ignore */
 	public wsClose(): void {
 		if (this.wsClient) this.wsClient.close(1006, 'Self closed');
 	}
 
-	/** @ignore */
 	protected testJSON(text: string) {
 		if (typeof text !== 'string') {
 			return false;
