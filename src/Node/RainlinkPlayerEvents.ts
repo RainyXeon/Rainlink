@@ -3,7 +3,7 @@ import { LavalinkEventsEnum } from '../Interface/LavalinkEvents';
 import { Rainlink } from '../Rainlink';
 
 export class RainlinkPlayerEvents {
-	private readonly methods: Record<string, (manager: Rainlink, data: Record<string, any>) => void>;
+	protected readonly methods: Record<string, (manager: Rainlink, data: Record<string, any>) => void>;
 
 	constructor() {
 		this.methods = {

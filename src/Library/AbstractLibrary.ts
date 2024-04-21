@@ -16,6 +16,10 @@ export abstract class AbstractLibrary {
 	protected ready(nodes: RainlinkNodeOptions[]): void {
     this.manager!.id = this.getId();
     this.manager!.shardCount = this.getShardCount();
+    this.manager!.emit(
+    	'debug',
+    	`[Rainlink] | Finished the initialization process | Registered ${this.manager!.plugins.size} plugins | Now connect all current nodes`,
+    );
     for (const node of nodes) this.manager?.nodes.add(node);
 	}
 

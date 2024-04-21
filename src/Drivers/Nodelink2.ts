@@ -6,8 +6,8 @@ import { RainlinkNode } from '../Node/RainlinkNode';
 import { AbstractDriver } from './AbstractDriver';
 import { RainlinkPlayer } from '../Player/RainlinkPlayer';
 import util from 'node:util';
-import { RainlinkWebsocket } from '../Node/RainlinkWebsocket';
-import { RainlinkDatabase } from '../Manager/RainlinkDatabase';
+import { RainlinkWebsocket } from '../Utilities/RainlinkWebsocket';
+import { RainlinkDatabase } from '../Utilities/RainlinkDatabase';
 
 export enum Nodelink2loadType {
   SHORTS = 'shorts',
@@ -42,7 +42,7 @@ export class Nodelink2 extends AbstractDriver {
 	public sessionId: string | null;
 	public playerFunctions: RainlinkDatabase<(player: RainlinkPlayer, ...args: any) => unknown>;
 	public globalFunctions: RainlinkDatabase<(manager: Rainlink, ...args: any) => unknown>;
-	private wsClient?: RainlinkWebsocket;
+	protected wsClient?: RainlinkWebsocket;
 	public manager: Rainlink | null = null;
 	public node: RainlinkNode | null = null;
 
@@ -155,7 +155,7 @@ export class Nodelink2 extends AbstractDriver {
     this.node!.wsMessageEvent(wsData);
 	}
 
-	private debug(logs: string) {
+	protected debug(logs: string) {
 		if (!this.isRegistered) throw new Error(`Driver ${this.id} not registered by using initial()`);
     this.manager!.emit(RainlinkEvents.Debug, `[Rainlink] -> [Driver] -> [Nodelink2] | ${logs}`);
 	}

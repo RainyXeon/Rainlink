@@ -6,8 +6,8 @@ import { RainlinkNode } from '../Node/RainlinkNode';
 import { AbstractDriver } from './AbstractDriver';
 import util from 'node:util';
 import { RainlinkPlayer } from '../Player/RainlinkPlayer';
-import { RainlinkWebsocket } from '../Node/RainlinkWebsocket';
-import { RainlinkDatabase } from '../Manager/RainlinkDatabase';
+import { RainlinkWebsocket } from '../Utilities/RainlinkWebsocket';
+import { RainlinkDatabase } from '../Utilities/RainlinkDatabase';
 
 export class Lavalink4 extends AbstractDriver {
 	public id: string = 'lavalink/v4/koinu';
@@ -16,7 +16,7 @@ export class Lavalink4 extends AbstractDriver {
 	public sessionId: string | null;
 	public playerFunctions: RainlinkDatabase<(player: RainlinkPlayer, ...args: any) => unknown>;
 	public globalFunctions: RainlinkDatabase<(manager: Rainlink, ...args: any) => unknown>;
-	private wsClient?: RainlinkWebsocket;
+	protected wsClient?: RainlinkWebsocket;
 	public manager: Rainlink | null = null;
 	public node: RainlinkNode | null = null;
 
@@ -119,7 +119,7 @@ export class Lavalink4 extends AbstractDriver {
     this.node!.wsMessageEvent(wsData);
 	}
 
-	private debug(logs: string) {
+	protected debug(logs: string) {
 		if (!this.isRegistered) throw new Error(`Driver ${this.id} not registered by using initial()`);
     this.manager!.emit(RainlinkEvents.Debug, `[Rainlink] -> [Driver] -> [Lavalink4] | ${logs}`);
 	}

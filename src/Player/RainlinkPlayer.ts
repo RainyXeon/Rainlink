@@ -16,7 +16,7 @@ import { RainlinkSearchOptions, RainlinkSearchResult } from '../Interface/Manage
 import { RainlinkPlugin } from '../Plugin/VoiceReceiver/Plugin.js';
 import { ServerUpdate, StateUpdatePartial } from '../Interface/Connection.js';
 import { EventEmitter } from 'node:events';
-import { RainlinkDatabase } from '../Manager/RainlinkDatabase.js';
+import { RainlinkDatabase } from '../Utilities/RainlinkDatabase.js';
 
 export class RainlinkPlayer extends EventEmitter {
 	/**
@@ -646,17 +646,14 @@ export class RainlinkPlayer extends EventEmitter {
 		return this;
 	}
 
-	/** @ignore */
-	private debug(logs: string): void {
+	protected debug(logs: string): void {
 		this.manager.emit(RainlinkEvents.Debug, `[Rainlink] -> [Player] | ${logs}`);
 	}
 
-	/** @ignore */
-	private debugDiscord(logs: string): void {
+	protected debugDiscord(logs: string): void {
 		this.manager.emit(RainlinkEvents.Debug, `[Rainlink] -> [Player] -> [Voice] | ${logs}`);
 	}
 
-	/** @ignore */
 	protected checkDestroyed(): void {
 		if (this.state === RainlinkPlayerState.DESTROYED) throw new Error('Player is destroyed');
 	}

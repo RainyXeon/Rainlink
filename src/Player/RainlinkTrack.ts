@@ -139,7 +139,6 @@ export class RainlinkTrack {
 		return this;
 	}
 
-	/** @ignore */
 	protected async getTrack(manager: Rainlink): Promise<RawTrack> {
 		const node = await manager.nodes.getLeastUsed();
 
@@ -172,12 +171,10 @@ export class RainlinkTrack {
 		return rawTracks[0];
 	}
 
-	/** @ignore */
 	protected escapeRegExp(string: string) {
 		return string.replace(/[/\-\\^$*+?.()|[\]{}]/g, '\\$&');
 	}
 
-	/** @ignore */
 	protected async resolverEngine(manager: Rainlink): Promise<RainlinkSearchResult> {
 		const defaultSearchEngine = manager.rainlinkOptions.options!.defaultSearchEngine;
 		const engine = manager.searchEngines.get(this.source || defaultSearchEngine || 'youtube');

@@ -1,7 +1,7 @@
 import { RainlinkRequesterOptions } from '../Interface/Rest';
-import { RainlinkDatabase } from '../Manager/RainlinkDatabase';
+import { RainlinkDatabase } from '../Utilities/RainlinkDatabase';
 import { RainlinkNode } from '../Node/RainlinkNode';
-import { RainlinkWebsocket } from '../Node/RainlinkWebsocket';
+import { RainlinkWebsocket } from '../Utilities/RainlinkWebsocket';
 import { RainlinkPlayer } from '../Player/RainlinkPlayer';
 import { Rainlink } from '../Rainlink';
 

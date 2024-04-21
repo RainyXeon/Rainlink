@@ -2,7 +2,7 @@ import { RainlinkConnectState } from '../Interface/Constants';
 import { RainlinkNodeOptions } from '../Interface/Manager';
 import { RainlinkNode } from '../Node/RainlinkNode';
 import { Rainlink } from '../Rainlink';
-import { RainlinkDatabase } from './RainlinkDatabase';
+import { RainlinkDatabase } from '../Utilities/RainlinkDatabase';
 
 export class RainlinkNodeManager extends RainlinkDatabase<RainlinkNode> {
 	/** The rainlink manager */

@@ -23,7 +23,7 @@ import { AbstractDriver } from './Drivers/AbstractDriver';
 import { Lavalink3 } from './Drivers/Lavalink3';
 import { Nodelink2 } from './Drivers/Nodelink2';
 import { Lavalink4 } from './Drivers/Lavalink4';
-import { RainlinkDatabase } from './Manager/RainlinkDatabase';
+import { RainlinkDatabase } from './Utilities/RainlinkDatabase';
 
 export declare interface Rainlink {
   /* tslint:disable:unified-signatures */
@@ -454,7 +454,6 @@ export class Rainlink extends EventEmitter {
 		)
 			this.drivers.push(...this.rainlinkOptions.options.additionalDriver);
 		this.nodes = new RainlinkNodeManager(this);
-		this.library.listen(this.rainlinkOptions.nodes);
 		this.players = new RainlinkPlayerManager(this);
 		this.searchEngines = new RainlinkDatabase<string>();
 		this.searchPlugins = new RainlinkDatabase<SourceRainlinkPlugin>();
@@ -484,9 +483,9 @@ export class Rainlink extends EventEmitter {
 				}
 			}
 		}
+		this.library.listen(this.rainlinkOptions.nodes);
 	}
 
-	/** @ignore */
 	protected initialSearchEngines() {
 		for (const data of SourceIDs) {
 			this.searchEngines.set(data.name, data.id);
@@ -585,7 +584,10 @@ export class Rainlink extends EventEmitter {
 		}
 		}
 
-		this.debug(`-> [Search] | Searched ${query}; Track results: ${normalizedData.tracks.length}`);
+		this.emit(
+			RainlinkEvents.Debug,
+			`[Rainlink] -> [Search] | Searched ${query}; Track results: ${normalizedData.tracks.length}`,
+		);
 
 		return this.buildSearch(
 			normalizedData.playlistName ?? undefined,
@@ -596,7 +598,6 @@ export class Rainlink extends EventEmitter {
 		);
 	}
 
-	/** @ignore */
 	protected buildSearch(
 		playlistName?: string,
 		tracks: RainlinkTrack[] = [],
@@ -609,12 +610,6 @@ export class Rainlink extends EventEmitter {
 		};
 	}
 
-	/** @ignore */
-	protected debug(logs: string) {
-		this.emit(RainlinkEvents.Debug, `[Rainlink] ${logs}`);
-	}
-
-	/** @ignore */
 	protected get defaultOptions(): RainlinkAdditionalOptions {
 		return {
 			additionalDriver: [],
