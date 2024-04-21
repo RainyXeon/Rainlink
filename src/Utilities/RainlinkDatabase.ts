@@ -35,9 +35,7 @@ export class RainlinkDatabase<G = unknown> {
    * @returns D
    */
 	set<D = G>(key: string, data: D): D | undefined {
-		let newValue = this.cache[key] as unknown;
-		// eslint-disable-next-line @typescript-eslint/no-unused-vars
-		newValue = data;
+		this.cache[key] = data as unknown as G;
 		return data;
 	}
 
