@@ -427,10 +427,6 @@ export class Rainlink extends EventEmitter {
    * The current bott's shard count
    */
 	public shardCount: number = 1;
-	/**
-   * All function to extend support driver
-   */
-	public functions: RainlinkDatabase<(...args: any) => unknown>;
 
 	/**
    * The main class that handle all works in lavalink server.
@@ -458,7 +454,6 @@ export class Rainlink extends EventEmitter {
 		this.searchEngines = new RainlinkDatabase<string>();
 		this.searchPlugins = new RainlinkDatabase<SourceRainlinkPlugin>();
 		this.plugins = new RainlinkDatabase<RainlinkPlugin>();
-		this.functions = new RainlinkDatabase<(...args: any) => unknown>();
 		this.initialSearchEngines();
 		if (
 			!this.rainlinkOptions.options.defaultSearchEngine ||
