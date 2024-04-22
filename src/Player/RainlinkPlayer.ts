@@ -196,7 +196,7 @@ export class RainlinkPlayer extends EventEmitter {
 		this.clear(false);
 		this.disconnect();
 		const voiceReceiver = this.manager.plugins.get('rainlink-voiceReceiver') as RainlinkPlugin;
-		if (this.node.driver.id.includes('nodelink')) voiceReceiver.close(this.guildId);
+		if (voiceReceiver && this.node.driver.id.includes('nodelink')) voiceReceiver.close(this.guildId);
 		this.node.rest.updatePlayer({
 			guildId: this.guildId,
 			playerOptions: {
@@ -728,12 +728,6 @@ export class RainlinkPlayer extends EventEmitter {
 		this.deaf = self_deaf;
 		this.mute = self_mute;
 		this.sessionId = session_id || null;
-		if (
-			this.node.driver.id.includes('legacy') &&
-      this.node.driver.id.includes('lavalink') &&
-      this.serverUpdate?.token
-		)
-			this.sendServerUpdate();
 		this.debugDiscord(
 			`State Update Received | Channel: ${this.voiceId} Session ID: ${session_id} Guild: ${this.guildId}`,
 		);
