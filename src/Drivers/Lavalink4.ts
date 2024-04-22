@@ -15,7 +15,7 @@ export class Lavalink4 extends AbstractDriver {
 	public httpUrl: string = '';
 	public sessionId: string | null;
 	public playerFunctions: RainlinkDatabase<(player: RainlinkPlayer, ...args: any) => unknown>;
-	public globalFunctions: RainlinkDatabase<(manager: Rainlink, ...args: any) => unknown>;
+	public functions: RainlinkDatabase<(manager: Rainlink, ...args: any) => unknown>;
 	protected wsClient?: RainlinkWebsocket;
 	public manager: Rainlink | null = null;
 	public node: RainlinkNode | null = null;
@@ -23,7 +23,7 @@ export class Lavalink4 extends AbstractDriver {
 	constructor() {
 		super();
 		this.playerFunctions = new RainlinkDatabase<(player: RainlinkPlayer, ...args: any) => unknown>();
-		this.globalFunctions = new RainlinkDatabase<(manager: Rainlink, ...args: any) => unknown>();
+		this.functions = new RainlinkDatabase<(manager: Rainlink, ...args: any) => unknown>();
 		this.sessionId = null;
 	}
 
