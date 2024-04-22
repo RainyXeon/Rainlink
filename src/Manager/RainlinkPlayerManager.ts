@@ -52,7 +52,7 @@ export class RainlinkPlayerManager extends RainlinkDatabase<RainlinkPlayer> {
 		this.debug('Player created at ' + options.guildId);
 		this.manager.emit(RainlinkEvents.PlayerCreate, player);
 		const voiceReceiver = this.manager.plugins.get('rainlink-voiceReceiver') as RainlinkPlugin;
-		if (node.driver.id.includes('nodelink')) voiceReceiver.open(node, options);
+		if (voiceReceiver && node.driver.id.includes('nodelink')) voiceReceiver.open(node, options);
 		return player;
 	}
 
