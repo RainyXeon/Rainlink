@@ -87,11 +87,6 @@ export class RainlinkNode {
 		this.clean(true);
 		this.state = RainlinkConnectState.Connected;
 		this.debug(`Node ${this.options.name} connected! URL: ${this.driver.wsUrl}`);
-		if (this.driver.globalFunctions.size !== 0) {
-			this.driver.globalFunctions.full.forEach(data => {
-				this.manager.functions.set(data[0], data[1].bind(null, this.manager));
-			});
-		}
 		this.manager.emit(RainlinkEvents.NodeConnect, this);
 	}
 
