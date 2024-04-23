@@ -54,11 +54,12 @@ This is the list of all rainlink plugin currently supported
 
 This is the list of all rainlink driver currently supported (codename is made up by me)
 
-| Driver Name       | Voice Server | Language   | Supported Version | Codename | Notes                                                      |
-| ----------------- | ------------ | ---------- | ----------------- | -------- | ---------------------------------------------------------- | 
-| lavalink/v4/koinu | Lavalink     | Java       | v4.0.0 - v4.x.x   | koinu    |                                                            |
-| lavalink/v3/koto  | Lavalink     | Java       | v3.0.0 - v3.7.x   | koto     | `filter` and `resume` in lavalink below v3.4 not supported |
-| nodelink/v2/nari  | Nodelink     | Javascript | v2.0.0 - v2.x.x   | nari     | Some `filter` mode in nodelink not supported               |
+| Driver Name       | Voice Server                                          | Language   | Supported Version | Codename | Notes                                                             |
+| ----------------- | ----------------------------------------------------- | ---------- | ----------------- | -------- | ----------------------------------------------------------------- | 
+| lavalink/v4/koinu | [Lavalink](https://github.com/lavalink-devs/Lavalink) | Java       | v4.0.0 - v4.x.x   | koinu    |                                                                   |
+| lavalink/v3/koto  | [Lavalink](https://github.com/lavalink-devs/Lavalink) | Java       | v3.0.0 - v3.7.x   | koto     | `filter` and `resume` in lavalink below v3.4 not supported        |
+| nodelink/v2/nari  | [Nodelink](https://github.com/PerformanC/NodeLink)    | Javascript | v2.0.0 - v2.x.x   | nari     | Some `filter` mode in nodelink not supported                      |
+| frequenc/v1/miku  | [FrequenC](https://github.com/PerformanC/FrequenC)    | C          | IN TESTING        | miku     | This driver is in testing so don't use it or you will have errors |
 
 # 💾 Example bot:
 
