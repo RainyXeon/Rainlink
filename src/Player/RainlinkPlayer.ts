@@ -161,8 +161,8 @@ export class RainlinkPlayer extends EventEmitter {
 		this.track = null;
 		this.functions = new RainlinkDatabase<(...args: any) => unknown>();
 		if (this.node.driver.playerFunctions.size !== 0) {
-			this.node.driver.playerFunctions.full.forEach(data => {
-				this.functions.set(data[0], data[1].bind(null, this));
+			this.node.driver.playerFunctions.forEach((data, key) => {
+				this.functions.set(key, data.bind(null, this));
 			});
 		}
 		if (voiceOptions.volume && voiceOptions.volume !== this.volume) this.volume = voiceOptions.volume;

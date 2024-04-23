@@ -40,6 +40,17 @@ export class RainlinkDatabase<G = unknown> {
 	}
 
 	/**
+	 * executes a provided function once for each array element.
+	 * @param callback Callback function
+	 */
+	forEach(callback: (value: G, key: string) => unknown): void {
+		for (const data of this.full) {
+			callback(data[1], data[0])
+		}
+	}
+
+
+	/**
    * Get how many elements of current database
    * @returns number
    */
