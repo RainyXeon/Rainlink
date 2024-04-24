@@ -46,7 +46,7 @@ export class FrequenC extends AbstractDriver {
 			headers: {
 				Authorization: this.node!.options.auth,
 				'User-Id': this.manager!.id,
-				'Client-Info': `${metadata.name}/${metadata.version} (${metadata.name})`,
+				'Client-Info': `${metadata.name}/${metadata.version} (${metadata.github})`,
 				'user-agent': this.manager!.rainlinkOptions.options!.userAgent!,
 				'Num-Shards': this.manager!.shardCount,
 			},
@@ -67,18 +67,16 @@ export class FrequenC extends AbstractDriver {
 
 	public async requester<D = any>(options: RainlinkRequesterOptions): Promise<D | undefined> {
 		if (!this.isRegistered) throw new Error(`Driver ${this.id} not registered by using initial()`);
-		if (options.useSessionId && this.sessionId == null)
-			throw new Error('sessionId not initalized! Please wait for lavalink get connected!');
 		const url = new URL(`${this.httpUrl}${options.path}`);
 		if (options.params) url.search = new URLSearchParams(options.params).toString();
-
+		if (options.path.includes('/sessions//')) return undefined;
 		if (options.data) {
 			options.body = JSON.stringify(options.data);
 		}
 
 		const lavalinkHeaders = {
 			Authorization: this.node!.options.auth,
-			'User-Agent': this.manager!.rainlinkOptions.options!.userAgent!,
+			// 'User-Agent': this.manager!.rainlinkOptions.options!.userAgent!,
 			...options.headers,
 		};
 
