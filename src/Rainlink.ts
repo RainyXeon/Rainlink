@@ -612,7 +612,7 @@ export class Rainlink extends EventEmitter {
 			retryTimeout: 3000,
 			retryCount: 15,
 			voiceConnectionTimeout: 15000,
-			defaultSearchEngine: 'soundcloud',
+			defaultSearchEngine: 'youtube',
 			defaultVolume: 100,
 			searchFallback: {
 				enable: true,
