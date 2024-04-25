@@ -79,7 +79,7 @@ export class Lavalink3 extends AbstractDriver {
 		if (!this.isRegistered) throw new Error(`Driver ${this.id} not registered by using initial()`);
 		const url = new URL(`${this.httpUrl}${options.path}`);
 		if (options.params) url.search = new URLSearchParams(options.params).toString();
-		if (options.rawReqData && options.useSessionId) {
+		if (options.rawReqData && options.path.includes('/sessions')) {
 			this.convertToV3websocket(options.rawReqData);
 			return;
 		}

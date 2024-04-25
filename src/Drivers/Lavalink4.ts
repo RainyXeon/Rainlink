@@ -69,7 +69,7 @@ export class Lavalink4 extends AbstractDriver {
 
 	public async requester<D = any>(options: RainlinkRequesterOptions): Promise<D | undefined> {
 		if (!this.isRegistered) throw new Error(`Driver ${this.id} not registered by using initial()`);
-		if (options.useSessionId && this.sessionId == null)
+		if (options.path.includes('/sessions') && this.sessionId == null)
 			throw new Error('sessionId not initalized! Please wait for lavalink get connected!');
 		const url = new URL(`${this.httpUrl}${options.path}`);
 		if (options.params) url.search = new URLSearchParams(options.params).toString();

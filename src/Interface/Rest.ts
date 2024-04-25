@@ -4,7 +4,6 @@ import { Exception } from './LavalinkEvents';
 
 export interface RainlinkRequesterOptions extends RequestInit {
   params?: string | Record<string, string>;
-  useSessionId?: boolean;
   data?: Record<string, unknown>;
   path: string;
   rawReqData?: UpdatePlayerInfo;
