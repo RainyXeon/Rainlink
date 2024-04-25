@@ -67,9 +67,10 @@ export class FrequenC extends AbstractDriver {
 
 	public async requester<D = any>(options: RainlinkRequesterOptions): Promise<D | undefined> {
 		if (!this.isRegistered) throw new Error(`Driver ${this.id} not registered by using initial()`);
+		if (options.path.includes('/sessions') && this.sessionId == null)
+			throw new Error('sessionId not initalized! Please wait for lavalink get connected!');
 		const url = new URL(`${this.httpUrl}${options.path}`);
 		if (options.params) url.search = new URLSearchParams(options.params).toString();
-		if (options.path.includes('/sessions//')) return undefined;
 		if (options.data) {
 			options.body = JSON.stringify(options.data);
 		}
@@ -112,6 +113,10 @@ export class FrequenC extends AbstractDriver {
 	protected wsMessageEvent(data: string) {
 		if (!this.isRegistered) throw new Error(`Driver ${this.id} not registered by using initial()`);
 		const wsData = JSON.parse(data.toString());
+		if (wsData.op == 'ready') {
+			wsData.sessionId = wsData.session_id;
+			delete wsData.session_id;
+		}
     this.node!.wsMessageEvent(wsData);
 	}
 
@@ -125,6 +130,18 @@ export class FrequenC extends AbstractDriver {
 	}
 
 	public async updateSession(sessionId: string, mode: boolean, timeout: number): Promise<void> {
+		const options: RainlinkRequesterOptions = {
+			path: `/sessions/${sessionId}`,
+			headers: { 'Content-Type': 'application/json' },
+			method: 'PATCH',
+			data: {
+				resuming: mode,
+				timeout: timeout,
+			},
+		};
+
+		await this.requester<{ resuming: boolean; timeout: number }>(options);
+		this.debug(`Session updated! resume: ${mode}, timeout: ${timeout}`);
 		return;
 	}
 }
