@@ -115,9 +115,7 @@ export enum RainlinkLoopMode {
   NONE = 'none',
 }
 
-/**
- * Rainlink prebuilt filter data
- */
+/** @ignore */
 export const RainlinkFilterData = {
 	clear: {},
 
@@ -151,8 +149,9 @@ export const RainlinkFilterData = {
 	},
 	nightcore: {
 		timescale: {
-			speed: 1.3,
-			pitch: 1.3,
+			speed: 1.05,
+			pitch: 1.125,
+			rate: 1.05,
 		},
 	},
 
@@ -375,3 +374,5 @@ export const RainlinkFilterData = {
 		},
 	},
 };
+
+export type RainlinkFilterMode = keyof typeof RainlinkFilterData;

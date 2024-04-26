@@ -31,6 +31,23 @@ npm i rainlink
 
 Here: [https://rainlinkjs.vercel.app/](https://rainlinkjs.vercel.app/)
 
+# 📃 Migrtation logs:
+
+## 0.8.0 -> 0.9.0
+```diff
+src/Player/RainlinkPlayer.ts
+- <RainlinkPlayer>.setFilter("nightcore")
++ <RainlinkPlayer>.filter.set()
++ <RainlinkPlayer>.filter
+
+src/Interface/Constants.ts
++ RainlinkFilterMode
+
+src/index.ts (Add new class)
++ RainlinkFilter
+
+```
+
 # 💿 Used by
 
 | Name                                                 | Creator      | Variants          |

@@ -8,6 +8,7 @@ export * from './Rainlink';
 export * from './Player/RainlinkPlayer';
 export * from './Player/RainlinkQueue';
 export * from './Player/RainlinkTrack';
+export * from './Player/RainlinkFilter';
 // Export node class
 export * from './Node/RainlinkNode';
 export * from './Node/RainlinkRest';
