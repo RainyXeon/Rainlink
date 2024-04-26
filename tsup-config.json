@@ -4,5 +4,5 @@
   "splitting": false,
   "sourcemap": true,
   "clean": true,
-  "format": ["esm", "cjs"]
+  "format": ["cjs"]
 }

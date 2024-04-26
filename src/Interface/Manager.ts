@@ -7,6 +7,7 @@ import { RainlinkRest } from '../Node/RainlinkRest';
 import { RainlinkPlayer } from '../Player/RainlinkPlayer';
 import { AbstractDriver } from '../Drivers/AbstractDriver';
 import { RainlinkQueue } from '../Player/RainlinkQueue';
+import { RainlinkFilter } from '../Player/RainlinkFilter';
 
 /**
  * A structure interface
@@ -26,6 +27,10 @@ export interface Structures {
    * A custom structure that extends the RainlinkQueue class
    */
   queue?: Constructor<RainlinkQueue>;
+  /**
+   * A custom structure that extends the RainlinkQueue class
+   */
+  filter?: Constructor<RainlinkFilter>;
 }
 
 /**

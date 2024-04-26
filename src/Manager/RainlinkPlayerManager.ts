@@ -12,7 +12,6 @@ export class RainlinkPlayerManager extends RainlinkDatabase<RainlinkPlayer> {
 	/**
    * The main class for handling lavalink players
    * @param manager The rainlink manager
-   * @param voiceManagers The rainlink discord voice manager class
    */
 	constructor(manager: Rainlink) {
 		super();

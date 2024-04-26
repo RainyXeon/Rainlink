@@ -4,7 +4,6 @@ import { RainlinkNode } from '../Node/RainlinkNode.js';
 import { RainlinkQueue } from './RainlinkQueue.js';
 import {
 	RainlinkEvents,
-	RainlinkFilterData,
 	RainlinkLoopMode,
 	RainlinkPlayerState,
 	VoiceConnectState,
@@ -17,6 +16,7 @@ import { RainlinkPlugin } from '../Plugin/VoiceReceiver/Plugin.js';
 import { ServerUpdate, StateUpdatePartial } from '../Interface/Connection.js';
 import { EventEmitter } from 'node:events';
 import { RainlinkDatabase } from '../Utilities/RainlinkDatabase.js';
+import { RainlinkFilter } from './RainlinkFilter.js';
 
 export class RainlinkPlayer extends EventEmitter {
 	/**
@@ -115,6 +115,10 @@ export class RainlinkPlayer extends EventEmitter {
    * Connection state
    */
 	public voiceState: VoiceConnectState;
+	/**
+   * Filter class to set, clear get the current filter data
+   */
+	public filter: RainlinkFilter;
 	/** @ignore */
 	public sudoDestroy: boolean;
 
@@ -123,12 +127,11 @@ export class RainlinkPlayer extends EventEmitter {
    * @param manager The rainlink manager
    * @param voiceOptions The rainlink voice option, use VoiceChannelOptions interface
    * @param node The rainlink current use node
-   * @param voiceManager The rainlink current voice manager
    */
 	constructor(manager: Rainlink, voiceOptions: VoiceChannelOptions, node: RainlinkNode) {
 		super();
 		this.manager = manager;
-		this.manager = manager;
+		const rainlinkOptions = this.manager.rainlinkOptions.options!;
 		this.guildId = voiceOptions.guildId;
 		this.voiceId = voiceOptions.voiceId;
 		this.shardId = voiceOptions.shardId;
@@ -144,14 +147,15 @@ export class RainlinkPlayer extends EventEmitter {
 		this.guildId = voiceOptions.guildId;
 		this.voiceId = voiceOptions.voiceId;
 		this.textId = voiceOptions.textId;
-		const customQueue =
-      this.manager.rainlinkOptions.options!.structures &&
-      this.manager.rainlinkOptions.options!.structures.queue;
+		const customQueue = rainlinkOptions.structures && rainlinkOptions.structures.queue;
 		this.queue = customQueue ? new customQueue(this.manager, this) : new RainlinkQueue(this.manager, this);
 		this.data = new RainlinkDatabase<unknown>();
+		if (rainlinkOptions.structures && rainlinkOptions.structures.filter)
+			this.filter = new rainlinkOptions.structures.filter(this);
+		else this.filter = new RainlinkFilter(this);
 		this.paused = true;
 		this.position = 0;
-		this.volume = this.manager.rainlinkOptions.options!.defaultVolume!;
+		this.volume = rainlinkOptions.defaultVolume!;
 		this.playing = false;
 		this.loop = RainlinkLoopMode.NONE;
 		this.state = RainlinkPlayerState.DESTROYED;
@@ -209,7 +213,7 @@ export class RainlinkPlayer extends EventEmitter {
 		await this.node.rest.destroyPlayer(this.guildId);
 		this.manager.players.delete(this.guildId);
 		this.state = RainlinkPlayerState.DESTROYED;
-		this.debug('Player destroyed at ' + this.guildId);
+		this.debug('Player destroyed');
 		this.voiceId = '';
 		this.manager.emit(RainlinkEvents.PlayerDestroy, this);
 		this.sudoDestroy = false;
@@ -249,7 +253,7 @@ export class RainlinkPlayer extends EventEmitter {
 
 		if (!resolveResult || (resolveResult && !resolveResult.isPlayable)) {
 			this.manager.emit(RainlinkEvents.TrackResolveError, this, current, errorMessage);
-			this.debug(`Player ${this.guildId} resolve error: ${errorMessage}`);
+			this.debug(`Player resolve error: ${errorMessage}`);
 			this.queue.current = null;
 			this.queue.size ? await this.play() : this.manager.emit(RainlinkEvents.QueueEmpty, this);
 			return this;
@@ -494,7 +498,7 @@ export class RainlinkPlayer extends EventEmitter {
 
 	/**
    * Reset all data to default
-   * @param Whenever emit empty event or not
+   * @param emitEmpty Whenever emit empty event or not
    * @inverval
    */
 	public clear(emitEmpty: boolean): void {
@@ -540,7 +544,7 @@ export class RainlinkPlayer extends EventEmitter {
 		this.voiceState = VoiceConnectState.DISCONNECTED;
 		this.pause();
 		this.state = RainlinkPlayerState.DISCONNECTED;
-		this.debug(`Player disconnected; Guild id: ${this.guildId}`);
+		this.debug('Player disconnected');
 		return this;
 	}
 
@@ -554,7 +558,7 @@ export class RainlinkPlayer extends EventEmitter {
 			return this;
 		this.voiceState = VoiceConnectState.CONNECTING;
 		this.sendVoiceUpdate();
-		this.debugDiscord(`Requesting Connection | Guild: ${this.guildId}`);
+		this.debugDiscord('Requesting Connection');
 		const controller = new AbortController();
 		const timeout = setTimeout(
 			() => controller.abort(),
@@ -574,7 +578,7 @@ export class RainlinkPlayer extends EventEmitter {
 			}
 			this.voiceState = VoiceConnectState.CONNECTED;
 		} catch (error: any) {
-			this.debugDiscord(`Request Connection Failed | Guild: ${this.guildId}`);
+			this.debugDiscord('Request Connection Failed');
 			if (error.name === 'AbortError')
 				throw new Error(
 					`The voice connection is not established in ${this.manager.rainlinkOptions.options!.voiceConnectionTimeout}ms`,
@@ -583,7 +587,7 @@ export class RainlinkPlayer extends EventEmitter {
 		} finally {
 			clearTimeout(timeout);
 			this.state = RainlinkPlayerState.CONNECTED;
-			this.debug(`Player ${this.guildId} connected`);
+			this.debug('Player connected');
 		}
 		return this;
 	}
@@ -609,29 +613,7 @@ export class RainlinkPlayer extends EventEmitter {
 		this.disconnect();
 		this.voiceId = voiceId;
 		this.connect();
-		this.debugDiscord(`Player ${this.guildId} moved to voice channel ${voiceId}`);
-		return this;
-	}
-
-	/**
-   * Set a filter that prebuilt in rainlink
-   * @param filter The filter name
-   * @returns RainlinkPlayer
-   */
-	public async setFilter(filter: keyof typeof RainlinkFilterData): Promise<RainlinkPlayer> {
-		this.checkDestroyed();
-
-		const filterData = RainlinkFilterData[filter as keyof typeof RainlinkFilterData];
-
-		if (!filterData) throw new Error('Filter not found');
-
-		await this.send({
-			guildId: this.guildId,
-			playerOptions: {
-				filters: filterData,
-			},
-		});
-
+		this.debugDiscord(`Player moved to voice channel ${voiceId}`);
 		return this;
 	}
 
@@ -647,11 +629,11 @@ export class RainlinkPlayer extends EventEmitter {
 	}
 
 	protected debug(logs: string): void {
-		this.manager.emit(RainlinkEvents.Debug, `[Rainlink] -> [Player] | ${logs}`);
+		this.manager.emit(RainlinkEvents.Debug, `[Rainlink] -> [Player / ${this.guildId}] | ${logs}`);
 	}
 
 	protected debugDiscord(logs: string): void {
-		this.manager.emit(RainlinkEvents.Debug, `[Rainlink] -> [Player] -> [Voice] | ${logs}`);
+		this.manager.emit(RainlinkEvents.Debug, `[Rainlink] -> [Player / ${this.guildId}] -> [Voice] | ${logs}`);
 	}
 
 	protected checkDestroyed(): void {
@@ -698,14 +680,12 @@ export class RainlinkPlayer extends EventEmitter {
 		this.region = data.endpoint.split('.').shift()?.replace(/[0-9]/g, '') || null;
 
 		if (this.region && this.lastRegion !== this.region) {
-			this.debugDiscord(
-				`Voice Region Moved | Old Region: ${this.lastRegion} New Region: ${this.region} Guild: ${this.guildId}`,
-			);
+			this.debugDiscord(`Voice Region Moved | Old Region: ${this.lastRegion} New Region: ${this.region}`);
 		}
 
 		this.serverUpdate = data;
 		this.emit('connectionUpdate', VoiceState.SESSION_READY);
-		this.debugDiscord(`Server Update Received | Server: ${this.region} Guild: ${this.guildId}`);
+		this.debugDiscord(`Server Update Received | Server: ${this.region}`);
 	}
 
 	/**
@@ -717,19 +697,17 @@ export class RainlinkPlayer extends EventEmitter {
 		this.voiceId = channel_id || null;
 
 		if (this.voiceId && this.lastvoiceId !== this.voiceId) {
-			this.debugDiscord(`Channel Moved | Old Channel: ${this.voiceId} Guild: ${this.guildId}`);
+			this.debugDiscord(`Channel Moved | Old Channel: ${this.voiceId}`);
 		}
 
 		if (!this.voiceId) {
 			this.voiceState = VoiceConnectState.DISCONNECTED;
-			this.debugDiscord(`Channel Disconnected | Guild: ${this.guildId}`);
+			this.debugDiscord('Channel Disconnected');
 		}
 
 		this.deaf = self_deaf;
 		this.mute = self_mute;
 		this.sessionId = session_id || null;
-		this.debugDiscord(
-			`State Update Received | Channel: ${this.voiceId} Session ID: ${session_id} Guild: ${this.guildId}`,
-		);
+		this.debugDiscord(`State Update Received | Channel: ${this.voiceId} Session ID: ${session_id}`);
 	}
 }
