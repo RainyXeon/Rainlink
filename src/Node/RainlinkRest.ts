@@ -57,6 +57,7 @@ export class RainlinkRest {
 		const options: RainlinkRequesterOptions = {
 			path: `/decodetrack?encodedTrack=${encodeURIComponent(base64track)}`,
 			params: undefined,
+			headers: { 'Content-Type': 'application/json' },
 			method: 'GET',
 		};
 		return await this.nodeManager.driver.requester<RawTrack>(options);
@@ -70,6 +71,7 @@ export class RainlinkRest {
 		const options: RainlinkRequesterOptions = {
 			path: `/sessions/${this.sessionId}/players/${data.guildId}`,
 			params: { noReplace: data.noReplace?.toString() || 'false' },
+			headers: { 'Content-Type': 'application/json' },
 			method: 'PATCH',
 			data: data.playerOptions as Record<string, unknown>,
 			rawReqData: data,
@@ -85,6 +87,7 @@ export class RainlinkRest {
 		const options: RainlinkRequesterOptions = {
 			path: `/sessions/${this.sessionId}/players/${guildId}`,
 			params: undefined,
+			headers: { 'Content-Type': 'application/json' },
 			method: 'DELETE',
 		};
 		this.nodeManager.driver.requester(options);
@@ -98,6 +101,7 @@ export class RainlinkRest {
 		const options: RainlinkRequesterOptions = {
 			path: '/loadtracks',
 			params: { identifier: data },
+			headers: { 'Content-Type': 'application/json' },
 			method: 'GET',
 		};
 
@@ -142,6 +146,7 @@ export class RainlinkRest {
 	public getLavalinkInfo(): Promise<NodeInfo | undefined> {
 		const options = {
 			path: '/info',
+			headers: { 'Content-Type': 'application/json' },
 		};
 		return this.nodeManager.driver.requester(options);
 	}
