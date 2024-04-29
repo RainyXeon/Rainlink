@@ -1,4 +1,4 @@
-import { RainlinkConnectState } from '../Interface/Constants';
+import { RainlinkConnectState, RainlinkEvents } from '../Interface/Constants';
 import { RainlinkNodeOptions } from '../Interface/Manager';
 import { RainlinkNode } from '../Node/RainlinkNode';
 import { Rainlink } from '../Rainlink';
@@ -25,6 +25,7 @@ export class RainlinkNodeManager extends RainlinkDatabase<RainlinkNode> {
 		const newNode = new RainlinkNode(this.manager, node);
 		newNode.connect();
 		this.set(node.name, newNode);
+		this.debug(`Node ${node.name} added to manager!`);
 		return newNode;
 	}
 
@@ -73,7 +74,12 @@ export class RainlinkNodeManager extends RainlinkDatabase<RainlinkNode> {
 		if (node) {
 			node.disconnect();
 			this.delete(name);
+			this.debug(`Node ${name} removed from manager!`);
 		}
 		return;
+	}
+
+	protected debug(logs: string) {
+		this.manager.emit(RainlinkEvents.Debug, `[Rainlink] / [NodeManager] | ${logs}`);
 	}
 }

@@ -99,7 +99,7 @@ export class Nodelink2 extends AbstractDriver {
 	public async requester<D = any>(options: RainlinkRequesterOptions): Promise<D | undefined> {
 		if (!this.isRegistered) throw new Error(`Driver ${this.id} not registered by using initial()`);
 		if (options.path.includes('/sessions') && this.sessionId == null)
-			throw new Error('sessionId not initalized! Please wait for lavalink get connected!');
+			throw new Error('sessionId not initalized! Please wait for nodelink get connected!');
 		const url = new URL(`${this.httpUrl}${options.path}`);
 		if (options.params) url.search = new URLSearchParams(options.params).toString();
 
@@ -157,7 +157,10 @@ export class Nodelink2 extends AbstractDriver {
 
 	protected debug(logs: string) {
 		if (!this.isRegistered) throw new Error(`Driver ${this.id} not registered by using initial()`);
-    this.manager!.emit(RainlinkEvents.Debug, `[Rainlink] -> [Driver] -> [Nodelink2] | ${logs}`);
+    this.manager!.emit(
+    	RainlinkEvents.Debug,
+    	`[Rainlink] / [Node] / [${this.node?.options.name}] / [Driver] / [Nodelink2] | ${logs}`,
+    );
 	}
 
 	public wsClose(): void {

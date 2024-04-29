@@ -72,7 +72,8 @@ export class FrequenC extends AbstractDriver {
 		const url = new URL(`${this.httpUrl}${options.path}`);
 		if (options.params) url.search = new URLSearchParams(options.params).toString();
 		if (options.data) {
-			options.body = JSON.stringify(options.data);
+			const converted = this.toSnake(options.data);
+			options.body = JSON.stringify(converted);
 		}
 
 		const lavalinkHeaders = {
@@ -82,7 +83,9 @@ export class FrequenC extends AbstractDriver {
 		};
 
 		options.headers = lavalinkHeaders;
-		options.path = url.pathname + url.search;
+		options.path = url.pathname + '/';
+		if (options.body && JSON.stringify(options.body) == '{}') delete options.body;
+		//  + url.search;
 
 		const res = await fetch(url.origin + options.path, options);
 
@@ -122,7 +125,32 @@ export class FrequenC extends AbstractDriver {
 
 	protected debug(logs: string) {
 		if (!this.isRegistered) throw new Error(`Driver ${this.id} not registered by using initial()`);
-    this.manager!.emit(RainlinkEvents.Debug, `[Rainlink] -> [Driver] -> [FrequenC1] | ${logs}`);
+    this.manager!.emit(
+    	RainlinkEvents.Debug,
+    	`[Rainlink] / [Node] / [${this.node?.options.name}] / [Driver] / [FrequenC1] | ${logs}`,
+    );
+	}
+
+	protected toSnake(obj: Record<string, unknown>): Record<string, unknown> {
+		if (typeof obj !== 'object') return {};
+		if (!obj || JSON.stringify(obj) == '{}') return {};
+		const allKeys = Object.keys(obj);
+		const regex = /^([a-z]{1,})(_[a-z0-9]{1,})*$/;
+
+		for (const key of allKeys) {
+			let newKey;
+			if (!regex.test(key)) {
+				newKey = key.replace(/[A-Z]/g, letter => `_${letter.toLowerCase()}`);
+				obj[newKey] = obj[key];
+				delete obj[key];
+			}
+			if (newKey && typeof obj[newKey] !== 'object' && typeof obj[key] !== 'object') continue;
+
+			newKey
+				? this.toSnake(obj[newKey] as Record<string, unknown>)
+				: this.toSnake(obj[key] as Record<string, unknown>);
+		}
+		return obj;
 	}
 
 	public wsClose(): void {
