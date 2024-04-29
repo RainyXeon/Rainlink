@@ -75,6 +75,11 @@ export class FrequenC extends AbstractDriver {
 			const converted = this.toSnake(options.data);
 			options.body = JSON.stringify(converted);
 		}
+		if (
+			/\/sessions\/[a-zA-Z0-9]{16}\/players/.test(options.path) &&
+      (options.method == 'GET' || !options.method)
+		)
+			return undefined;
 
 		const lavalinkHeaders = {
 			Authorization: this.node!.options.auth,
@@ -83,7 +88,7 @@ export class FrequenC extends AbstractDriver {
 		};
 
 		options.headers = lavalinkHeaders;
-		options.path = url.pathname + '/';
+		options.path = url.pathname;
 		if (options.body && JSON.stringify(options.body) == '{}') delete options.body;
 		//  + url.search;
 
@@ -115,7 +120,7 @@ export class FrequenC extends AbstractDriver {
 
 	protected wsMessageEvent(data: string) {
 		if (!this.isRegistered) throw new Error(`Driver ${this.id} not registered by using initial()`);
-		const wsData = JSON.parse(data.toString());
+		const wsData = this.toSnake(JSON.parse(data.toString()));
 		if (wsData.op == 'ready') {
 			wsData.sessionId = wsData.session_id;
 			delete wsData.session_id;
