@@ -183,6 +183,6 @@ export class RainlinkNode {
 	}
 
 	protected debug(logs: string) {
-		this.manager.emit(RainlinkEvents.Debug, `[Rainlink] / [Node] / [${this.options.name}] | ${logs}`);
+		this.manager.emit(RainlinkEvents.Debug, `[Rainlink] / [Node @ ${this.options.name}] | ${logs}`);
 	}
 }

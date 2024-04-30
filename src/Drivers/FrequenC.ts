@@ -110,11 +110,10 @@ export class FrequenC extends AbstractDriver {
 			return undefined;
 		}
 
-		let finalData
+		let finalData;
 
-		if (res.headers.get("content-type") == "application/json")
-			finalData = await res.json();
-		else finalData = { rawData: await res.text() }
+		if (res.headers.get('content-type') == 'application/json') finalData = await res.json();
+		else finalData = { rawData: await res.text() };
 
 		this.debug(
 			`${options.method ?? 'GET'} ${options.path} payload=${options.body ? String(options.body) : '{}'}`,
@@ -137,7 +136,7 @@ export class FrequenC extends AbstractDriver {
 		if (!this.isRegistered) throw new Error(`Driver ${this.id} not registered by using initial()`);
     this.manager!.emit(
     	RainlinkEvents.Debug,
-    	`[Rainlink] / [Node] / [${this.node?.options.name}] / [Driver] / [FrequenC1] | ${logs}`,
+    	`[Rainlink] / [Node @ ${this.node?.options.name}] / [Driver] / [FrequenC1] | ${logs}`,
     );
 	}
 

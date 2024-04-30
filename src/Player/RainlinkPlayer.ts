@@ -629,11 +629,11 @@ export class RainlinkPlayer extends EventEmitter {
 	}
 
 	protected debug(logs: string): void {
-		this.manager.emit(RainlinkEvents.Debug, `[Rainlink] / [Player / ${this.guildId}] | ${logs}`);
+		this.manager.emit(RainlinkEvents.Debug, `[Rainlink] / [Player @ ${this.guildId}] | ${logs}`);
 	}
 
 	protected debugDiscord(logs: string): void {
-		this.manager.emit(RainlinkEvents.Debug, `[Rainlink] / [Player / ${this.guildId}] / [Voice] | ${logs}`);
+		this.manager.emit(RainlinkEvents.Debug, `[Rainlink] / [Player @ ${this.guildId}] / [Voice] | ${logs}`);
 	}
 
 	protected checkDestroyed(): void {

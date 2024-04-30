@@ -123,7 +123,7 @@ export class Lavalink4 extends AbstractDriver {
 		if (!this.isRegistered) throw new Error(`Driver ${this.id} not registered by using initial()`);
     this.manager!.emit(
     	RainlinkEvents.Debug,
-    	`[Rainlink] / [Node] / [${this.node?.options.name}] / [Driver] / [Lavalink4] | ${logs}`,
+    	`[Rainlink] / [Node @ ${this.node?.options.name}] / [Driver] / [Lavalink4] | ${logs}`,
     );
 	}
 

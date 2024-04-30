@@ -174,7 +174,7 @@ export class RainlinkFilter {
 	protected debug(logs: string) {
 		this.player.manager.emit(
 			RainlinkEvents.Debug,
-			`[Rainlink] / [Player / ${this.player.guildId}] / [Filter] | ${logs}`,
+			`[Rainlink] / [Player @ ${this.player.guildId}] / [Filter] | ${logs}`,
 		);
 	}
 
