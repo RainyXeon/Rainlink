@@ -44,11 +44,11 @@ export class FrequenC extends AbstractDriver {
 		if (!this.isRegistered) throw new Error(`Driver ${this.id} not registered by using initial()`);
 		const ws = new RainlinkWebsocket(this.wsUrl, {
 			headers: {
-				Authorization: this.node!.options.auth,
-				'User-Id': this.manager!.id,
-				'Client-Info': `${metadata.name}/${metadata.version} (${metadata.github})`,
+				authorization: this.node!.options.auth,
+				'user-id': this.manager!.id,
+				'client-info': `${metadata.name}/${metadata.version} (${metadata.github})`,
 				'user-agent': this.manager!.rainlinkOptions.options!.userAgent!,
-				'Num-Shards': this.manager!.shardCount,
+				'num-shards': this.manager!.shardCount,
 			},
 		});
 
@@ -75,6 +75,8 @@ export class FrequenC extends AbstractDriver {
 			const converted = this.toSnake(options.data);
 			options.body = JSON.stringify(converted);
 		}
+
+		// Ignore GET /sessions/{sessionId}/players
 		if (
 			/\/sessions\/[a-zA-Z0-9]{16}\/players/.test(options.path) &&
       (options.method == 'GET' || !options.method)
@@ -82,8 +84,7 @@ export class FrequenC extends AbstractDriver {
 			return undefined;
 
 		const lavalinkHeaders = {
-			Authorization: this.node!.options.auth,
-			// 'User-Agent': this.manager!.rainlinkOptions.options!.userAgent!,
+			authorization: this.node!.options.auth,
 			...options.headers,
 		};
 
@@ -103,13 +104,17 @@ export class FrequenC extends AbstractDriver {
 				`${options.method ?? 'GET'} ${options.path} payload=${options.body ? String(options.body) : '{}'}`,
 			);
 			this.debug(
-				'Something went wrong with lavalink server. ' +
+				'Something went wrong with frequenc server. ' +
           `Status code: ${res.status}\n Headers: ${util.inspect(options.headers)}`,
 			);
 			return undefined;
 		}
 
-		const finalData = await res.json();
+		let finalData
+
+		if (res.headers.get("content-type") == "application/json")
+			finalData = await res.json();
+		else finalData = { rawData: await res.text() }
 
 		this.debug(
 			`${options.method ?? 'GET'} ${options.path} payload=${options.body ? String(options.body) : '{}'}`,
@@ -165,7 +170,7 @@ export class FrequenC extends AbstractDriver {
 	public async updateSession(sessionId: string, mode: boolean, timeout: number): Promise<void> {
 		const options: RainlinkRequesterOptions = {
 			path: `/sessions/${sessionId}`,
-			headers: { 'Content-Type': 'application/json' },
+			headers: { 'content-type': 'application/json' },
 			method: 'PATCH',
 			data: {
 				resuming: mode,

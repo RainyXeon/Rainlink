@@ -263,7 +263,7 @@ export class Lavalink3 extends AbstractDriver {
 		}
 		const options: RainlinkRequesterOptions = {
 			path: `/sessions/${sessionId}`,
-			headers: { 'Content-Type': 'application/json' },
+			headers: { 'content-type': 'application/json' },
 			method: 'PATCH',
 			data: {
 				resumingKey: sessionId,

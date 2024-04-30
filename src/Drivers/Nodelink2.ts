@@ -73,13 +73,13 @@ export class Nodelink2 extends AbstractDriver {
 		const ws = new RainlinkWebsocket(this.wsUrl, {
 			headers: {
 				Authorization: this.node!.options.auth,
-				'User-Id': this.manager!.id,
-				'Content-Encoding': 'brotli, gzip, deflate',
+				'user-id': this.manager!.id,
+				'content-encoding': 'brotli, gzip, deflate',
 				'accept-encoding': 'brotli, gzip, deflate',
-				'Client-Name': `${metadata.name}/${metadata.version} (${metadata.github})`,
-				'Session-Id': this.sessionId !== null && isResume ? this.sessionId : '',
+				'client-name': `${metadata.name}/${metadata.version} (${metadata.github})`,
+				'session-id': this.sessionId !== null && isResume ? this.sessionId : '',
 				'user-agent': this.manager!.rainlinkOptions.options!.userAgent!,
-				'Num-Shards': this.manager!.shardCount,
+				'num-shards': this.manager!.shardCount,
 			},
 		});
 
@@ -129,7 +129,7 @@ export class Nodelink2 extends AbstractDriver {
 				`${options.method ?? 'GET'} ${options.path} payload=${options.body ? String(options.body) : '{}'}`,
 			);
 			this.debug(
-				'Something went wrong with lavalink server. ' +
+				'Something went wrong with nodelink server. ' +
           `Status code: ${res.status}\n Headers: ${util.inspect(options.headers)}`,
 			);
 			return undefined;
@@ -221,7 +221,7 @@ export class Nodelink2 extends AbstractDriver {
 				encodedTrack: String(player.queue.current?.encoded),
 				language: language,
 			},
-			headers: { 'Content-Type': 'application/json' },
+			headers: { 'content-type': 'application/json' },
 			method: 'GET',
 		};
 		const data = await player.node.driver.requester<NodelinkGetLyricsInterface>(options);

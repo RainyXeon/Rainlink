@@ -46,11 +46,11 @@ export class Lavalink4 extends AbstractDriver {
 		const ws = new RainlinkWebsocket(this.wsUrl, {
 			headers: {
 				Authorization: this.node!.options.auth,
-				'User-Id': this.manager!.id,
-				'Client-Name': `${metadata.name}/${metadata.version} (${metadata.github})`,
-				'Session-Id': this.sessionId !== null && isResume ? this.sessionId : '',
+				'user-id': this.manager!.id,
+				'client-name': `${metadata.name}/${metadata.version} (${metadata.github})`,
+				'session-id': this.sessionId !== null && isResume ? this.sessionId : '',
 				'user-agent': this.manager!.rainlinkOptions.options!.userAgent!,
-				'Num-Shards': this.manager!.shardCount,
+				'num-shards': this.manager!.shardCount,
 			},
 		});
 
@@ -134,7 +134,7 @@ export class Lavalink4 extends AbstractDriver {
 	public async updateSession(sessionId: string, mode: boolean, timeout: number): Promise<void> {
 		const options: RainlinkRequesterOptions = {
 			path: `/sessions/${sessionId}`,
-			headers: { 'Content-Type': 'application/json' },
+			headers: { 'content-type': 'application/json' },
 			method: 'PATCH',
 			data: {
 				resuming: mode,
