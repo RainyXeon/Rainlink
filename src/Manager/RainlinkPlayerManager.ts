@@ -66,6 +66,6 @@ export class RainlinkPlayerManager extends RainlinkDatabase<RainlinkPlayer> {
 	}
 
 	protected debug(logs: string) {
-		this.manager.emit(RainlinkEvents.Debug, `[Rainlink] -> [Player] | ${logs}`);
+		this.manager.emit(RainlinkEvents.Debug, `[Rainlink] / [PlayerManager] | ${logs}`);
 	}
 }

@@ -35,11 +35,11 @@ export class RainlinkPlugin extends Plugin {
 		const wsUrl = `${node.options.secure ? 'wss' : 'ws'}://${node.options.host}:${node.options.port}`;
 		const ws = new RainlinkWebsocket(wsUrl + '/connection/data', {
 			headers: {
-				Authorization: node.options.auth,
-				'User-Id': this.manager!.id,
-				'Client-Name': `${metadata.name}/${metadata.version} (${metadata.github})`,
+				authorization: node.options.auth,
+				'user-id': this.manager!.id,
+				'client-name': `${metadata.name}/${metadata.version} (${metadata.github})`,
 				'user-agent': this.manager!.rainlinkOptions.options!.userAgent!,
-				'Guild-Id': voiceOptions.guildId,
+				'guild-id': voiceOptions.guildId,
 			},
 		});
 		this.runningWs.set(voiceOptions.guildId, ws);
@@ -104,6 +104,8 @@ export class RainlinkPlugin extends Plugin {
 	}
 
 	protected debug(logs: string) {
-		this.manager ? this.manager.emit(RainlinkEvents.Debug, `[Plugin] -> [Voice Receiver]: ${logs}`) : true;
+		this.manager
+			? this.manager.emit(RainlinkEvents.Debug, `[Rainlink] / [Plugin] / [Voice Receiver] | ${logs}`)
+			: true;
 	}
 }

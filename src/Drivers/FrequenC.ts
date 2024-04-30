@@ -44,11 +44,11 @@ export class FrequenC extends AbstractDriver {
 		if (!this.isRegistered) throw new Error(`Driver ${this.id} not registered by using initial()`);
 		const ws = new RainlinkWebsocket(this.wsUrl, {
 			headers: {
-				Authorization: this.node!.options.auth,
-				'User-Id': this.manager!.id,
-				'Client-Info': `${metadata.name}/${metadata.version} (${metadata.github})`,
+				authorization: this.node!.options.auth,
+				'user-id': this.manager!.id,
+				'client-info': `${metadata.name}/${metadata.version} (${metadata.github})`,
 				'user-agent': this.manager!.rainlinkOptions.options!.userAgent!,
-				'Num-Shards': this.manager!.shardCount,
+				'num-shards': this.manager!.shardCount,
 			},
 		});
 
@@ -72,17 +72,26 @@ export class FrequenC extends AbstractDriver {
 		const url = new URL(`${this.httpUrl}${options.path}`);
 		if (options.params) url.search = new URLSearchParams(options.params).toString();
 		if (options.data) {
-			options.body = JSON.stringify(options.data);
+			const converted = this.toSnake(options.data);
+			options.body = JSON.stringify(converted);
 		}
 
+		// Ignore GET /sessions/{sessionId}/players
+		if (
+			/\/sessions\/[a-zA-Z0-9]{16}\/players/.test(options.path) &&
+      (options.method == 'GET' || !options.method)
+		)
+			return undefined;
+
 		const lavalinkHeaders = {
-			Authorization: this.node!.options.auth,
-			// 'User-Agent': this.manager!.rainlinkOptions.options!.userAgent!,
+			authorization: this.node!.options.auth,
 			...options.headers,
 		};
 
 		options.headers = lavalinkHeaders;
-		options.path = url.pathname + url.search;
+		options.path = url.pathname;
+		if (options.body && JSON.stringify(options.body) == '{}') delete options.body;
+		//  + url.search;
 
 		const res = await fetch(url.origin + options.path, options);
 
@@ -95,13 +104,16 @@ export class FrequenC extends AbstractDriver {
 				`${options.method ?? 'GET'} ${options.path} payload=${options.body ? String(options.body) : '{}'}`,
 			);
 			this.debug(
-				'Something went wrong with lavalink server. ' +
+				'Something went wrong with frequenc server. ' +
           `Status code: ${res.status}\n Headers: ${util.inspect(options.headers)}`,
 			);
 			return undefined;
 		}
 
-		const finalData = await res.json();
+		let finalData;
+
+		if (res.headers.get('content-type') == 'application/json') finalData = await res.json();
+		else finalData = { rawData: await res.text() };
 
 		this.debug(
 			`${options.method ?? 'GET'} ${options.path} payload=${options.body ? String(options.body) : '{}'}`,
@@ -112,7 +124,7 @@ export class FrequenC extends AbstractDriver {
 
 	protected wsMessageEvent(data: string) {
 		if (!this.isRegistered) throw new Error(`Driver ${this.id} not registered by using initial()`);
-		const wsData = JSON.parse(data.toString());
+		const wsData = this.toSnake(JSON.parse(data.toString()));
 		if (wsData.op == 'ready') {
 			wsData.sessionId = wsData.session_id;
 			delete wsData.session_id;
@@ -122,7 +134,32 @@ export class FrequenC extends AbstractDriver {
 
 	protected debug(logs: string) {
 		if (!this.isRegistered) throw new Error(`Driver ${this.id} not registered by using initial()`);
-    this.manager!.emit(RainlinkEvents.Debug, `[Rainlink] -> [Driver] -> [FrequenC1] | ${logs}`);
+    this.manager!.emit(
+    	RainlinkEvents.Debug,
+    	`[Rainlink] / [Node @ ${this.node?.options.name}] / [Driver] / [FrequenC1] | ${logs}`,
+    );
+	}
+
+	protected toSnake(obj: Record<string, unknown>): Record<string, unknown> {
+		if (typeof obj !== 'object') return {};
+		if (!obj || JSON.stringify(obj) == '{}') return {};
+		const allKeys = Object.keys(obj);
+		const regex = /^([a-z]{1,})(_[a-z0-9]{1,})*$/;
+
+		for (const key of allKeys) {
+			let newKey;
+			if (!regex.test(key)) {
+				newKey = key.replace(/[A-Z]/g, letter => `_${letter.toLowerCase()}`);
+				obj[newKey] = obj[key];
+				delete obj[key];
+			}
+			if (newKey && typeof obj[newKey] !== 'object' && typeof obj[key] !== 'object') continue;
+
+			newKey
+				? this.toSnake(obj[newKey] as Record<string, unknown>)
+				: this.toSnake(obj[key] as Record<string, unknown>);
+		}
+		return obj;
 	}
 
 	public wsClose(): void {
@@ -132,7 +169,7 @@ export class FrequenC extends AbstractDriver {
 	public async updateSession(sessionId: string, mode: boolean, timeout: number): Promise<void> {
 		const options: RainlinkRequesterOptions = {
 			path: `/sessions/${sessionId}`,
-			headers: { 'Content-Type': 'application/json' },
+			headers: { 'content-type': 'application/json' },
 			method: 'PATCH',
 			data: {
 				resuming: mode,
