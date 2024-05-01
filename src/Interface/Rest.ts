@@ -1,6 +1,7 @@
 import { FilterOptions } from './Player';
 import { LavalinkLoadType } from './Constants';
 import { Exception } from './LavalinkEvents';
+import { LavalinkNodeStatsResponse } from './Node';
 
 export interface RainlinkRequesterOptions extends RequestInit {
   params?: string | Record<string, string>;
@@ -8,6 +9,8 @@ export interface RainlinkRequesterOptions extends RequestInit {
   path: string;
   rawReqData?: UpdatePlayerInfo;
 }
+
+export type LavalinkStats = Omit<LavalinkNodeStatsResponse, 'op'>;
 
 export interface LavalinkPlayer {
   guildId: string;

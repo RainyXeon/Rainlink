@@ -76,24 +76,16 @@ export class FrequenC extends AbstractDriver {
 			options.body = JSON.stringify(converted);
 		}
 
-		// Ignore GET /sessions/{sessionId}/players
-		if (
-			/\/sessions\/[a-zA-Z0-9]{16}\/players/.test(options.path) &&
-      (options.method == 'GET' || !options.method)
-		)
-			return undefined;
-
 		const lavalinkHeaders = {
 			authorization: this.node!.options.auth,
 			...options.headers,
 		};
 
 		options.headers = lavalinkHeaders;
-		options.path = url.pathname;
 		if (options.body && JSON.stringify(options.body) == '{}') delete options.body;
 		//  + url.search;
 
-		const res = await fetch(url.origin + options.path, options);
+		const res = await fetch(url, options);
 
 		if (res.status == 204) {
 			this.debug('Player now destroyed');
@@ -101,7 +93,7 @@ export class FrequenC extends AbstractDriver {
 		}
 		if (res.status !== 200) {
 			this.debug(
-				`${options.method ?? 'GET'} ${options.path} payload=${options.body ? String(options.body) : '{}'}`,
+				`${options.method ?? 'GET'} ${url.pathname + url.search} payload=${options.body ? String(options.body) : '{}'}`,
 			);
 			this.debug(
 				'Something went wrong with frequenc server. ' +
@@ -116,7 +108,7 @@ export class FrequenC extends AbstractDriver {
 		else finalData = { rawData: await res.text() };
 
 		this.debug(
-			`${options.method ?? 'GET'} ${options.path} payload=${options.body ? String(options.body) : '{}'}`,
+			`${options.method ?? 'GET'} ${url.pathname + url.search} payload=${options.body ? String(options.body) : '{}'}`,
 		);
 
 		return finalData as D;
@@ -125,10 +117,6 @@ export class FrequenC extends AbstractDriver {
 	protected wsMessageEvent(data: string) {
 		if (!this.isRegistered) throw new Error(`Driver ${this.id} not registered by using initial()`);
 		const wsData = this.toSnake(JSON.parse(data.toString()));
-		if (wsData.op == 'ready') {
-			wsData.sessionId = wsData.session_id;
-			delete wsData.session_id;
-		}
     this.node!.wsMessageEvent(wsData);
 	}
 
