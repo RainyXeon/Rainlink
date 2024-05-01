@@ -121,7 +121,7 @@ export class RainlinkTrack {
 			`[Rainlink] / [Track] | Resolving ${this.source} track ${this.title}; Source: ${this.source}`,
 		);
 
-		const result = await this.getTrack(manager);
+		const result = await this.getTrack(manager, options ? options.nodeName : undefined);
 		if (!result) throw new Error('No results found');
 
 		this.encoded = result.encoded;
