@@ -246,10 +246,12 @@ export class RainlinkPlayer extends EventEmitter {
 
 		let errorMessage: string | undefined;
 
-		const resolveResult = await current.resolver(this.manager).catch((e: any) => {
-			errorMessage = e.message;
-			return null;
-		});
+		const resolveResult = await current
+			.resolver(this.manager, { nodeName: this.node.options.name })
+			.catch((e: any) => {
+				errorMessage = e.message;
+				return null;
+			});
 
 		if (!resolveResult || (resolveResult && !resolveResult.isPlayable)) {
 			this.manager.emit(RainlinkEvents.TrackResolveError, this, current, errorMessage);

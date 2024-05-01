@@ -1,6 +1,6 @@
 {
   "name": "rainlink",
-  "version": "0.9.1",
+  "version": "0.9.2",
   "description": "Another lavalink wrapper but focus on stability and rich features",
   "repository": {
     "type": "git",
