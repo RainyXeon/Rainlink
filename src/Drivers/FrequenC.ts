@@ -72,7 +72,7 @@ export class FrequenC extends AbstractDriver {
 		const url = new URL(`${this.httpUrl}${options.path}`);
 		if (options.params) url.search = new URLSearchParams(options.params).toString();
 		if (options.data) {
-			const converted = this.toSnake(options.data);
+			const converted = this.camelToSnake(options.data);
 			options.body = JSON.stringify(converted);
 		}
 
@@ -82,6 +82,7 @@ export class FrequenC extends AbstractDriver {
 		};
 
 		options.headers = lavalinkHeaders;
+		url.search = ''
 		if (options.body && JSON.stringify(options.body) == '{}') delete options.body;
 		//  + url.search;
 
@@ -116,7 +117,8 @@ export class FrequenC extends AbstractDriver {
 
 	protected wsMessageEvent(data: string) {
 		if (!this.isRegistered) throw new Error(`Driver ${this.id} not registered by using initial()`);
-		const wsData = this.toSnake(JSON.parse(data.toString()));
+		const wsData = this.snakeToCamel(JSON.parse(data.toString()));
+		console.log(wsData)
     this.node!.wsMessageEvent(wsData);
 	}
 
@@ -126,28 +128,6 @@ export class FrequenC extends AbstractDriver {
     	RainlinkEvents.Debug,
     	`[Rainlink] / [Node @ ${this.node?.options.name}] / [Driver] / [FrequenC1] | ${logs}`,
     );
-	}
-
-	protected toSnake(obj: Record<string, unknown>): Record<string, unknown> {
-		if (typeof obj !== 'object') return {};
-		if (!obj || JSON.stringify(obj) == '{}') return {};
-		const allKeys = Object.keys(obj);
-		const regex = /^([a-z]{1,})(_[a-z0-9]{1,})*$/;
-
-		for (const key of allKeys) {
-			let newKey;
-			if (!regex.test(key)) {
-				newKey = key.replace(/[A-Z]/g, letter => `_${letter.toLowerCase()}`);
-				obj[newKey] = obj[key];
-				delete obj[key];
-			}
-			if (newKey && typeof obj[newKey] !== 'object' && typeof obj[key] !== 'object') continue;
-
-			newKey
-				? this.toSnake(obj[newKey] as Record<string, unknown>)
-				: this.toSnake(obj[key] as Record<string, unknown>);
-		}
-		return obj;
 	}
 
 	public wsClose(): void {
@@ -168,5 +148,52 @@ export class FrequenC extends AbstractDriver {
 		await this.requester<{ resuming: boolean; timeout: number }>(options);
 		this.debug(`Session updated! resume: ${mode}, timeout: ${timeout}`);
 		return;
+	}
+
+	protected camelToSnake(obj: Record<string, unknown>): Record<string, unknown> {
+		if (typeof obj !== 'object') return {};
+		if (!obj || JSON.stringify(obj) == '{}') return {};
+		const allKeys = Object.keys(obj);
+		const regex = /^([a-z]{1,})(_[a-z0-9]{1,})*$/;
+
+		for (const key of allKeys) {
+			let newKey;
+			if (!regex.test(key)) {
+				newKey = key.replace(/[A-Z]/g, letter => `_${letter.toLowerCase()}`);
+				obj[newKey] = obj[key];
+				delete obj[key];
+			}
+			if (newKey && typeof obj[newKey] !== 'object' && typeof obj[key] !== 'object') continue;
+
+			newKey
+				? this.camelToSnake(obj[newKey] as Record<string, unknown>)
+				: this.camelToSnake(obj[key] as Record<string, unknown>);
+		}
+		return obj;
+	}
+
+	protected snakeToCamel(obj: Record<string, unknown>): Record<string, unknown> {
+		if (typeof obj !== 'object') return {};
+		if (!obj || JSON.stringify(obj) == '{}') return {};
+		const allKeys = Object.keys(obj);
+		for (const key of allKeys) {
+			let newKey;
+			if (/([-_][a-z])/.test(key)) {
+				newKey = key.toLowerCase().replace(/([-_][a-z])/g, group =>
+					group
+						.toUpperCase()
+						.replace('-', '')
+						.replace('_', '')
+				);
+				obj[newKey] = obj[key];
+				delete obj[key];
+			}
+			if (newKey && typeof obj[newKey] !== 'object' && typeof obj[key] !== 'object') continue;
+
+			newKey
+				? this.snakeToCamel(obj[newKey] as Record<string, unknown>)
+				: this.snakeToCamel(obj[key] as Record<string, unknown>);
+		}
+		return obj;
 	}
 }
