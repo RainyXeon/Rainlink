@@ -89,7 +89,9 @@ export class FrequenC extends AbstractDriver {
 		const res = await fetch(url, options);
 
 		if (res.status == 204) {
-			this.debug('Player now destroyed');
+			this.debug(
+				`${options.method ?? 'GET'} ${url.pathname + url.search} payload=${options.body ? String(options.body) : '{}'}`,
+			);
 			return undefined;
 		}
 		if (res.status !== 200) {
@@ -118,7 +120,6 @@ export class FrequenC extends AbstractDriver {
 	protected wsMessageEvent(data: string) {
 		if (!this.isRegistered) throw new Error(`Driver ${this.id} not registered by using initial()`);
 		const wsData = this.snakeToCamel(JSON.parse(data.toString()));
-		console.log(wsData)
     this.node!.wsMessageEvent(wsData);
 	}
 
