@@ -25,20 +25,20 @@ module.exports = class Tester {
     try {
       const data = await targetFunction()
       if (data === "localPass") {
-        this.debug(`PASS   | ${title}`)
+        this.debug(`PASS   | #${this.count}. ${title}`)
         this.pass = this.pass + 1
         return true
       }
       if (data !== expected) {
-        this.debug(`<FAIL> | ${title} | Expected: ${expected} | Actural: ${data}`)
+        this.debug(`<FAIL> | #${this.count}. ${title} | Expected: ${expected} | Actural: ${data}`)
         this.failed = this.failed + 1
         return false
       }
-      this.debug(`PASS   | ${title}`)
+      this.debug(`PASS   | #${this.count}. ${title}`)
       this.pass = this.pass + 1
       return true
     } catch (err) {
-      this.debug(`<FAIL> | ${title} | error logs:`)
+      this.debug(`<FAIL> | #${this.count}. ${title} | error logs:`)
       this.failed = this.failed + 1
       console.error(err)
       process.exit()
