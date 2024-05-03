@@ -4,29 +4,42 @@ const util = require('node:util');
 module.exports = class Tester {
   constructor() {
     console.log("----- Rainlink testing program v1.0 -----")
+    this.count = 0
+    this.pass = 0
+    this.failed = 0
   }
 
   debug(logs) {
     const finalString = typeof logs == "object" ? util.inspect(logs) : util.inspect(logs).slice(1, -1)
-    console.log("[Tester]: " + finalString)
+    console.log(finalString)
+  }
+
+  printSummary() {
+    const passPercent = ((this.pass / this.count) * 100).toFixed(0)
+    const failedPercent = ((this.failed / this.count) * 100).toFixed(0)
+    this.debug(`----- ${this.pass} tests passed, ${this.failed} tests failed. ${passPercent}% pass. ${failedPercent}% fail. -----`)
   }
 
   async testCase(title, targetFunction, expected) {
-    this.debug(`TESTING  | ${title}`)
+    this.count = this.count + 1
     try {
       const data = await targetFunction()
       if (data === "localPass") {
-        this.debug(`PASSED   | ${title}`)
-        return false
+        this.debug(`PASS   | ${title}`)
+        this.pass = this.pass + 1
+        return true
       }
       if (data !== expected) {
-        this.debug(`<FAILED> | ${title} | Expected: ${expected} | Actural: ${data}`)
+        this.debug(`<FAIL> | ${title} | Expected: ${expected} | Actural: ${data}`)
+        this.failed = this.failed + 1
         return false
       }
-      this.debug(`PASSED   | ${title}`)
+      this.debug(`PASS   | ${title}`)
+      this.pass = this.pass + 1
       return true
     } catch (err) {
-      this.debug(`<FAILED> | ${title} | error logs:`)
+      this.debug(`<FAIL> | ${title} | error logs:`)
+      this.failed = this.failed + 1
       console.error(err)
       process.exit()
     }
