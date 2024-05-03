@@ -58,7 +58,7 @@ async function run() {
     const res = await client.rainlink.nodes.full.at(0)[1].driver.functions.get("decode")(encoded)
     tester.debug(`@ Title: ${res.info.title}, Author: ${res.info.author}, URI: ${res.info.uri}`)
     return res.info.identifier
-  }, "5Cof9rP7TEQc")
+  }, "5Cof9rP7TEQ")
 
   process.exit(0)
 }
