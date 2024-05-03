@@ -1,7 +1,7 @@
 import { Rainlink } from '../Rainlink';
 import { metadata } from '../metadata';
 import { RainlinkEvents } from '../Interface/Constants';
-import { RainlinkRequesterOptions } from '../Interface/Rest';
+import { RainlinkRequesterOptions, RawTrack } from '../Interface/Rest';
 import { RainlinkNode } from '../Node/RainlinkNode';
 import { AbstractDriver } from './AbstractDriver';
 import util from 'node:util';
@@ -38,6 +38,7 @@ export class FrequenC extends AbstractDriver {
 		this.node = node;
 		this.wsUrl = `${this.node.options.secure ? 'wss' : 'ws'}://${this.node.options.host}:${this.node.options.port}/v1/websocket`;
 		this.httpUrl = `${this.node.options.secure ? 'https://' : 'http://'}${this.node.options.host}:${this.node.options.port}/v1`;
+		this.functions.set('buildTrack', this.buildTrack);
 	}
 
 	public connect(): RainlinkWebsocket {
@@ -82,7 +83,6 @@ export class FrequenC extends AbstractDriver {
 		};
 
 		options.headers = lavalinkHeaders;
-		url.search = ''
 		if (options.body && JSON.stringify(options.body) == '{}') delete options.body;
 		//  + url.search;
 
@@ -180,12 +180,9 @@ export class FrequenC extends AbstractDriver {
 		for (const key of allKeys) {
 			let newKey;
 			if (/([-_][a-z])/.test(key)) {
-				newKey = key.toLowerCase().replace(/([-_][a-z])/g, group =>
-					group
-						.toUpperCase()
-						.replace('-', '')
-						.replace('_', '')
-				);
+				newKey = key
+					.toLowerCase()
+					.replace(/([-_][a-z])/g, group => group.toUpperCase().replace('-', '').replace('_', ''));
 				obj[newKey] = obj[key];
 				delete obj[key];
 			}
@@ -196,5 +193,76 @@ export class FrequenC extends AbstractDriver {
 				: this.snakeToCamel(obj[key] as Record<string, unknown>);
 		}
 		return obj;
+	}
+
+	protected buildTrack(base64: string) {
+		return new Decoder(base64).getTrack ?? undefined;
+	}
+}
+
+class Decoder {
+	protected position: number;
+	protected buffer: Buffer;
+	constructor(protected track: string) {
+		this.position = 0;
+		this.buffer = Buffer.from(track, 'base64');
+	}
+
+	get getTrack(): RawTrack | null {
+		try {
+			(((Number(this.read('int')) & 0xc0000000) >> 30) & 1) !== 0 ? this.read('byte') : 1;
+			return {
+				encoded: this.track,
+				info: {
+					title: String(this.read('utf')),
+					author: String(this.read('utf')),
+					length: Number(this.read('long')),
+					identifier: String(this.read('utf')),
+					isSeekable: true,
+					isStream: this.read('byte') === 1,
+					uri: String(this.read('utf')),
+					artworkUrl: this.read('byte') === 1 ? String(this.read('utf')) : null,
+					isrc: this.read('byte') === 1 ? String(this.read('utf')) : null,
+					sourceName: String(this.read('utf')).toLowerCase(),
+					position: 0,
+				},
+				pluginInfo: {},
+			};
+		} catch (err) {
+			return null;
+		}
+	}
+
+	protected changeBytes(bytes: number) {
+		this.position += bytes;
+		return this.position - bytes;
+	}
+
+	protected read(type: string) {
+		switch (type) {
+		case 'byte': {
+			return this.buffer[this.changeBytes(1)];
+		}
+		case 'unsignedShort': {
+			const result = this.buffer.readUInt16BE(this.changeBytes(2));
+			return result;
+		}
+		case 'int': {
+			const result = this.buffer.readInt32BE(this.changeBytes(4));
+			return result;
+		}
+		case 'long': {
+			const msb: bigint = BigInt(this.read('int') as string | number | bigint | boolean);
+			const lsb: bigint = BigInt(this.read('int') as string | number | bigint | boolean);
+
+			return msb * BigInt(2 ** 32) + lsb;
+		}
+		case 'utf': {
+			const len = this.read('unsignedShort');
+			const start = this.changeBytes(Number(len));
+			const result = this.buffer.toString('utf8', start, Number(start) + Number(len));
+			return result;
+		}
+		}
 	}
 }

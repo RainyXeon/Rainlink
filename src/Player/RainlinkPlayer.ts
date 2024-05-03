@@ -246,12 +246,10 @@ export class RainlinkPlayer extends EventEmitter {
 
 		let errorMessage: string | undefined;
 
-		const resolveResult = await current
-			.resolver(this.manager, { nodeName: this.node.options.name })
-			.catch((e: any) => {
-				errorMessage = e.message;
-				return null;
-			});
+		const resolveResult = await current.resolver(this).catch((e: any) => {
+			errorMessage = e.message;
+			return null;
+		});
 
 		if (!resolveResult || (resolveResult && !resolveResult.isPlayable)) {
 			this.manager.emit(RainlinkEvents.TrackResolveError, this, current, errorMessage);
@@ -307,7 +305,10 @@ export class RainlinkPlayer extends EventEmitter {
    */
 	public async search(query: string, options?: RainlinkSearchOptions): Promise<RainlinkSearchResult> {
 		this.checkDestroyed();
-		return await this.manager.search(query, options);
+		return await this.manager.search(query, {
+			nodeName: this.node.options.name,
+			...options,
+		});
 	}
 
 	/**
@@ -317,7 +318,7 @@ export class RainlinkPlayer extends EventEmitter {
 	public async pause(): Promise<RainlinkPlayer> {
 		this.checkDestroyed();
 		if (this.paused == true) return this;
-		await this.node.rest.updatePlayer({
+		this.node.rest.updatePlayer({
 			guildId: this.guildId,
 			playerOptions: {
 				paused: true,
@@ -356,7 +357,7 @@ export class RainlinkPlayer extends EventEmitter {
 	public async setPause(mode: boolean): Promise<RainlinkPlayer> {
 		this.checkDestroyed();
 		if (this.paused == mode) return this;
-		await this.node.rest.updatePlayer({
+		this.node.rest.updatePlayer({
 			guildId: this.guildId,
 			playerOptions: {
 				paused: mode,
@@ -429,7 +430,7 @@ export class RainlinkPlayer extends EventEmitter {
 		if (position < 0 || position > (this.queue.current.duration ?? 0))
 			position = Math.max(Math.min(position, this.queue.current.duration ?? 0), 0);
 
-		await this.node.rest.updatePlayer({
+		this.node.rest.updatePlayer({
 			guildId: this.guildId,
 			playerOptions: {
 				position: position,
@@ -447,7 +448,7 @@ export class RainlinkPlayer extends EventEmitter {
 	public async setVolume(volume: number): Promise<RainlinkPlayer> {
 		this.checkDestroyed();
 		if (isNaN(volume)) throw new Error('volume must be a number');
-		await this.node.rest.updatePlayer({
+		this.node.rest.updatePlayer({
 			guildId: this.guildId,
 			playerOptions: {
 				volume: volume,
@@ -626,7 +627,7 @@ export class RainlinkPlayer extends EventEmitter {
    */
 	public async send(data: UpdatePlayerInfo): Promise<RainlinkPlayer> {
 		this.checkDestroyed();
-		await this.node.rest.updatePlayer(data);
+		this.node.rest.updatePlayer(data);
 		return this;
 	}
 
