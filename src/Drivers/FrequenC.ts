@@ -38,7 +38,7 @@ export class FrequenC extends AbstractDriver {
 		this.node = node;
 		this.wsUrl = `${this.node.options.secure ? 'wss' : 'ws'}://${this.node.options.host}:${this.node.options.port}/v1/websocket`;
 		this.httpUrl = `${this.node.options.secure ? 'https://' : 'http://'}${this.node.options.host}:${this.node.options.port}/v1`;
-		this.functions.set('buildTrack', this.buildTrack);
+		this.functions.set('decode', this.decode);
 	}
 
 	public connect(): RainlinkWebsocket {
@@ -195,7 +195,7 @@ export class FrequenC extends AbstractDriver {
 		return obj;
 	}
 
-	protected buildTrack(base64: string) {
+	protected decode(base64: string) {
 		return new Decoder(base64).getTrack ?? undefined;
 	}
 }
