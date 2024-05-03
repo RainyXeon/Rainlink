@@ -10,9 +10,9 @@ const Nodes = [
   {
     name: 'owo',
     host: process.env.v4_host,
-    port: 2333,
+    port: 8888,
     auth: 'youshallnotpass',
-    secure: false
+    driver: "frequenc/v1/miku"
   }
 ];
 
@@ -37,36 +37,28 @@ async function run() {
     })
     return await connectChecking
   })
-  
-  await tester.testCase('GET /info', async () => {
-    const data = await client.rainlink.nodes.full.at(0)[1].rest.getInfo()
-    tester.debug(data)
-    return "localPass"
-  })
 
-  await tester.testCase('GET /status', async () => {
-    const data = await client.rainlink.nodes.full.at(0)[1].rest.getStatus()
-    tester.debug(data)
-    return "localPass"
-  })
-
-  await tester.testCase('GET /sessions/{id}/players', async () => {
-    const data = await client.rainlink.nodes.full.at(0)[1].rest.getPlayers()
-    tester.debug("Players: " + data.length)
-    return "localPass"
-  })
-
-  await tester.testCase('Search tracks (title)', async () => {
+  await tester.testCase('#1. Search tracks (title)', async () => {
     const data = await client.rainlink.search("Primary/yuiko - in the Garden")
-    tester.debug(data.tracks[0].raw)
+    tester.debug(`@ Title: ${data.tracks[0].title}, Author: ${data.tracks[0].author}, URI: ${data.tracks[0].uri}`)
     return data.tracks[0].raw.info.identifier
   }, "5Cof9rP7TEQ")
 
-  await tester.testCase('Search tracks (uri)', async () => {
-    const data = await client.rainlink.search("https://www.youtube.com/watch?v=5Cof9rP7TEQ")
-    tester.debug(data.tracks[0].raw)
-    return data.tracks[0].raw.info.identifier
+  await tester.testCase('#2. Decode track (server side)', async () => {
+    const data = await client.rainlink.search("Primary/yuiko - in the Garden")
+    const encoded = data.tracks[0].raw.encoded
+    const res = await client.rainlink.nodes.full.at(0)[1].rest.decodeTrack(encoded)
+    tester.debug(`@ Title: ${res.info.title}, Author: ${res.info.author}, URI: ${res.info.uri}`)
+    return res.info.identifier
   }, "5Cof9rP7TEQ")
+
+  await tester.testCase('#3. Decode track (client side)', async () => {
+    const data = await client.rainlink.search("Primary/yuiko - in the Garden")
+    const encoded = data.tracks[0].raw.encoded
+    const res = await client.rainlink.nodes.full.at(0)[1].driver.functions.get("decode")(encoded)
+    tester.debug(`@ Title: ${res.info.title}, Author: ${res.info.author}, URI: ${res.info.uri}`)
+    return res.info.identifier
+  }, "5Cof9rP7TEQc")
 
   process.exit(0)
 }

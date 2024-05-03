@@ -12,21 +12,21 @@ module.exports = class Tester {
   }
 
   async testCase(title, targetFunction, expected) {
-    this.debug(`TESTING | [ ${title} ]`)
+    this.debug(`TESTING  | ${title}`)
     try {
       const data = await targetFunction()
       if (data === "localPass") {
-        this.debug(`PASSED  | [ ${title} ]`)
+        this.debug(`PASSED   | ${title}`)
         return false
       }
       if (data !== expected) {
-        this.debug(`FAILED  | [ ${title} ] | Expected: ${expected} | Actural: ${data}`)
+        this.debug(`<FAILED> | ${title} | Expected: ${expected} | Actural: ${data}`)
         return false
       }
-      this.debug(`PASSED  | [ ${title} ]`)
+      this.debug(`PASSED   | ${title}`)
       return true
     } catch (err) {
-      this.debug(`FAILED  | [ ${title} ] | error logs:`)
+      this.debug(`<FAILED> | ${title} | error logs:`)
       console.error(err)
       process.exit()
     }
