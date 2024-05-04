@@ -214,12 +214,12 @@ class Decoder {
 			return {
 				encoded: this.track,
 				info: {
-					title: String(this.read('utf')),
-					author: String(this.read('utf')),
-					length: Number(this.read('long')),
-					identifier: String(this.read('utf')),
+					title: String(this.read('utf')), // Char
+					author: String(this.read('utf')), // Char
+					length: Number(this.read('long')), // Unsigned int 32-bit
+					identifier: String(this.read('utf')), // Char
 					isSeekable: true,
-					isStream: this.read('byte') === 1,
+					isStream: this.read('byte') === 1, // Byte
 					uri: String(this.read('utf')),
 					artworkUrl: this.read('byte') === 1 ? String(this.read('utf')) : null,
 					isrc: this.read('byte') === 1 ? String(this.read('utf')) : null,
@@ -238,6 +238,11 @@ class Decoder {
 		return this.position - bytes;
 	}
 
+	// utf: char -> string
+	// long: Unsigned int 32-bit -> number
+	// byte: Byte -> boolean (0 / 1)
+	// unsignedShort: Unsigned int 16-bit -> number
+	// int: Unsigned int 32-bit	-> number
 	protected read(type: string) {
 		switch (type) {
 		case 'byte': {
