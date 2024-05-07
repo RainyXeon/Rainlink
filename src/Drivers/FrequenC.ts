@@ -210,20 +210,20 @@ class Decoder {
 
 	get getTrack(): RawTrack | null {
 		try {
-			(((Number(this.read('int')) & 0xc0000000) >> 30) & 1) !== 0 ? this.read('byte') : 1;
+			(((this.readInt() & 0xc0000000) >> 30) & 1) !== 0 ? this.readByte() : 1;
 			return {
 				encoded: this.track,
 				info: {
-					title: String(this.read('utf')), // Char
-					author: String(this.read('utf')), // Char
-					length: Number(this.read('long')), // Unsigned int 32-bit
-					identifier: String(this.read('utf')), // Char
+					title: this.readUTF(), // Char
+					author: this.readUTF(), // Char
+					length: Number(this.readLong()), // Unsigned int 32-bit
+					identifier: this.readUTF(), // Char
 					isSeekable: true,
-					isStream: this.read('byte') === 1, // Byte
-					uri: String(this.read('utf')),
-					artworkUrl: this.read('byte') === 1 ? String(this.read('utf')) : null,
-					isrc: this.read('byte') === 1 ? String(this.read('utf')) : null,
-					sourceName: String(this.read('utf')).toLowerCase(),
+					isStream: this.readByte() === 1, // Byte
+					uri: this.readUTF(),
+					artworkUrl: this.readByte() === 1 ? this.readUTF() : null,
+					isrc: this.readByte() === 1 ? this.readUTF() : null,
+					sourceName: this.readUTF().toLowerCase(),
 					position: 0,
 				},
 				pluginInfo: {},
@@ -243,31 +243,32 @@ class Decoder {
 	// byte: Byte -> boolean (0 / 1)
 	// unsignedShort: Unsigned int 16-bit -> number
 	// int: Unsigned int 32-bit	-> number
-	protected read(type: string) {
-		switch (type) {
-		case 'byte': {
-			return this.buffer[this.changeBytes(1)];
-		}
-		case 'unsignedShort': {
-			const result = this.buffer.readUInt16BE(this.changeBytes(2));
-			return result;
-		}
-		case 'int': {
-			const result = this.buffer.readInt32BE(this.changeBytes(4));
-			return result;
-		}
-		case 'long': {
-			const msb: bigint = BigInt(this.read('int') as string | number | bigint | boolean);
-			const lsb: bigint = BigInt(this.read('int') as string | number | bigint | boolean);
 
-			return msb * BigInt(2 ** 32) + lsb;
-		}
-		case 'utf': {
-			const len = this.read('unsignedShort');
-			const start = this.changeBytes(Number(len));
-			const result = this.buffer.toString('utf8', start, Number(start) + Number(len));
-			return result;
-		}
-		}
+	protected readByte() {
+		return this.buffer[this.changeBytes(1)];
+	}
+	
+	protected readUnsignedShort() {
+		const result = this.buffer.readUInt16BE(this.changeBytes(2));
+		return result;
+	}
+
+	protected readInt() {
+		const result = this.buffer.readInt32BE(this.changeBytes(4));
+		return result;
+	}
+
+	protected readLong() {
+		const msb: bigint = BigInt(this.readInt());
+		const lsb: bigint = BigInt(this.readInt());
+
+		return msb * BigInt(2 ** 32) + lsb;
+	}
+
+	protected readUTF() {
+		const len = this.readUnsignedShort();
+		const start = this.changeBytes(Number(len));
+		const result = this.buffer.toString('utf8', start, Number(start) + Number(len));
+		return result;
 	}
 }
