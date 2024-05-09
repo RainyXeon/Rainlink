@@ -22,8 +22,6 @@ jobs:
       - name: "print version"
         run: npm --v
       - name: "Install packages"
-        run: |
-          npm i
-          npm ci
+        run: npm i
       - name: "Build packages"
         run: npm run build
