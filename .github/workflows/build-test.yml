@@ -17,10 +17,10 @@ jobs:
           node-version: '20.x'
           registry-url: 'https://registry.npmjs.org'
           cache: "npm"
-      - name: "Install latest npm version"
-        run: npm install -g npm
       - name: "print version"
-        run: npm --v
+        run: npm --v      
+      - name: "print node version"
+        run: node -v
       - name: "Install packages"
         run: npm i      
       - name: "Install packages (again)"
