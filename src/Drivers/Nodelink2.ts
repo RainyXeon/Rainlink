@@ -171,35 +171,31 @@ export class Nodelink2 extends AbstractDriver {
 		switch (nl2Data.loadType) {
 		case Nodelink2loadType.SHORTS: {
 			nl2Data.loadType = LavalinkLoadType.TRACK;
-			break;
+			return nl2Data;
 		}
 		case Nodelink2loadType.ALBUM: {
 			nl2Data.loadType = LavalinkLoadType.PLAYLIST;
-			break;
+			return nl2Data;
 		}
 		case Nodelink2loadType.ARTIST: {
 			nl2Data.loadType = LavalinkLoadType.PLAYLIST;
-			break;
+			return nl2Data;
 		}
 		case Nodelink2loadType.EPISODE: {
 			nl2Data.loadType = LavalinkLoadType.PLAYLIST;
-			break;
+			return nl2Data;
 		}
 		case Nodelink2loadType.STATION: {
 			nl2Data.loadType = LavalinkLoadType.PLAYLIST;
-			break;
+			return nl2Data;
 		}
 		case Nodelink2loadType.PODCAST: {
 			nl2Data.loadType = LavalinkLoadType.PLAYLIST;
-			break;
+			return nl2Data;
 		}
 		case Nodelink2loadType.SHOW: {
 			nl2Data.loadType = LavalinkLoadType.PLAYLIST;
-			break;
-		}
-		default: {
-			nl2Data.loadType = LavalinkLoadType.TRACK;
-			break;
+			return nl2Data;
 		}
 		}
 		return nl2Data;

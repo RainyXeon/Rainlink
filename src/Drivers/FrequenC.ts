@@ -247,7 +247,7 @@ class Decoder {
 	protected readByte() {
 		return this.buffer[this.changeBytes(1)];
 	}
-	
+
 	protected readUnsignedShort() {
 		const result = this.buffer.readUInt16BE(this.changeBytes(2));
 		return result;
