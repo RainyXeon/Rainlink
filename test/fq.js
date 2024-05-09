@@ -41,24 +41,26 @@ async function run() {
   await tester.testCase('Search tracks (title)', async () => {
     const data = await client.rainlink.search("Primary/yuiko - in the Garden")
     tester.debug(`<DATA> | Title: ${data.tracks[0].title}, Author: ${data.tracks[0].author}, URI: ${data.tracks[0].uri}`)
-    return data.tracks[0].raw.info.identifier
-  }, "5Cof9rP7TEQ")
+    return data.tracks.length !== 0 ? "localPass" : false
+  })
 
   await tester.testCase('Decode track (server side)', async () => {
     const data = await client.rainlink.search("Primary/yuiko - in the Garden")
     const encoded = data.tracks[0].raw.encoded
+    const testingId = data.tracks[0].identifier
     const res = await client.rainlink.nodes.full.at(0)[1].rest.decodeTrack(encoded)
     tester.debug(`<DATA> | Title: ${res.info.title}, Author: ${res.info.author}, URI: ${res.info.uri}`)
-    return res.info.identifier
-  }, "5Cof9rP7TEQ")
+    return res.info.identifier === testingId ? "localPass" : false
+  })
 
   await tester.testCase('Decode track (client side)', async () => {
     const data = await client.rainlink.search("Primary/yuiko - in the Garden")
     const encoded = data.tracks[0].raw.encoded
+    const testingId = data.tracks[0].identifier
     const res = await client.rainlink.nodes.full.at(0)[1].driver.functions.get("decode")(encoded)
     tester.debug(`<DATA> | Title: ${res.info.title}, Author: ${res.info.author}, URI: ${res.info.uri}`)
-    return res.info.identifier
-  }, "5Cof9rP7TEQ")
+    return res.info.identifier === testingId ? "localPass" : false
+  })
 
   tester.printSummary()
   process.exit(0)

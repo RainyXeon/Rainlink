@@ -40,12 +40,12 @@ async function run() {
   
   await tester.testCase('GET /info', async () => {
     const data = await client.rainlink.nodes.full.at(0)[1].rest.getInfo()
-    return "localPass" ?? true
+    return data ? "localPass" : true
   })
 
   await tester.testCase('GET /status', async () => {
     const data = await client.rainlink.nodes.full.at(0)[1].rest.getStatus()
-    return "localPass" ?? true
+    return data ? "localPass" : true
   })
 
   await tester.testCase('GET /sessions/{id}/players', async () => {
