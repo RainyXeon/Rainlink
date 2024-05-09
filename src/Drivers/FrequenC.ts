@@ -1,7 +1,7 @@
 import { Rainlink } from '../Rainlink';
 import { metadata } from '../metadata';
 import { RainlinkEvents } from '../Interface/Constants';
-import { RainlinkRequesterOptions } from '../Interface/Rest';
+import { RainlinkRequesterOptions, RawTrack } from '../Interface/Rest';
 import { RainlinkNode } from '../Node/RainlinkNode';
 import { AbstractDriver } from './AbstractDriver';
 import util from 'node:util';
@@ -38,6 +38,7 @@ export class FrequenC extends AbstractDriver {
 		this.node = node;
 		this.wsUrl = `${this.node.options.secure ? 'wss' : 'ws'}://${this.node.options.host}:${this.node.options.port}/v1/websocket`;
 		this.httpUrl = `${this.node.options.secure ? 'https://' : 'http://'}${this.node.options.host}:${this.node.options.port}/v1`;
+		this.functions.set('decode', this.decode);
 	}
 
 	public connect(): RainlinkWebsocket {
@@ -72,7 +73,7 @@ export class FrequenC extends AbstractDriver {
 		const url = new URL(`${this.httpUrl}${options.path}`);
 		if (options.params) url.search = new URLSearchParams(options.params).toString();
 		if (options.data) {
-			const converted = this.toSnake(options.data);
+			const converted = this.camelToSnake(options.data);
 			options.body = JSON.stringify(converted);
 		}
 
@@ -88,7 +89,9 @@ export class FrequenC extends AbstractDriver {
 		const res = await fetch(url, options);
 
 		if (res.status == 204) {
-			this.debug('Player now destroyed');
+			this.debug(
+				`${options.method ?? 'GET'} ${url.pathname + url.search} payload=${options.body ? String(options.body) : '{}'}`,
+			);
 			return undefined;
 		}
 		if (res.status !== 200) {
@@ -116,7 +119,7 @@ export class FrequenC extends AbstractDriver {
 
 	protected wsMessageEvent(data: string) {
 		if (!this.isRegistered) throw new Error(`Driver ${this.id} not registered by using initial()`);
-		const wsData = this.toSnake(JSON.parse(data.toString()));
+		const wsData = this.snakeToCamel(JSON.parse(data.toString()));
     this.node!.wsMessageEvent(wsData);
 	}
 
@@ -126,28 +129,6 @@ export class FrequenC extends AbstractDriver {
     	RainlinkEvents.Debug,
     	`[Rainlink] / [Node @ ${this.node?.options.name}] / [Driver] / [FrequenC1] | ${logs}`,
     );
-	}
-
-	protected toSnake(obj: Record<string, unknown>): Record<string, unknown> {
-		if (typeof obj !== 'object') return {};
-		if (!obj || JSON.stringify(obj) == '{}') return {};
-		const allKeys = Object.keys(obj);
-		const regex = /^([a-z]{1,})(_[a-z0-9]{1,})*$/;
-
-		for (const key of allKeys) {
-			let newKey;
-			if (!regex.test(key)) {
-				newKey = key.replace(/[A-Z]/g, letter => `_${letter.toLowerCase()}`);
-				obj[newKey] = obj[key];
-				delete obj[key];
-			}
-			if (newKey && typeof obj[newKey] !== 'object' && typeof obj[key] !== 'object') continue;
-
-			newKey
-				? this.toSnake(obj[newKey] as Record<string, unknown>)
-				: this.toSnake(obj[key] as Record<string, unknown>);
-		}
-		return obj;
 	}
 
 	public wsClose(): void {
@@ -168,5 +149,126 @@ export class FrequenC extends AbstractDriver {
 		await this.requester<{ resuming: boolean; timeout: number }>(options);
 		this.debug(`Session updated! resume: ${mode}, timeout: ${timeout}`);
 		return;
+	}
+
+	protected camelToSnake(obj: Record<string, unknown>): Record<string, unknown> {
+		if (typeof obj !== 'object') return {};
+		if (!obj || JSON.stringify(obj) == '{}') return {};
+		const allKeys = Object.keys(obj);
+		const regex = /^([a-z]{1,})(_[a-z0-9]{1,})*$/;
+
+		for (const key of allKeys) {
+			let newKey;
+			if (!regex.test(key)) {
+				newKey = key.replace(/[A-Z]/g, letter => `_${letter.toLowerCase()}`);
+				obj[newKey] = obj[key];
+				delete obj[key];
+			}
+			if (newKey && typeof obj[newKey] !== 'object' && typeof obj[key] !== 'object') continue;
+
+			newKey
+				? this.camelToSnake(obj[newKey] as Record<string, unknown>)
+				: this.camelToSnake(obj[key] as Record<string, unknown>);
+		}
+		return obj;
+	}
+
+	protected snakeToCamel(obj: Record<string, unknown>): Record<string, unknown> {
+		if (typeof obj !== 'object') return {};
+		if (!obj || JSON.stringify(obj) == '{}') return {};
+		const allKeys = Object.keys(obj);
+		for (const key of allKeys) {
+			let newKey;
+			if (/([-_][a-z])/.test(key)) {
+				newKey = key
+					.toLowerCase()
+					.replace(/([-_][a-z])/g, group => group.toUpperCase().replace('-', '').replace('_', ''));
+				obj[newKey] = obj[key];
+				delete obj[key];
+			}
+			if (newKey && typeof obj[newKey] !== 'object' && typeof obj[key] !== 'object') continue;
+
+			newKey
+				? this.snakeToCamel(obj[newKey] as Record<string, unknown>)
+				: this.snakeToCamel(obj[key] as Record<string, unknown>);
+		}
+		return obj;
+	}
+
+	protected decode(base64: string) {
+		return new Decoder(base64).getTrack ?? undefined;
+	}
+}
+
+class Decoder {
+	protected position: number;
+	protected buffer: Buffer;
+	constructor(protected track: string) {
+		this.position = 0;
+		this.buffer = Buffer.from(track, 'base64');
+	}
+
+	get getTrack(): RawTrack | null {
+		try {
+			(((this.readInt() & 0xc0000000) >> 30) & 1) !== 0 ? this.readByte() : 1;
+			return {
+				encoded: this.track,
+				info: {
+					title: this.readUTF(), // Char
+					author: this.readUTF(), // Char
+					length: Number(this.readLong()), // Unsigned int 32-bit
+					identifier: this.readUTF(), // Char
+					isSeekable: true,
+					isStream: this.readByte() === 1, // Byte
+					uri: this.readUTF(),
+					artworkUrl: this.readByte() === 1 ? this.readUTF() : null,
+					isrc: this.readByte() === 1 ? this.readUTF() : null,
+					sourceName: this.readUTF().toLowerCase(),
+					position: 0,
+				},
+				pluginInfo: {},
+			};
+		} catch (err) {
+			return null;
+		}
+	}
+
+	protected changeBytes(bytes: number) {
+		this.position += bytes;
+		return this.position - bytes;
+	}
+
+	// utf: char -> string
+	// long: Unsigned int 32-bit -> number
+	// byte: Byte -> boolean (0 / 1)
+	// unsignedShort: Unsigned int 16-bit -> number
+	// int: Unsigned int 32-bit	-> number
+
+	protected readByte() {
+		return this.buffer[this.changeBytes(1)];
+	}
+
+	protected readUnsignedShort() {
+		const result = this.buffer.readUInt16BE(this.changeBytes(2));
+		return result;
+	}
+
+	protected readInt() {
+		const result = this.buffer.readInt32BE(this.changeBytes(4));
+		return result;
+	}
+
+	protected readLong() {
+		const msb: bigint = BigInt(this.readInt());
+		const lsb: bigint = BigInt(this.readInt());
+
+		return msb * BigInt(2 ** 32) + lsb;
+	}
+
+	protected readUTF() {
+		const len = this.readUnsignedShort();
+		const start = this.changeBytes(Number(len));
+		const result = this.buffer.toString('utf8', start, Number(start) + Number(len));
+		return result;
 	}
 }

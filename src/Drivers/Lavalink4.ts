@@ -89,7 +89,9 @@ export class Lavalink4 extends AbstractDriver {
 		const res = await fetch(url, options);
 
 		if (res.status == 204) {
-			this.debug('Player now destroyed');
+			this.debug(
+				`${options.method ?? 'GET'} ${url.pathname + url.search} payload=${options.body ? String(options.body) : '{}'}`,
+			);
 			return undefined;
 		}
 		if (res.status !== 200) {

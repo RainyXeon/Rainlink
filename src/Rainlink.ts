@@ -588,7 +588,12 @@ export class Rainlink extends EventEmitter {
 		return this.buildSearch(
 			normalizedData.playlistName ?? undefined,
 			normalizedData.tracks.map(
-				track => new RainlinkTrack(track, options && options.requester ? options.requester : undefined),
+				track =>
+					new RainlinkTrack(
+						track,
+						options && options.requester ? options.requester : undefined,
+						node.driver.id,
+					),
 			),
 			loadType,
 		);

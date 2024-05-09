@@ -8,3 +8,10 @@ bot.test.js
 docs
 md
 src
+.github
+test
+.vscode
+test.***************
+tsup-config.json
+.eslintrc.yml
+.env
