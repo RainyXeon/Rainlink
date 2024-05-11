@@ -30,7 +30,7 @@ module.exports = class Tester {
         return true
       }
       if (data !== expected) {
-        this.debug(`<FAIL> | #${this.count}. ${title} | Expected: ${expected} | Actural: ${data}`)
+        this.debug(`!FAIL! | #${this.count}. ${title} | Expected: ${expected} | Actural: ${data}`)
         this.failed = this.failed + 1
         return false
       }
@@ -38,7 +38,7 @@ module.exports = class Tester {
       this.pass = this.pass + 1
       return true
     } catch (err) {
-      this.debug(`<FAIL> | #${this.count}. ${title} | error logs:`)
+      this.debug(`!FAIL! | #${this.count}. ${title} | error logs:`)
       this.failed = this.failed + 1
       console.error(err)
       process.exit()

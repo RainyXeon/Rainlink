@@ -8,9 +8,7 @@ import { RainlinkWebsocket } from '../../Utilities/RainlinkWebsocket';
 import { RainlinkDatabase } from '../../Utilities/RainlinkDatabase';
 
 export class RainlinkPlugin extends Plugin {
-	protected manager?: Rainlink;
-	/** Whenever the plugin is enabled or not */
-	public enabled: boolean = false;
+	protected manager: Rainlink | null = null;
 	protected runningWs: RainlinkDatabase<RainlinkWebsocket> = new RainlinkDatabase<RainlinkWebsocket>();
 
 	constructor() {
@@ -29,9 +27,7 @@ export class RainlinkPlugin extends Plugin {
 
 	/** Open the ws voice reciver client */
 	public open(node: RainlinkNode, voiceOptions: VoiceChannelOptions): void {
-		if (!this.enabled) throw new Error('This plugin is unloaded!');
-		if (!node.driver.id.includes('nodelink'))
-			throw new Error('This node not support voice receiver, please use Nodelink2 to use this feature!');
+		if (!this.manager) throw new Error('This plugin is unloaded!');
 		const wsUrl = `${node.options.secure ? 'wss' : 'ws'}://${node.options.host}:${node.options.port}`;
 		const ws = new RainlinkWebsocket(wsUrl + '/connection/data', {
 			headers: {
@@ -61,6 +57,7 @@ export class RainlinkPlugin extends Plugin {
 
 	/** Open the ws voice reciver client */
 	public close(guildId: string): void {
+		if (!this.manager) throw new Error('This plugin is unloaded!');
 		const targetWs = this.runningWs.get(guildId);
 		if (!targetWs) return;
 		targetWs.close(1006, 'Self closed');
@@ -70,6 +67,7 @@ export class RainlinkPlugin extends Plugin {
 	}
 
 	protected wsMessageEvent(node: RainlinkNode, data: string) {
+		if (!this.manager) throw new Error('This plugin is unloaded!');
 		const wsData = JSON.parse(data.toString());
 		this.debug(String(data));
 		switch (wsData.type) {
@@ -94,13 +92,26 @@ export class RainlinkPlugin extends Plugin {
 	/** Load function for make the plugin working */
 	public load(manager: Rainlink): void {
 		this.manager = manager;
-		this.enabled = true;
+		this.manager.on('playerCreate', player => {
+			if (!player.node.driver.id.includes('nodelink')) return;
+			this.open(player.node, {
+				guildId: player.guildId,
+				shardId: player.shardId,
+				voiceId: player.voiceId || '',
+				textId: player.textId,
+			});
+		});
+		this.manager.on('playerDestroy', player => {
+			if (!player.node.driver.id.includes('nodelink')) return;
+			this.close(player.guildId);
+		});
 	}
 
 	/** unload function for make the plugin stop working */
-	public unload(manager: Rainlink): void {
-		this.manager = manager;
-		this.enabled = false;
+	public unload(): void {
+		this.manager?.removeListener('playerCreate', () => {});
+		this.manager?.removeListener('playerDestroy', () => {});
+		this.manager = null;
 	}
 
 	protected debug(logs: string) {
