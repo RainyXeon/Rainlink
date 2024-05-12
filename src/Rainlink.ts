@@ -80,14 +80,6 @@ export declare interface Rainlink {
    */
   on(event: 'playerUpdate', listener: (player: RainlinkPlayer, data: Record<string, any>) => void): this;
   /**
-   * Emitted when a playuer is moved into another channel. [Require plugin]
-   * @event Rainlink#playerMoved
-   */
-  on(
-    event: 'playerMoved',
-    listener: (player: RainlinkPlayer, oldChannelId: string, newChannelId: string) => void,
-  ): this;
-  /**
    * Emitted when a track paused.
    * @event Rainlink#playerPause
    */
@@ -226,11 +218,6 @@ export declare interface Rainlink {
   /** @ignore */
   once(event: 'playerUpdate', listener: (player: RainlinkPlayer, data: Record<string, any>) => void): this;
   /** @ignore */
-  once(
-    event: 'playerMoved',
-    listener: (player: RainlinkPlayer, oldChannelId: string, newChannelId: string) => void,
-  ): this;
-  /** @ignore */
   once(event: 'playerPause', listener: (player: RainlinkPlayer, track: RainlinkTrack) => void): this;
   /** @ignore */
   once(event: 'playerResume', listener: (player: RainlinkPlayer, data: RainlinkTrack) => void): this;
@@ -317,11 +304,6 @@ export declare interface Rainlink {
   off(event: 'playerException', listener: (player: RainlinkPlayer, data: Record<string, any>) => void): this;
   /** @ignore */
   off(event: 'playerUpdate', listener: (player: RainlinkPlayer, data: Record<string, any>) => void): this;
-  /** @ignore */
-  off(
-    event: 'playerMoved',
-    listener: (player: RainlinkPlayer, oldChannelId: string, newChannelId: string) => void,
-  ): this;
   /** @ignore */
   off(event: 'playerPause', listener: (player: RainlinkPlayer, track: RainlinkTrack) => void): this;
   /** @ignore */
@@ -464,7 +446,7 @@ export class Rainlink extends EventEmitter {
 
 		if (this.rainlinkOptions.plugins) {
 			for (const [, plugin] of this.rainlinkOptions.plugins.entries()) {
-				if (plugin.constructor.name !== 'RainlinkPlugin')
+				if (!plugin.isRainlinkPlugin)
 					throw new Error('Plugin must be an instance of RainlinkPlugin or SourceRainlinkPlugin');
 				plugin.load(this);
 
