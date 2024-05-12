@@ -1,6 +1,5 @@
 import { metadata } from './metadata';
 import Library from './Library';
-import Plugin from './Plugin';
 
 // Export main class
 export * from './Rainlink';
@@ -30,7 +29,6 @@ export * from './Interface/Track';
 // Export plugin
 export * from './Plugin/RainlinkPlugin';
 export * from './Plugin/SourceRainlinkPlugin';
-export { Plugin };
 // Export driver
 export * from './Drivers/AbstractDriver';
 export * from './Drivers/Lavalink3';

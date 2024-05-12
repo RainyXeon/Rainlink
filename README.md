@@ -2,12 +2,6 @@
 
 Another lavalink wrapper but focus on stability and rich features
 
-# ⚠️ Warning!!
-
-⚠️ This lavalink wrapper is just in the beta stage, it will have some bug so please report it on github!
-
-⚠️ Update 5: Rainlink now in stage 25 of development (Near stable)
-
 # 🌟 Features
  - Stable client
  - Support TypeScript
@@ -49,6 +43,7 @@ This is the list of all rainlink plugin currently supported
 | rainlink-deezer    | Official | [npmjs](https://www.npmjs.com/package/rainlink-deezer) / [github](https://github.com/RainyProduction/rainlink-deezer)         | RainyXeon | 
 | rainlink-apple     | Official | [npmjs](https://www.npmjs.com/package/rainlink-apple) / [github](https://github.com/RainyProduction/rainlink-apple)           | RainyXeon | 
 | rainlink-spotify   | Official | [npmjs](https://www.npmjs.com/package/rainlink-spotify) / [github](https://github.com/RainyProduction/rainlink-spotify)       | RainyXeon | 
+| rainlink-voice     | Official | [npmjs](hhttps://www.npmjs.com/package/rainlink-voice) / [github](https://github.com/RainyProduction/rainlink-voice)          | RainyXeon | 
 
 # ⚙ Drivers
 
@@ -62,6 +57,21 @@ This is the list of all rainlink driver currently supported (codename is made up
 | frequenc/v1/miku  | [FrequenC](https://github.com/PerformanC/FrequenC)    | C          | IN TESTING        | miku     | This driver is in testing so don't use it or you will have errors |
 
 # 📃 Migrtation logs:
+## 0.9.2 -> 1.0.0
+```diff
+src/index.ts
+- Plugin
+- Plugin.VoiceReceiver
+- Plugin.PlayerMoved
+src/Interface/Constants.ts
+- VoiceConnect = 'voiceConnect',
+- VoiceDisconnect = 'voiceDisconnect',
+- VoiceError = 'voiceError',
+- VoiceStartSpeaking = 'voiceStartSpeaking',
+- VoiceEndSpeaking = 'voiceEndSpeaking',
+src/Plugin/RainlinkPlugin.ts
++ isRainlinkPlugin
+```
 
 ## 0.9.0 -> 0.9.2
 ```diff

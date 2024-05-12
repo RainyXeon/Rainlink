@@ -158,40 +158,6 @@ export declare interface Rainlink {
    */
   on(event: 'queueEmpty', listener: (player: RainlinkPlayer, queue: RainlinkQueue) => void): this;
   ////// ------------------------- Queue Event ------------------------- /////
-
-  ////// ------------------------- Voice Event ------------------------- /////
-  /**
-   * Emitted when connected to voice receive server [ONLY Nodelink DRIVER!!!!!!].
-   * @event Rainlink#voiceConnect
-   */
-  on(event: 'voiceConnect', listener: (node: RainlinkNode) => void): this;
-  /**
-   * Emitted when disconnected to voice receive server [ONLY Nodelink DRIVER!!!!!!].
-   * @event Rainlink#voiceDisconnect
-   */
-  on(event: 'voiceDisconnect', listener: (node: RainlinkNode, code: number, reason: Buffer) => void): this;
-  /**
-   * Emitted when voice receive server errored [ONLY Nodelink DRIVER!!!!!!].
-   * @event Rainlink#VoiceError
-   */
-  on(event: 'VoiceError', listener: (node: RainlinkNode, error: Error) => void): this;
-  /**
-   * Emitted when user started speaking [ONLY Nodelink DRIVER!!!!!!].
-   * @event Rainlink#voiceStartSpeaking
-   */
-  on(
-    event: 'voiceStartSpeaking',
-    listener: (node: RainlinkNode, userId: string, guildId: string) => void,
-  ): this;
-  /**
-   * Emitted when user finished speaking [ONLY Nodelink DRIVER!!!!!!].
-   * @event Rainlink#voiceEndSpeaking
-   */
-  on(
-    event: 'voiceEndSpeaking',
-    listener: (node: RainlinkNode, userTrack: string, userId: string, guildId: string) => void,
-  ): this;
-  ////// ------------------------- Voice Event ------------------------- /////
   // ------------------------- ON EVENT ------------------------- //
 
   // ------------------------- ONCE EVENT ------------------------- //
@@ -260,25 +226,6 @@ export declare interface Rainlink {
   /** @ignore */
   once(event: 'queueEmpty', listener: (player: RainlinkPlayer, queue: RainlinkQueue) => void): this;
   ////// ------------------------- Queue Event ------------------------- /////
-
-  ////// ------------------------- Voice Event ------------------------- /////
-  /** @ignore */
-  once(event: 'voiceConnect', listener: (node: RainlinkNode) => void): this;
-  /** @ignore */
-  once(event: 'voiceDisconnect', listener: (node: RainlinkNode, code: number, reason: Buffer) => void): this;
-  /** @ignore */
-  once(event: 'VoiceError', listener: (node: RainlinkNode, error: Error) => void): this;
-  /** @ignore */
-  once(
-    event: 'voiceStartSpeaking',
-    listener: (node: RainlinkNode, userId: string, guildId: string) => void,
-  ): this;
-  /** @ignore */
-  once(
-    event: 'voiceEndSpeaking',
-    listener: (node: RainlinkNode, userTrack: string, userId: string, guildId: string) => void,
-  ): this;
-  ////// ------------------------- Voice Event ------------------------- /////
   // ------------------------- ONCE EVENT ------------------------- //
 
   // ------------------------- OFF EVENT ------------------------- //
@@ -347,25 +294,6 @@ export declare interface Rainlink {
   /** @ignore */
   off(event: 'queueEmpty', listener: (player: RainlinkPlayer, queue: RainlinkQueue) => void): this;
   ////// ------------------------- Queue Event ------------------------- /////
-
-  ////// ------------------------- Voice Event ------------------------- /////
-  /** @ignore */
-  off(event: 'voiceConnect', listener: (node: RainlinkNode) => void): this;
-  /** @ignore */
-  off(event: 'voiceDisconnect', listener: (node: RainlinkNode, code: number, reason: Buffer) => void): this;
-  /** @ignore */
-  off(event: 'VoiceError', listener: (node: RainlinkNode, error: Error) => void): this;
-  /** @ignore */
-  off(
-    event: 'voiceStartSpeaking',
-    listener: (node: RainlinkNode, userId: string, guildId: string) => void,
-  ): this;
-  /** @ignore */
-  off(
-    event: 'voiceEndSpeaking',
-    listener: (node: RainlinkNode, userTrack: string, userId: string, guildId: string) => void,
-  ): this;
-  ////// ------------------------- Voice Event ------------------------- /////
   // ------------------------- OFF EVENT ------------------------- //
 }
 
