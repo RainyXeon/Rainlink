@@ -30,12 +30,6 @@ export enum RainlinkEvents {
   QueueShuffle = 'queueShuffle',
   QueueClear = 'queueClear',
   QueueEmpty = 'queueEmpty',
-  // Voice receiver
-  VoiceConnect = 'voiceConnect',
-  VoiceDisconnect = 'voiceDisconnect',
-  VoiceError = 'voiceError',
-  VoiceStartSpeaking = 'voiceStartSpeaking',
-  VoiceEndSpeaking = 'voiceEndSpeaking',
 }
 
 /**
