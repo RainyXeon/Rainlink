@@ -12,7 +12,6 @@ import {
 import { RainlinkTrack } from './RainlinkTrack.js';
 import { UpdatePlayerInfo, UpdatePlayerOptions } from '../Interface/Rest.js';
 import { RainlinkSearchOptions, RainlinkSearchResult } from '../Interface/Manager.js';
-import { RainlinkPlugin } from '../Plugin/VoiceReceiver/Plugin.js';
 import { ServerUpdate, StateUpdatePartial } from '../Interface/Connection.js';
 import { EventEmitter } from 'node:events';
 import { RainlinkDatabase } from '../Utilities/RainlinkDatabase.js';
@@ -199,8 +198,6 @@ export class RainlinkPlayer extends EventEmitter {
 		this.sudoDestroy = true;
 		this.clear(false);
 		this.disconnect();
-		const voiceReceiver = this.manager.plugins.get('rainlink-voiceReceiver') as RainlinkPlugin;
-		if (voiceReceiver && this.node.driver.id.includes('nodelink')) voiceReceiver.close(this.guildId);
 		this.node.rest.updatePlayer({
 			guildId: this.guildId,
 			playerOptions: {

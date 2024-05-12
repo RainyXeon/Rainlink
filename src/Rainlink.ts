@@ -464,7 +464,7 @@ export class Rainlink extends EventEmitter {
 
 		if (this.rainlinkOptions.plugins) {
 			for (const [, plugin] of this.rainlinkOptions.plugins.entries()) {
-				if (plugin.constructor.name !== 'RainlinkPlugin')
+				if (!plugin.isRainlinkPlugin)
 					throw new Error('Plugin must be an instance of RainlinkPlugin or SourceRainlinkPlugin');
 				plugin.load(this);
 

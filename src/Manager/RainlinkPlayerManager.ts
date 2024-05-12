@@ -2,7 +2,6 @@ import { RainlinkEvents, RainlinkPlayerState, VoiceState } from '../Interface/Co
 import { VoiceChannelOptions } from '../Interface/Player';
 import { RainlinkPlayer } from '../Player/RainlinkPlayer';
 import { Rainlink } from '../Rainlink';
-import { RainlinkPlugin } from '../Plugin/VoiceReceiver/Plugin';
 import { RainlinkDatabase } from '../Utilities/RainlinkDatabase';
 
 export class RainlinkPlayerManager extends RainlinkDatabase<RainlinkPlayer> {
@@ -50,8 +49,6 @@ export class RainlinkPlayerManager extends RainlinkDatabase<RainlinkPlayer> {
 		player.state = RainlinkPlayerState.CONNECTED;
 		this.debug('Player created at ' + options.guildId);
 		this.manager.emit(RainlinkEvents.PlayerCreate, player);
-		const voiceReceiver = this.manager.plugins.get('rainlink-voiceReceiver') as RainlinkPlugin;
-		if (voiceReceiver && node.driver.id.includes('nodelink')) voiceReceiver.open(node, options);
 		return player;
 	}
 

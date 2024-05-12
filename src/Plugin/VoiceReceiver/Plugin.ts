@@ -86,7 +86,6 @@ export class RainlinkPlugin extends Plugin {
 			break;
 		}
 		}
-		// this.node.wsMessageEvent(wsData);
 	}
 
 	/** Load function for make the plugin working */
