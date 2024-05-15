@@ -90,6 +90,8 @@ export class RainlinkPlayerEvents {
 	protected TrackExceptionEvent(manager: Rainlink, data: Record<string, any>) {
 		const player = manager.players.get(data.guildId);
 		if (player) {
+			player.playing = false;
+			player.paused = true;
 			manager.emit(RainlinkEvents.PlayerException, player, data);
 			manager.emit(
 				RainlinkEvents.Debug,
@@ -102,6 +104,8 @@ export class RainlinkPlayerEvents {
 	protected TrackStuckEvent(manager: Rainlink, data: Record<string, any>) {
 		const player = manager.players.get(data.guildId);
 		if (player) {
+			player.playing = false;
+			player.paused = true;
 			manager.emit(RainlinkEvents.TrackStuck, player, data);
 			manager.emit(
 				RainlinkEvents.Debug,
@@ -114,6 +118,8 @@ export class RainlinkPlayerEvents {
 	protected WebSocketClosedEvent(manager: Rainlink, data: Record<string, any>) {
 		const player = manager.players.get(data.guildId);
 		if (player) {
+			player.playing = false;
+			player.paused = true;
 			manager.emit(RainlinkEvents.PlayerWebsocketClosed, player, data);
 			manager.emit(
 				RainlinkEvents.Debug,

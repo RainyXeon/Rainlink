@@ -186,7 +186,7 @@ export class RainlinkPlayer extends EventEmitter {
 				},
 			},
 		};
-		this.node.rest.updatePlayer(playerUpdate);
+		await this.node.rest.updatePlayer(playerUpdate);
 	}
 
 	/**
@@ -196,18 +196,19 @@ export class RainlinkPlayer extends EventEmitter {
 	public async destroy(): Promise<void> {
 		this.checkDestroyed();
 		this.sudoDestroy = true;
+		if (this.playing)
+			await this.node.rest.updatePlayer({
+				guildId: this.guildId,
+				playerOptions: {
+					track: {
+						encoded: null,
+						length: 0,
+					},
+				},
+			});
 		this.clear(false);
 		this.disconnect();
-		this.node.rest.updatePlayer({
-			guildId: this.guildId,
-			playerOptions: {
-				track: {
-					encoded: null,
-					length: 0,
-				},
-			},
-		});
-		this.node.rest.destroyPlayer(this.guildId);
+		await this.node.rest.destroyPlayer(this.guildId);
 		this.manager.players.delete(this.guildId);
 		this.state = RainlinkPlayerState.DESTROYED;
 		this.debug('Player destroyed');
@@ -274,7 +275,7 @@ export class RainlinkPlayer extends EventEmitter {
 		}
 		if (playerOptions.position) this.position = playerOptions.position;
 
-		this.node.rest.updatePlayer({
+		await this.node.rest.updatePlayer({
 			guildId: this.guildId,
 			noReplace: options?.noReplace ?? false,
 			playerOptions,
@@ -315,7 +316,7 @@ export class RainlinkPlayer extends EventEmitter {
 	public async pause(): Promise<RainlinkPlayer> {
 		this.checkDestroyed();
 		if (this.paused == true) return this;
-		this.node.rest.updatePlayer({
+		await this.node.rest.updatePlayer({
 			guildId: this.guildId,
 			playerOptions: {
 				paused: true,
@@ -334,7 +335,7 @@ export class RainlinkPlayer extends EventEmitter {
 	public async resume(): Promise<RainlinkPlayer> {
 		this.checkDestroyed();
 		if (this.paused == false) return this;
-		this.node.rest.updatePlayer({
+		await this.node.rest.updatePlayer({
 			guildId: this.guildId,
 			playerOptions: {
 				paused: false,
@@ -354,7 +355,7 @@ export class RainlinkPlayer extends EventEmitter {
 	public async setPause(mode: boolean): Promise<RainlinkPlayer> {
 		this.checkDestroyed();
 		if (this.paused == mode) return this;
-		this.node.rest.updatePlayer({
+		await this.node.rest.updatePlayer({
 			guildId: this.guildId,
 			playerOptions: {
 				paused: mode,
@@ -400,7 +401,7 @@ export class RainlinkPlayer extends EventEmitter {
    */
 	public async skip(): Promise<RainlinkPlayer> {
 		this.checkDestroyed();
-		this.node.rest.updatePlayer({
+		await this.node.rest.updatePlayer({
 			guildId: this.guildId,
 			playerOptions: {
 				track: {
@@ -427,7 +428,7 @@ export class RainlinkPlayer extends EventEmitter {
 		if (position < 0 || position > (this.queue.current.duration ?? 0))
 			position = Math.max(Math.min(position, this.queue.current.duration ?? 0), 0);
 
-		this.node.rest.updatePlayer({
+		await this.node.rest.updatePlayer({
 			guildId: this.guildId,
 			playerOptions: {
 				position: position,
@@ -445,7 +446,7 @@ export class RainlinkPlayer extends EventEmitter {
 	public async setVolume(volume: number): Promise<RainlinkPlayer> {
 		this.checkDestroyed();
 		if (isNaN(volume)) throw new Error('volume must be a number');
-		this.node.rest.updatePlayer({
+		await this.node.rest.updatePlayer({
 			guildId: this.guildId,
 			playerOptions: {
 				volume: volume,
@@ -483,7 +484,7 @@ export class RainlinkPlayer extends EventEmitter {
 
 		this.clear(false);
 
-		this.node.rest.updatePlayer({
+		await this.node.rest.updatePlayer({
 			guildId: this.guildId,
 			playerOptions: {
 				track: {
@@ -624,7 +625,7 @@ export class RainlinkPlayer extends EventEmitter {
    */
 	public async send(data: UpdatePlayerInfo): Promise<RainlinkPlayer> {
 		this.checkDestroyed();
-		this.node.rest.updatePlayer(data);
+		await this.node.rest.updatePlayer(data);
 		return this;
 	}
 
