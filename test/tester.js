@@ -41,7 +41,6 @@ module.exports = class Tester {
       this.debug(`!FAIL! | #${this.count}. ${title} | error logs:`)
       this.failed = this.failed + 1
       console.error(err)
-      process.exit()
     }
   }
 

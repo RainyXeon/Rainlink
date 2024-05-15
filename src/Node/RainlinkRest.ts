@@ -67,7 +67,10 @@ export class RainlinkRest {
    */
 	public async decodeTrack(base64track: string): Promise<RawTrack | undefined> {
 		const options: RainlinkRequesterOptions = {
-			path: `/decodetrack?encodedTrack=${encodeURIComponent(base64track)}`,
+			path: '/decodetrack',
+			params: {
+				encodedTrack: base64track,
+			},
 			headers: { 'content-type': 'application/json' },
 		};
 		return await this.nodeManager.driver.requester<RawTrack>(options);
@@ -77,7 +80,7 @@ export class RainlinkRest {
    * Updates a Lavalink player
    * @returns Promise that resolves to a Lavalink player
    */
-	public updatePlayer(data: UpdatePlayerInfo): void {
+	public async updatePlayer(data: UpdatePlayerInfo): Promise<void> {
 		const options: RainlinkRequesterOptions = {
 			path: `/sessions/${this.sessionId}/players/${data.guildId}`,
 			params: { noReplace: data.noReplace?.toString() || 'false' },
@@ -86,20 +89,20 @@ export class RainlinkRest {
 			data: data.playerOptions as Record<string, unknown>,
 			rawReqData: data,
 		};
-		this.nodeManager.driver.requester<LavalinkPlayer>(options);
+		await this.nodeManager.driver.requester<LavalinkPlayer>(options);
 	}
 
 	/**
    * Destroy a Lavalink player
    * @returns Promise that resolves to a Lavalink player
    */
-	public destroyPlayer(guildId: string): void {
+	public async destroyPlayer(guildId: string): Promise<void> {
 		const options: RainlinkRequesterOptions = {
 			path: `/sessions/${this.sessionId}/players/${guildId}`,
 			headers: { 'content-type': 'application/json' },
 			method: 'DELETE',
 		};
-		this.nodeManager.driver.requester(options);
+		await this.nodeManager.driver.requester(options);
 	}
 
 	/**
@@ -153,12 +156,12 @@ export class RainlinkRest {
 	/**
    * Get Lavalink info
    */
-	public getInfo(): Promise<NodeInfo | undefined> {
+	public async getInfo(): Promise<NodeInfo | undefined> {
 		const options = {
 			path: '/info',
 			headers: { 'content-type': 'application/json' },
 		};
-		return this.nodeManager.driver.requester(options);
+		return await this.nodeManager.driver.requester(options);
 	}
 
 	protected testJSON(text: string) {
