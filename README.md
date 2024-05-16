@@ -43,7 +43,7 @@ This is the list of all rainlink plugin currently supported
 | rainlink-deezer    | Official | [npmjs](https://www.npmjs.com/package/rainlink-deezer) / [github](https://github.com/RainyProduction/rainlink-deezer)         | RainyXeon | 
 | rainlink-apple     | Official | [npmjs](https://www.npmjs.com/package/rainlink-apple) / [github](https://github.com/RainyProduction/rainlink-apple)           | RainyXeon | 
 | rainlink-spotify   | Official | [npmjs](https://www.npmjs.com/package/rainlink-spotify) / [github](https://github.com/RainyProduction/rainlink-spotify)       | RainyXeon | 
-| rainlink-voice     | Official | [npmjs](hhttps://www.npmjs.com/package/rainlink-voice) / [github](https://github.com/RainyProduction/rainlink-voice)          | RainyXeon | 
+| rainlink-voice     | Official | [npmjs](https://www.npmjs.com/package/rainlink-voice) / [github](https://github.com/RainyProduction/rainlink-voice)           | RainyXeon | 
 
 # ⚙ Drivers
 
@@ -99,49 +99,41 @@ src/index.ts (Add new class)
 ```js
 const {Client, GatewayIntentBits} = require('discord.js');
 const {Guilds, GuildVoiceStates, GuildMessages, MessageContent} = GatewayIntentBits;
-const {Rainlink, Library, Plugin, RainlinkDriver} = require("rainlink");
-
+const {Rainlink, Library} = require("rainlink");
 const Nodes = [{
     name: 'owo',
-    host: 'localhost',
+    host: '192.168.0.66',
     port: 2333,
     auth: 'youshallnotpass',
     secure: false,
-    // You don't have to add this properties if you're using lavalink v4.
-    // If you use a version other than lavalink, you can refer to the Drivers section above
-    driver: "lavalink/v4/koinu"
 }];
 
 const client = new Client({intents: [Guilds, GuildVoiceStates, GuildMessages, MessageContent]});
 const rainlink = new Rainlink({
     library: new Library.DiscordJS(client),
-    nodes: Nodes
+    nodes: Nodes,
 });
 
-client.on("ready", () => console.log(client.user.tag + " Ready!"));
+client.on("ready", () => console.log(client.user?.tag + " Ready!"));
 
 rainlink.on('nodeConnect', (node) => console.log(`Lavalink ${node.options.name}: Ready!`));
 rainlink.on('nodeError', (node, error) => console.error(`Lavalink ${node.options.name}: Error Caught,`, error));
-rainlink.on('nodeClosed', (node, code, reason) => console.warn(`Lavalink ${node.options.name}: Closed, Code ${code}, Reason ${reason || 'No reason'}`));
+rainlink.on("nodeClosed", (node) => console.warn(`Lavalink ${node.options.name}: Closed`))
 // rainlink.on('debug', (name, info) => console.debug(`Lavalink ${name}: Debug,`, info));
-rainlink.on('nodeDisconnect', (node, players, moved) => {
-    if (moved) return;
-    players.map(player => player.connection.disconnect())
-    console.warn(`Lavalink ${node.options.name}: Disconnected`);
+rainlink.on('nodeDisconnect', (node, code, reason) => {
+  console.warn(`Lavalink ${node.options.name}: Disconnected, Code ${code}, Reason ${reason || 'No reason'}`)
 });
 
 rainlink.on("trackStart", (player, track) => {
-    client.channels.cache.get(player.textId)?.send({content: `Now playing **${track.title}** by **${track.author}**`})
-        .then(x => player.data.set("message", x));
+    client.channels.cache.get(player.textId).send({content: `Now playing **${track.title}** by **${track.author}**`})
 });
 
 rainlink.on("trackEnd", (player) => {
-    player.data.get("message")?.edit({content: `Finished playing`});
+  client.channels.cache.get(player.textId).send({content: `Finished playing`})
 });
 
 rainlink.on("queueEmpty", player => {
-    client.channels.cache.get(player.textId)?.send({content: `Destroyed player due to inactivity.`})
-        .then(x => player.data.set("message", x));
+    client.channels.cache.get(player.textId).send({content: `Destroyed player due to inactivity.`})
     player.destroy();
 });
 
