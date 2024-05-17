@@ -87,8 +87,10 @@ export class FrequenC extends AbstractDriver {
 		//  + url.search;
 
 		if (options.path == '/decodetrack') {
-			const data = this.decode(options.params ? (options.params as Record<string, string>).encodedTrack : '') as D;
-			if (data) return data 
+			const data = this.decode(
+				options.params ? (options.params as Record<string, string>).encodedTrack : '',
+			) as D;
+			if (data) return data;
 		}
 
 		const res = await fetch(url, options);
