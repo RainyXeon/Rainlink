@@ -1,3 +1,6 @@
+/**
+ * The voice channel options interface for creating player
+ */
 export interface VoiceChannelOptions {
   guildId: string;
   shardId: number;
@@ -9,6 +12,9 @@ export interface VoiceChannelOptions {
   mute?: boolean;
 }
 
+/**
+ * The filter options interface for using with updatePlyer()
+ */
 export interface FilterOptions {
   volume?: number;
   equalizer?: Band[];

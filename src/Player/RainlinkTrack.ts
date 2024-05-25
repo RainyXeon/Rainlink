@@ -4,6 +4,9 @@ import { RawTrack } from '../Interface/Rest';
 import { ResolveOptions } from '../Interface/Track';
 import { RainlinkPlayer } from './RainlinkPlayer';
 
+/**
+ * A class for managing track info
+ */
 export class RainlinkTrack {
 	/** Encoded string from lavalink */
 	encoded: string;

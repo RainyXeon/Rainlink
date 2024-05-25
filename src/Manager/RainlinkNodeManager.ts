@@ -4,6 +4,7 @@ import { RainlinkNode } from '../Node/RainlinkNode';
 import { Rainlink } from '../Rainlink';
 import { RainlinkDatabase } from '../Utilities/RainlinkDatabase';
 
+/** The node manager class for managing all audio sending server/node */
 export class RainlinkNodeManager extends RainlinkDatabase<RainlinkNode> {
 	/** The rainlink manager */
 	public manager: Rainlink;

@@ -5,6 +5,10 @@ import { RainlinkWebsocket } from '../Utilities/RainlinkWebsocket';
 import { RainlinkPlayer } from '../Player/RainlinkPlayer';
 import { Rainlink } from '../Rainlink';
 
+/**
+ * The abstract class for developing driver
+ * to use another audio sending server.
+ */
 export abstract class AbstractDriver {
   /**  The id for the driver*/
   abstract id: string;

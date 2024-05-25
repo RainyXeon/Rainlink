@@ -297,6 +297,7 @@ export declare interface Rainlink {
   // ------------------------- OFF EVENT ------------------------- //
 }
 
+/** The heart of Rainlink. Manage all package action */
 export class Rainlink extends EventEmitter {
 	/**
    * Discord library connector

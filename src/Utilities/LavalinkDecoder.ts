@@ -1,6 +1,7 @@
 import { RawTrack } from '../Interface/Rest';
 import { AbstractDecoder } from './AbstractDecoder';
 
+/** A class to decode lavalink track */
 export class LavalinkDecoder extends AbstractDecoder {
 	/** The current position of base64 string */
 	protected position = 0;
@@ -16,7 +17,7 @@ export class LavalinkDecoder extends AbstractDecoder {
 	}
 
 	/** Get the decoded track with version detector */
-	get getTrack(): RawTrack | null {
+	public get getTrack(): RawTrack | null {
 		try {
 			const isVersioned = (((this.readInt() & 0xc0000000) >> 30) & 1) !== 0;
 			const version = isVersioned ? Number(this.readByte()) : 1;
@@ -37,7 +38,7 @@ export class LavalinkDecoder extends AbstractDecoder {
 	}
 
 	/** Get the decoded track with version 1 */
-	get trackVersionOne(): RawTrack | null {
+	public get trackVersionOne(): RawTrack | null {
 		try {
 			return {
 				encoded: this.track,
@@ -62,7 +63,7 @@ export class LavalinkDecoder extends AbstractDecoder {
 	}
 
 	/** Get the decoded track with version 2 */
-	get trackVersionTwo(): RawTrack | null {
+	public get trackVersionTwo(): RawTrack | null {
 		try {
 			return {
 				encoded: this.track,
@@ -87,7 +88,7 @@ export class LavalinkDecoder extends AbstractDecoder {
 	}
 
 	/** Get the decoded track with version 3 */
-	get trackVersionThree(): RawTrack | null {
+	public get trackVersionThree(): RawTrack | null {
 		try {
 			return {
 				encoded: this.track,

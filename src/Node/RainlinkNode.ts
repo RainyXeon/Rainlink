@@ -11,6 +11,7 @@ import { AbstractDriver } from '../Drivers/AbstractDriver';
 import { Lavalink4 } from '../Drivers/Lavalink4';
 import { RainlinkWebsocket } from '../Utilities/RainlinkWebsocket';
 
+/** The node manager class for managing current audio sending server/node */
 export class RainlinkNode {
 	/** The rainlink manager */
 	public manager: Rainlink;

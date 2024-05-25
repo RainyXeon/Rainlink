@@ -3,6 +3,9 @@ import { Rainlink } from '../Rainlink';
 import { RainlinkPlayer } from './RainlinkPlayer';
 import { RainlinkTrack } from './RainlinkTrack';
 
+/**
+ * A class for managing track queue
+ */
 export class RainlinkQueue extends Array<RainlinkTrack> {
 	/** Rainlink manager */
 	manager: Rainlink;

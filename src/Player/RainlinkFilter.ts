@@ -18,7 +18,15 @@ import {
 } from '../Interface/Player';
 import { RainlinkPlayer } from './RainlinkPlayer';
 
+/**
+ * This class is for set, clear and managing filter
+ */
 export class RainlinkFilter {
+	/**
+   * Current filter config
+   */
+	public currentFilter: FilterOptions | null = null;
+
 	constructor(protected player: RainlinkPlayer) {}
 
 	/**
@@ -43,6 +51,8 @@ export class RainlinkFilter {
 			},
 		});
 
+		this.currentFilter = filterData;
+
 		this.debug(
 			filter !== 'clear'
 				? `${filter} filter has been successfully set.`
@@ -65,6 +75,8 @@ export class RainlinkFilter {
 				filters: {},
 			},
 		});
+
+		this.currentFilter = null;
 
 		this.debug('All filters have been successfully reset to their default positions.');
 
@@ -165,6 +177,8 @@ export class RainlinkFilter {
 				filters: filter,
 			},
 		});
+
+		this.currentFilter = filter;
 
 		this.debug('Custom filter has been successfully set. Data: ' + util.inspect(filter));
 

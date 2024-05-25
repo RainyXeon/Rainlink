@@ -4,6 +4,7 @@ import { RainlinkPlayer } from '../Player/RainlinkPlayer';
 import { Rainlink } from '../Rainlink';
 import { RainlinkDatabase } from '../Utilities/RainlinkDatabase';
 
+/** The node manager class for managing all active players */
 export class RainlinkPlayerManager extends RainlinkDatabase<RainlinkPlayer> {
 	/** The rainlink manager */
 	public manager: Rainlink;
