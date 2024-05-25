@@ -1,13 +1,14 @@
 import { Rainlink } from '../Rainlink';
 import { metadata } from '../metadata';
 import { LavalinkLoadType, RainlinkEvents } from '../Interface/Constants';
-import { RainlinkRequesterOptions, RawTrack, UpdatePlayerInfo } from '../Interface/Rest';
+import { RainlinkRequesterOptions, UpdatePlayerInfo } from '../Interface/Rest';
 import { RainlinkNode } from '../Node/RainlinkNode';
 import { AbstractDriver } from './AbstractDriver';
 import util from 'node:util';
 import { RainlinkPlayer } from '../Player/RainlinkPlayer';
 import { RainlinkWebsocket } from '../Utilities/RainlinkWebsocket';
 import { RainlinkDatabase } from '../Utilities/RainlinkDatabase';
+import { LavalinkDecoder } from '../Utilities/LavalinkDecoder';
 
 export enum Lavalink3loadType {
   TRACK_LOADED = 'TRACK_LOADED',
@@ -372,134 +373,6 @@ export class Lavalink3 extends AbstractDriver {
 	}
 
 	protected decode(base64: string) {
-		return new Decoder(base64).getTrack ?? undefined;
-	}
-}
-
-class Decoder {
-	protected position = 0;
-	protected buffer: Buffer;
-	constructor(protected track: string) {
-		this.buffer = Buffer.from(track, 'base64');
-	}
-
-	get getTrack(): RawTrack | null {
-		try {
-			const isVersioned = (((this.readInt() & 0xc0000000) >> 30) & 1) !== 0;
-			const version = isVersioned ? Number(this.readByte()) : 1;
-
-			switch (version) {
-			case 1:
-				return this.trackVersionOne;
-			case 2:
-				return this.trackVersionTwo;
-			case 3:
-				return this.trackVersionThree;
-			default:
-				return null;
-			}
-		} catch {
-			return null;
-		}
-	}
-
-	get trackVersionOne(): RawTrack | null {
-		try {
-			return {
-				encoded: this.track,
-				info: {
-					title: this.readUTF(), // Char
-					author: this.readUTF(), // Char
-					length: Number(this.readLong()), // Unsigned int 32-bit
-					identifier: this.readUTF(), // Char
-					isSeekable: true,
-					isStream: !!this.readByte(), // Byte
-					uri: null,
-					artworkUrl: null,
-					isrc: null,
-					sourceName: this.readUTF().toLowerCase(),
-					position: Number(this.readLong()),
-				},
-				pluginInfo: {},
-			};
-		} catch {
-			return null;
-		}
-	}
-
-	get trackVersionTwo(): RawTrack | null {
-		try {
-			return {
-				encoded: this.track,
-				info: {
-					title: this.readUTF(), // Char
-					author: this.readUTF(), // Char
-					length: Number(this.readLong()), // Unsigned int 32-bit
-					identifier: this.readUTF(), // Char
-					isSeekable: true,
-					isStream: !!this.readByte(), // Byte
-					uri: this.readByte() ? this.readUTF() : null,
-					artworkUrl: null,
-					isrc: null,
-					sourceName: this.readUTF().toLowerCase(),
-					position: Number(this.readLong()),
-				},
-				pluginInfo: {},
-			};
-		} catch {
-			return null;
-		}
-	}
-
-	get trackVersionThree(): RawTrack | null {
-		try {
-			return {
-				encoded: this.track,
-				info: {
-					title: this.readUTF(), // Char
-					author: this.readUTF(), // Char
-					length: Number(this.readLong()), // Unsigned int 32-bit
-					identifier: this.readUTF(), // Char
-					isSeekable: true,
-					isStream: !!this.readByte(), // Byte
-					uri: this.readByte() ? this.readUTF() : null,
-					artworkUrl: this.readByte() ? this.readUTF() : null,
-					isrc: this.readByte() ? this.readUTF() : null,
-					sourceName: this.readUTF().toLowerCase(),
-					position: Number(this.readLong()),
-				},
-				pluginInfo: {},
-			};
-		} catch {
-			return null;
-		}
-	}
-
-	changeBytes(bytes: number) {
-		this.position += bytes;
-		return this.position - bytes;
-	}
-
-	readByte() {
-		return this.buffer[this.changeBytes(1)];
-	}
-
-	readUShort() {
-		return this.buffer.readUInt16BE(this.changeBytes(2));
-	}
-
-	readInt() {
-		return this.buffer.readInt32BE(this.changeBytes(4));
-	}
-
-	readLong() {
-		return this.buffer.readBigInt64BE(this.changeBytes(8));
-	}
-
-	readUTF() {
-		const len = this.readUShort();
-		const start = this.changeBytes(len);
-
-		return this.buffer.toString('utf8', start, start + len);
+		return new LavalinkDecoder(base64).getTrack ?? undefined;
 	}
 }
