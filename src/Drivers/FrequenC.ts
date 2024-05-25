@@ -8,6 +8,7 @@ import util from 'node:util';
 import { RainlinkPlayer } from '../Player/RainlinkPlayer';
 import { RainlinkWebsocket } from '../Utilities/RainlinkWebsocket';
 import { RainlinkDatabase } from '../Utilities/RainlinkDatabase';
+import { AbstractDecoder } from '../Utilities/AbstractDecoder';
 
 export class FrequenC extends AbstractDriver {
 	public id: string = 'frequenc/v1/miku';
@@ -207,26 +208,28 @@ export class FrequenC extends AbstractDriver {
 	}
 }
 
-class Decoder {
-	protected position: number;
+class Decoder extends AbstractDecoder {
+	protected position: number = 0;
 	protected buffer: Buffer;
 	constructor(protected track: string) {
-		this.position = 0;
+		super();
 		this.buffer = Buffer.from(track, 'base64');
 	}
-
 	get getTrack(): RawTrack | null {
 		try {
-			(((this.readInt() & 0xc0000000) >> 30) & 1) !== 0 ? this.readByte() : 1;
+			// Read the length of base64 (This will use later)
+			this.readInt();
+			// Read the version of base64 (This will use later)
+			this.readByte();
 			return {
 				encoded: this.track,
 				info: {
-					title: this.readUTF(), // Char
-					author: this.readUTF(), // Char
-					length: Number(this.readLong()), // Unsigned int 32-bit
-					identifier: this.readUTF(), // Char
+					title: this.readUTF(),
+					author: this.readUTF(),
+					length: Number(this.readLong()),
+					identifier: this.readUTF(),
 					isSeekable: true,
-					isStream: this.readByte() === 1, // Byte
+					isStream: this.readByte() === 1,
 					uri: this.readUTF(),
 					artworkUrl: this.readByte() === 1 ? this.readUTF() : null,
 					isrc: this.readByte() === 1 ? this.readUTF() : null,
@@ -238,44 +241,5 @@ class Decoder {
 		} catch (err) {
 			return null;
 		}
-	}
-
-	protected changeBytes(bytes: number) {
-		this.position += bytes;
-		return this.position - bytes;
-	}
-
-	// utf: char -> string
-	// long: Unsigned int 32-bit -> number
-	// byte: Byte -> boolean (0 / 1)
-	// unsignedShort: Unsigned int 16-bit -> number
-	// int: Unsigned int 32-bit	-> number
-
-	protected readByte() {
-		return this.buffer[this.changeBytes(1)];
-	}
-
-	protected readUnsignedShort() {
-		const result = this.buffer.readUInt16BE(this.changeBytes(2));
-		return result;
-	}
-
-	protected readInt() {
-		const result = this.buffer.readInt32BE(this.changeBytes(4));
-		return result;
-	}
-
-	protected readLong() {
-		const msb: bigint = BigInt(this.readInt());
-		const lsb: bigint = BigInt(this.readInt());
-
-		return msb * BigInt(2 ** 32) + lsb;
-	}
-
-	protected readUTF() {
-		const len = this.readUnsignedShort();
-		const start = this.changeBytes(Number(len));
-		const result = this.buffer.toString('utf8', start, Number(start) + Number(len));
-		return result;
 	}
 }

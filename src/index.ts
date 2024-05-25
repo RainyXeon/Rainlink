@@ -37,6 +37,8 @@ export * from './Drivers/Nodelink2';
 // Export utilities
 export * from './Utilities/RainlinkDatabase';
 export * from './Utilities/RainlinkWebsocket';
+export * from './Utilities/AbstractDecoder';
+export * from './Utilities/LavalinkDecoder';
 // Export metadata
 export * from './metadata';
 export const version = metadata.version;
