@@ -45,6 +45,7 @@ export interface LavalinkNodeStatsResponse {
   uptime: number;
 }
 
+/** The audio sending node infomation interface */
 export type NodeInfo = {
   version: NodeInfoVersion;
   buildTime: number;
@@ -56,6 +57,7 @@ export type NodeInfo = {
   plugins: NodeInfoPlugin[];
 };
 
+/** The audio sending node version infomation interface */
 export type NodeInfoVersion = {
   semver: string;
   major: number;
@@ -65,12 +67,14 @@ export type NodeInfoVersion = {
   build?: string;
 };
 
+/** The audio sending node git infomation interface */
 export type NodeInfoGit = {
   branch: string;
   commit: string;
   commitTime: number;
 };
 
+/** The audio sending node plugin infomation interface */
 export type NodeInfoPlugin = {
   name: string;
   version: string;

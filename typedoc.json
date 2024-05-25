@@ -5,7 +5,13 @@
   "excludeProtected": true,
   "excludePrivate": true,
   "entryPointStrategy": "resolve",
+  "sourceLinkExternal": true,
   "sort": ["kind"],
+  "validation": {
+    "notExported": false,
+    "invalidLink": true,
+    "notDocumented": false
+  },
   "exclude": [
     "src/Plugin/Nico/NicoSearchConst.ts",
     "src/Plugin/Nico/NicoSearch.ts",

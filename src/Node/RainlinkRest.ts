@@ -16,6 +16,10 @@ import {
 } from '../Interface/Rest';
 import { NodeInfo } from '../Interface/Node';
 
+/**
+ * The rest class for get and calling
+ * from audio sending node/server REST API
+ */
 export class RainlinkRest {
 	/** The rainlink manager */
 	public manager: Rainlink;

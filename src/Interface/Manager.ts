@@ -14,6 +14,9 @@ import { RainlinkFilter } from '../Player/RainlinkFilter';
  */
 export type Constructor<T> = new (...args: any[]) => T;
 
+/**
+ * The structures options interface for custom class/structures
+ */
 export interface Structures {
   /**
    * A custom structure that extends the RainlinkRest class

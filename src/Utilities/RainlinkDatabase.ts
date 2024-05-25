@@ -1,3 +1,7 @@
+/**
+ * A class for storing data using key like Map.
+ * Aka: reduce version of Map
+ */
 export class RainlinkDatabase<G = unknown> {
 	protected cache: Record<string, G> = {};
 

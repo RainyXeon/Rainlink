@@ -17,6 +17,9 @@ import { EventEmitter } from 'node:events';
 import { RainlinkDatabase } from '../Utilities/RainlinkDatabase.js';
 import { RainlinkFilter } from './RainlinkFilter.js';
 
+/**
+ * A class for managing player action.
+ */
 export class RainlinkPlayer extends EventEmitter {
 	/**
    * Main manager class

@@ -84,13 +84,13 @@ function parseFrameHeader(info: RainlinkWebsocketFHInfo, buffer: Buffer) {
 	};
 }
 
+/** Modded version of PWSL */
 export class RainlinkWebsocket extends EventEmitter {
 	protected socket: Socket | null;
 	protected continueInfo: ContinueInfoType;
 	protected state: RainlinkWebsocketState;
 
 	/**
-   * Modded version of PWSL class
    * @param url The WS url have to connect
    * @param options Some additional options of PWSL
    * @instance
