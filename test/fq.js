@@ -40,26 +40,45 @@ async function run() {
 
   await tester.testCase('Search tracks (title)', async () => {
     const data = await client.rainlink.search("Primary/yuiko - in the Garden")
-    tester.debug(`<DATA> | Title: ${data.tracks[0].title}, Author: ${data.tracks[0].author}, URI: ${data.tracks[0].uri}`)
+    tester.debug(`<DATA> | Type: ${data.type}, Tracks: ${data.tracks.length}`)
     return data.tracks.length !== 0 ? "localPass" : false
   })
 
   await tester.testCase('Decode track (server side)', async () => {
     const data = await client.rainlink.search("Primary/yuiko - in the Garden")
+    tester.debug(`<DATA> | Type: ${data.type}, Tracks: ${data.tracks.length}`)
     const encoded = data.tracks[0].raw.encoded
     const testingId = data.tracks[0].identifier
     const res = await client.rainlink.nodes.full.at(0)[1].rest.decodeTrack(encoded)
-    tester.debug(`<DATA> | Title: ${res.info.title}, Author: ${res.info.author}, URI: ${res.info.uri}`)
+    tester.debug(`<DATA> | Title: ${res ? res.info.title : "!FAILED!"}, Author: ${res ? res.info.author : "!FAILED!"}, URI: ${res ? res.info.uri : "!FAILED!"}`)
     return res.info.identifier === testingId ? "localPass" : false
   })
 
   await tester.testCase('Decode track (client side)', async () => {
     const data = await client.rainlink.search("Primary/yuiko - in the Garden")
+    tester.debug(`<DATA> | Type: ${data.type}, Tracks: ${data.tracks.length}`)
     const encoded = data.tracks[0].raw.encoded
     const testingId = data.tracks[0].identifier
     const res = await client.rainlink.nodes.full.at(0)[1].driver.functions.get("decode")(encoded)
-    tester.debug(`<DATA> | Title: ${res.info.title}, Author: ${res.info.author}, URI: ${res.info.uri}`)
+    tester.debug(`<DATA> | Title: ${res ? res.info.title : "!FAILED!"}, Author: ${res ? res.info.author : "!FAILED!"}, URI: ${res ? res.info.uri : "!FAILED!"}`)
     return res.info.identifier === testingId ? "localPass" : false
+  })
+
+  await tester.testCase('Connect to discord voice', async () => {
+    const isPass = await client.rainlink.create({
+      guildId: "1027945618347397220",
+      textId: "1163101075100946572",
+      voiceId: "1239150964284461086",
+      shardId: 0,
+      volume: 100
+    }).then(() => "localPass").catch(err => false)
+    return isPass
+  })
+
+  await tester.testCase('Disconnect to discord voice', async () => {
+    const isPass = await client.rainlink.players.destroy("1027945618347397220")
+    .then(() => "localPass").catch(err => false)
+    return isPass
   })
 
   tester.printSummary()

@@ -17,7 +17,14 @@ module.exports = class Tester {
   printSummary() {
     const passPercent = ((this.pass / this.count) * 100).toFixed(0)
     const failedPercent = ((this.failed / this.count) * 100).toFixed(0)
-    this.debug(`----- ${this.pass} tests passed, ${this.failed} tests failed. ${passPercent}% pass. ${failedPercent}% fail. -----`)
+    this.debug(``)
+    this.debug(`<o>--Test Results--<o>`)
+    this.debug(`# ${this.pass} tests passed`)
+    this.debug(`# ${this.failed} tests failed`)
+    this.debug(`# ${passPercent}% pass`)
+    this.debug(`# ${failedPercent}% fail`)
+    this.debug(`<0>-End of program-<0>`)
+    this.debug(``)
   }
 
   async testCase(title, targetFunction, expected) {

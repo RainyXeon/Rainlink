@@ -56,15 +56,34 @@ async function run() {
 
   await tester.testCase('Search tracks (title)', async () => {
     const data = await client.rainlink.search("Primary/yuiko - in the Garden")
+    tester.debug(`<DATA> | Type: ${data.type}, Tracks: ${data.tracks.length}`)
     tester.debug(`<DATA> | Title: ${data.tracks[0].title}, Author: ${data.tracks[0].author}, URI: ${data.tracks[0].uri}`)
     return data.tracks[0].raw.info.identifier
   }, "5Cof9rP7TEQ")
 
   await tester.testCase('Search tracks (uri)', async () => {
     const data = await client.rainlink.search("https://www.youtube.com/watch?v=5Cof9rP7TEQ")
+    tester.debug(`<DATA> | Type: ${data.type}, Tracks: ${data.tracks.length}`)
     tester.debug(`<DATA> | Title: ${data.tracks[0].title}, Author: ${data.tracks[0].author}, URI: ${data.tracks[0].uri}`)
     return data.tracks[0].raw.info.identifier
   }, "5Cof9rP7TEQ")
+
+  await tester.testCase('Connect to discord voice', async () => {
+    const isPass = await client.rainlink.create({
+      guildId: "1027945618347397220",
+      textId: "1163101075100946572",
+      voiceId: "1239150964284461086",
+      shardId: 0,
+      volume: 100
+    }).then(() => "localPass").catch(err => false)
+    return isPass
+  })
+
+  await tester.testCase('Disconnect to discord voice', async () => {
+    const isPass = await client.rainlink.players.destroy("1027945618347397220")
+    .then(() => "localPass").catch(err => false)
+    return isPass
+  })
 
   tester.printSummary()
 

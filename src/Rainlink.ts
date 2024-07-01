@@ -8,7 +8,7 @@ import {
 import { EventEmitter } from 'node:events';
 import { RainlinkNode } from './Node/RainlinkNode';
 import { AbstractLibrary } from './Library/AbstractLibrary';
-import { VoiceChannelOptions } from './Interface/Player';
+import { VoiceChannelOptions, PlayEncodedOptions } from './Interface/Player';
 import { RainlinkPlayerManager } from './Manager/RainlinkPlayerManager';
 import { RainlinkNodeManager } from './Manager/RainlinkNodeManager';
 import { LavalinkLoadType, RainlinkEvents, RainlinkPluginType, SourceIDs } from './Interface/Constants';
@@ -537,7 +537,12 @@ export class Rainlink extends EventEmitter {
 			resume: false,
 			userAgent: `Discord/Bot/${metadata.name}/${metadata.version} (${metadata.github})`,
 			nodeResolver: undefined,
-			structures: undefined,
+			structures: {
+            player: undefined,
+            rest: undefined,
+            queue: undefined,
+            filter: undefined
+         },
 			resumeTimeout: 300,
 		};
 	}
