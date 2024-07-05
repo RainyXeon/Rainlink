@@ -6,6 +6,7 @@ export enum RainlinkEvents {
   // Node
   NodeConnect = 'nodeConnect',
   NodeDisconnect = 'nodeDisconnect',
+	NodeReconnect = 'nodeReconnect',
   NodeClosed = 'nodeClosed',
   NodeError = 'nodeError',
   // Player

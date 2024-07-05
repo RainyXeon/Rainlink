@@ -46,6 +46,11 @@ export declare interface Rainlink {
    * @event Rainlink#nodeDisconnect
    */
   on(event: 'nodeDisconnect', listener: (node: RainlinkNode, code: number, reason: Buffer) => void): this;
+ 	/**
+   * Emitted when a lavalink server is trying to reconnect.
+   * @event Rainlink#nodeReconnect
+   */
+  on(event: 'nodeReconnect', listener: (node: RainlinkNode) => void): this;
   /**
    * Emitted when a lavalink server is closed.
    * @event Rainlink#nodeClosed
@@ -168,6 +173,8 @@ export declare interface Rainlink {
   once(event: 'nodeConnect', listener: (node: RainlinkNode) => void): this;
   /** @ignore */
   once(event: 'nodeDisconnect', listener: (node: RainlinkNode, code: number, reason: Buffer) => void): this;
+	/** @ignore */
+	once(event: 'nodeReconnect', listener: (node: RainlinkNode) => void): this;
   /** @ignore */
   once(event: 'nodeClosed', listener: (node: RainlinkNode) => void): this;
   /** @ignore */
@@ -236,6 +243,8 @@ export declare interface Rainlink {
   off(event: 'nodeConnect', listener: (node: RainlinkNode) => void): this;
   /** @ignore */
   off(event: 'nodeDisconnect', listener: (node: RainlinkNode, code: number, reason: Buffer) => void): this;
+	/** @ignore */
+	once(event: 'nodeReconnect', listener: (node: RainlinkNode) => void): this;
   /** @ignore */
   off(event: 'nodeClosed', listener: (node: RainlinkNode) => void): this;
   /** @ignore */
@@ -538,11 +547,11 @@ export class Rainlink extends EventEmitter {
 			userAgent: `Discord/Bot/${metadata.name}/${metadata.version} (${metadata.github})`,
 			nodeResolver: undefined,
 			structures: {
-            player: undefined,
-            rest: undefined,
-            queue: undefined,
-            filter: undefined
-         },
+        player: undefined,
+        rest: undefined,
+        queue: undefined,
+        filter: undefined
+      },
 			resumeTimeout: 300,
 		};
 	}

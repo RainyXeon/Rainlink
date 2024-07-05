@@ -28,7 +28,7 @@ Here: [https://rainlinkjs.vercel.app/](https://rainlinkjs.vercel.app/)
 # 💿 Used by
 
 | Name                                                 | Creator      | Variants          |
-| ---------------------------------------------------- | ------------ | ----------------- |
+|------------------------------------------------------|--------------|-------------------|
 | [ByteBlaze](https://github.com/RainyXeon/ByteBlaze)  | RainyXeon    | Modded / Built in |
 
 If you want to add your own bot create a pull request with your bot added. Please add your full name.
@@ -38,7 +38,7 @@ If you want to add your own bot create a pull request with your bot added. Pleas
 This is the list of all rainlink plugin currently supported
 
 | Name               | Type     | Link                                                                                                                          | Author    |
-| ------------------ | -------- | ----------------------------------------------------------------------------------------------------------------------------- | --------- |
+|--------------------|----------|-------------------------------------------------------------------------------------------------------------------------------|-----------|
 | rainlink-nico      | Official | [npmjs](https://www.npmjs.com/package/rainlink-nico) / [github](https://github.com/RainyProduction/rainlink-nico)             | RainyXeon |
 | rainlink-deezer    | Official | [npmjs](https://www.npmjs.com/package/rainlink-deezer) / [github](https://github.com/RainyProduction/rainlink-deezer)         | RainyXeon | 
 | rainlink-apple     | Official | [npmjs](https://www.npmjs.com/package/rainlink-apple) / [github](https://github.com/RainyProduction/rainlink-apple)           | RainyXeon | 
@@ -50,49 +50,11 @@ This is the list of all rainlink plugin currently supported
 This is the list of all rainlink driver currently supported (codename is made up by me)
 
 | Driver Name       | Voice Server                                          | Language   | Supported Version | Codename | Notes                                                             |
-| ----------------- | ----------------------------------------------------- | ---------- | ----------------- | -------- | ----------------------------------------------------------------- | 
+|-------------------|-------------------------------------------------------|------------|-------------------|----------|-------------------------------------------------------------------| 
 | lavalink/v4/koinu | [Lavalink](https://github.com/lavalink-devs/Lavalink) | Java       | v4.0.0 - v4.x.x   | koinu    |                                                                   |
 | lavalink/v3/koto  | [Lavalink](https://github.com/lavalink-devs/Lavalink) | Java       | v3.0.0 - v3.7.x   | koto     | `filter` and `resume` in lavalink below v3.4 not supported        |
 | nodelink/v2/nari  | [Nodelink](https://github.com/PerformanC/NodeLink)    | Javascript | v2.0.0 - v2.x.x   | nari     | Some `filter` mode in nodelink not supported                      |
 | frequenc/v1/miku  | [FrequenC](https://github.com/PerformanC/FrequenC)    | C          | IN TESTING        | miku     | This driver is in testing so don't use it or you will have errors |
-
-# 📃 Migrtation logs:
-## 0.9.2 -> 1.0.0
-```diff
-src/index.ts
-- Plugin
-- Plugin.VoiceReceiver
-- Plugin.PlayerMoved
-src/Interface/Constants.ts
-- VoiceConnect = 'voiceConnect',
-- VoiceDisconnect = 'voiceDisconnect',
-- VoiceError = 'voiceError',
-- VoiceStartSpeaking = 'voiceStartSpeaking',
-- VoiceEndSpeaking = 'voiceEndSpeaking',
-src/Plugin/RainlinkPlugin.ts
-+ isRainlinkPlugin
-```
-
-## 0.9.0 -> 0.9.2
-```diff
-src/Node/RainlinkRest.ts
-- getLavalinkInfo()
-+ getInfo()
-```
-
-## 0.8.0 -> 0.9.0
-```diff
-src/Player/RainlinkPlayer.ts
-- <RainlinkPlayer>.setFilter("nightcore")
-+ <RainlinkPlayer>.filter.set()
-+ <RainlinkPlayer>.filter
-
-src/Interface/Constants.ts
-+ RainlinkFilterMode
-
-src/index.ts (Add new class)
-+ RainlinkFilter
-```
 
 # 💾 Example bot:
 
@@ -168,8 +130,45 @@ client.on("messageCreate", async msg => {
     }
 })
 
-
 client.login('');
+```
+
+# 📃 Migrtation logs:
+## 0.9.2 -> 1.0.0
+```diff
+src/index.ts
+- Plugin
+- Plugin.VoiceReceiver
+- Plugin.PlayerMoved
+src/Interface/Constants.ts
+- VoiceConnect = 'voiceConnect',
+- VoiceDisconnect = 'voiceDisconnect',
+- VoiceError = 'voiceError',
+- VoiceStartSpeaking = 'voiceStartSpeaking',
+- VoiceEndSpeaking = 'voiceEndSpeaking',
+src/Plugin/RainlinkPlugin.ts
++ isRainlinkPlugin
+```
+
+## 0.9.0 -> 0.9.2
+```diff
+src/Node/RainlinkRest.ts
+- getLavalinkInfo()
++ getInfo()
+```
+
+## 0.8.0 -> 0.9.0
+```diff
+src/Player/RainlinkPlayer.ts
+- <RainlinkPlayer>.setFilter("nightcore")
++ <RainlinkPlayer>.filter.set()
++ <RainlinkPlayer>.filter
+
+src/Interface/Constants.ts
++ RainlinkFilterMode
+
+src/index.ts (Add new class)
++ RainlinkFilter
 ```
 
 # ✨ Special thanks
@@ -182,4 +181,4 @@ client.login('');
 
 # 💫 Credits
 - [@RainyXeon](https://github.com/RainyXeon): Owner of Rainlink
-- [@PAINFUEG0](https://github.com/PAINFUEG0): Tester and member of [#TeamRain](https://comming.soon)
+- [@PAINFUEG0](https://github.com/PAINFUEG0): Tester of [#TeamRain](https://comming.soon)
