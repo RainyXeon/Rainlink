@@ -172,6 +172,8 @@ export class RainlinkNode {
 	/** Reconnect back to this lavalink server */
 	public reconnect(noClean: boolean) {
 		if (!noClean) this.clean();
+		this.debug(`Node is trying to reconnect! URL: ${this.driver.wsUrl}`);
+		this.manager?.emit(RainlinkEvents.NodeReconnect, this)
 		this.driver.connect();
 	}
 
