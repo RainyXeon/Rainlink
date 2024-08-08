@@ -1,7 +1,7 @@
-import { DiscordJS } from './DiscordJS';
-import { ErisJS } from './ErisJS';
-import { OceanicJS } from './OceanicJS';
-import { Seyfert } from './Seyfert';
+import { DiscordJS } from './DiscordJS'
+import { ErisJS } from './ErisJS'
+import { OceanicJS } from './OceanicJS'
+import { Seyfert } from './Seyfert'
 
 /**
  * Import example:
@@ -18,4 +18,4 @@ export default {
 	ErisJS,
 	OceanicJS,
 	Seyfert,
-};
+}

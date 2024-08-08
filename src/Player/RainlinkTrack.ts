@@ -1,45 +1,45 @@
-import { RainlinkEvents } from '../Interface/Constants';
-import { RainlinkSearchResult, RainlinkSearchResultType } from '../Interface/Manager';
-import { RawTrack } from '../Interface/Rest';
-import { ResolveOptions } from '../Interface/Track';
-import { RainlinkPlayer } from './RainlinkPlayer';
+import { RainlinkEvents } from '../Interface/Constants'
+import { RainlinkSearchResult, RainlinkSearchResultType } from '../Interface/Manager'
+import { RawTrack } from '../Interface/Rest'
+import { ResolveOptions } from '../Interface/Track'
+import { RainlinkPlayer } from './RainlinkPlayer'
 
 /**
  * A class for managing track info
  */
 export class RainlinkTrack {
 	/** Encoded string from lavalink */
-	encoded: string;
+	encoded: string
 	/** Identifier string from lavalink */
-	identifier: string;
+	identifier: string
 	/** Whenever track is seekable or not */
-	isSeekable: boolean;
+	isSeekable: boolean
 	/** Track's author */
-	author: string;
+	author: string
 	/** Track's duration */
-	duration: number;
+	duration: number
 	/** Whenever track is stream able or not */
-	isStream: boolean;
+	isStream: boolean
 	/** Track's position */
-	position: number;
+	position: number
 	/** Track's title */
-	title: string;
+	title: string
 	/** Track's URL */
-	uri: string | null = null;
+	uri: string | null = null
 	/** Track's artwork URL */
-	artworkUrl: string | null = null;
+	artworkUrl: string | null = null
 	/** Track's isrc */
-	isrc: string | null = null;
+	isrc: string | null = null
 	/** Track's source name */
-	source: string;
+	source: string
 	/** Data from lavalink plugin */
-	pluginInfo: unknown;
+	pluginInfo: unknown
 	/** Track's requester */
-	requester: unknown;
+	requester: unknown
 	/** Track's realUri (youtube fall back) */
-	realUri: string | null = null;
+	realUri: string | null = null
 	/** Name of the driver that search this track */
-	driverName?: string;
+	driverName?: string
 
 	/**
    * The rainlink track class for playing track from lavalink
@@ -49,24 +49,24 @@ export class RainlinkTrack {
 	constructor(
     protected options: RawTrack,
     requester: unknown,
-    driverName?: string,
+    driverName?: string
 	) {
-		this.encoded = options.encoded;
-		this.identifier = options.info.identifier;
-		this.isSeekable = options.info.isSeekable;
-		this.author = options.info.author;
-		this.duration = options.info.length;
-		this.isStream = options.info.isStream;
-		this.position = options.info.position;
-		this.title = options.info.title;
-		this.uri = options.info.uri;
-		this.artworkUrl = options.info.artworkUrl;
-		this.isrc = options.info.isrc;
-		this.source = options.info.sourceName;
-		this.pluginInfo = options.pluginInfo;
-		this.requester = requester;
-		this.realUri = null;
-		this.driverName = driverName;
+		this.encoded = options.encoded
+		this.identifier = options.info.identifier
+		this.isSeekable = options.info.isSeekable
+		this.author = options.info.author
+		this.duration = options.info.length
+		this.isStream = options.info.isStream
+		this.position = options.info.position
+		this.title = options.info.title
+		this.uri = options.info.uri
+		this.artworkUrl = options.info.artworkUrl
+		this.isrc = options.info.isrc
+		this.source = options.info.sourceName
+		this.pluginInfo = options.pluginInfo
+		this.requester = requester
+		this.realUri = null
+		this.driverName = driverName
 	}
 
 	/**
@@ -82,7 +82,7 @@ export class RainlinkTrack {
       !!this.duration &&
       !!this.title &&
       !!this.uri
-		);
+		)
 	}
 
 	/**
@@ -106,102 +106,106 @@ export class RainlinkTrack {
 				sourceName: this.source,
 			},
 			pluginInfo: this.pluginInfo,
-		};
+		}
 	}
 
 	/** @ignore */
 	public async resolver(player: RainlinkPlayer, options?: ResolveOptions): Promise<RainlinkTrack> {
-		const { overwrite } = options ? options : { overwrite: false };
+		const { overwrite } = options ? options : { overwrite: false }
 
 		if (this.isPlayable && this.driverName == player.node.driver.id) {
-			this.realUri = this.raw.info.uri;
-			return this;
+			this.realUri = this.raw.info.uri
+			return this
 		}
 
 		player.manager.emit(
 			RainlinkEvents.Debug,
-			`[Rainlink] / [Track] | Resolving ${this.source} track ${this.title}; Source: ${this.source}`,
-		);
+			`[Rainlink] / [Track] | Resolving ${this.source} track ${this.title}; Source: ${this.source}`
+		)
 
-		const result = await this.getTrack(player);
-		if (!result) throw new Error('No results found');
+		const result = await this.getTrack(player)
+		if (!result) throw new Error('No results found')
 
-		this.encoded = result.encoded;
-		this.realUri = result.info.uri;
-		this.duration = result.info.length;
+		this.encoded = result.encoded
+		this.realUri = result.info.uri
+		this.duration = result.info.length
 
 		if (overwrite) {
-			this.title = result.info.title;
-			this.identifier = result.info.identifier;
-			this.isSeekable = result.info.isSeekable;
-			this.author = result.info.author;
-			this.duration = result.info.length;
-			this.isStream = result.info.isStream;
-			this.uri = result.info.uri;
+			this.title = result.info.title
+			this.identifier = result.info.identifier
+			this.isSeekable = result.info.isSeekable
+			this.author = result.info.author
+			this.duration = result.info.length
+			this.isStream = result.info.isStream
+			this.uri = result.info.uri
 		}
-		return this;
+		return this
 	}
 
 	protected async getTrack(player: RainlinkPlayer): Promise<RawTrack> {
-		const result = await this.resolverEngine(player);
+		const result = await this.resolverEngine(player)
 
-		if (!result || !result.tracks.length) throw new Error('No results found');
+		if (!result || !result.tracks.length) throw new Error('No results found')
 
-		const rawTracks = result.tracks.map(x => x.raw);
+		const rawTracks = result.tracks.map((x) => x.raw)
 
 		if (this.author) {
-			const author = [this.author, `${this.author} - Topic`];
+			const author = [this.author, `${this.author} - Topic`]
 			const officialTrack = rawTracks.find(
-				track =>
-					author.some(name => new RegExp(`^${this.escapeRegExp(name)}$`, 'i').test(track.info.author)) ||
-          new RegExp(`^${this.escapeRegExp(this.title)}$`, 'i').test(track.info.title),
-			);
-			if (officialTrack) return officialTrack;
+				(track) =>
+					author.some((name) =>
+						new RegExp(`^${this.escapeRegExp(name)}$`, 'i').test(track.info.author)
+					) || new RegExp(`^${this.escapeRegExp(this.title)}$`, 'i').test(track.info.title)
+			)
+			if (officialTrack) return officialTrack
 		}
 		if (this.duration) {
 			const sameDuration = rawTracks.find(
-				track =>
+				(track) =>
 					track.info.length >= (this.duration ? this.duration : 0) - 2000 &&
-          track.info.length <= (this.duration ? this.duration : 0) + 2000,
-			);
-			if (sameDuration) return sameDuration;
+          track.info.length <= (this.duration ? this.duration : 0) + 2000
+			)
+			if (sameDuration) return sameDuration
 		}
 
-		return rawTracks[0];
+		return rawTracks[0]
 	}
 
 	protected escapeRegExp(string: string) {
-		return string.replace(/[/\-\\^$*+?.()|[\]{}]/g, '\\$&');
+		return string.replace(/[/\-\\^$*+?.()|[\]{}]/g, '\\$&')
 	}
 
 	protected async resolverEngine(player: RainlinkPlayer): Promise<RainlinkSearchResult> {
-		const defaultSearchEngine = player.manager.rainlinkOptions.options!.defaultSearchEngine;
-		const engine = player.manager.searchEngines.get(this.source || defaultSearchEngine || 'youtube');
-		const searchQuery = [this.author, this.title].filter(x => !!x).join(' - ');
-		const searchFallbackEngineName = player.manager.rainlinkOptions.options!.searchFallback!.engine;
-		const searchFallbackEngine = player.manager.searchEngines.get(searchFallbackEngineName);
+		const defaultSearchEngine = player.manager.rainlinkOptions.options!.defaultSearchEngine
+		const engine = player.manager.searchEngines.get(this.source || defaultSearchEngine || 'youtube')
+		const searchQuery = [this.author, this.title].filter((x) => !!x).join(' - ')
+		const searchFallbackEngineName = player.manager.rainlinkOptions.options!.searchFallback!.engine
+		const searchFallbackEngine = player.manager.searchEngines.get(searchFallbackEngineName)
 
 		const prase1 = await player.search(`directSearch=${this.uri}`, {
 			requester: this.requester,
-		});
-		if (prase1.tracks.length !== 0) return prase1;
+		})
+		if (prase1.tracks.length !== 0) return prase1
 
 		const prase2 = await player.search(`directSearch=${engine}search:${searchQuery}`, {
 			requester: this.requester,
-		});
-		if (prase2.tracks.length !== 0) return prase2;
+		})
+		if (prase2.tracks.length !== 0) return prase2
 
 		if (player.manager.rainlinkOptions.options!.searchFallback?.enable && searchFallbackEngine) {
-			const prase3 = await player.search(`directSearch=${searchFallbackEngine}search:${searchQuery}`, {
-				requester: this.requester,
-			});
-			if (prase3.tracks.length !== 0) return prase3;
+			const prase3 = await player.search(
+				`directSearch=${searchFallbackEngine}search:${searchQuery}`,
+				{
+					requester: this.requester,
+				}
+			)
+			if (prase3.tracks.length !== 0) return prase3
 		}
 
 		return {
 			type: RainlinkSearchResultType.SEARCH,
 			playlistName: undefined,
 			tracks: [],
-		};
+		}
 	}
 }

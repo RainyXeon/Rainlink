@@ -1,10 +1,10 @@
 // Modded from: https://github.com/shipgirlproject/Shoukaku/blob/396aa531096eda327ade0f473f9807576e9ae9df/src/connectors/Connector.ts
 // Special thanks to shipgirlproject team!
 
-import { RainlinkNodeOptions } from '../Interface/Manager';
-import { Rainlink } from '../Rainlink';
-import { LavalinkLoadType } from '../Interface/Constants';
-import { RainlinkNode } from './RainlinkNode';
+import { RainlinkNodeOptions } from '../Interface/Manager'
+import { Rainlink } from '../Rainlink'
+import { LavalinkLoadType } from '../Interface/Constants'
+import { RainlinkNode } from './RainlinkNode'
 import {
 	LavalinkPlayer,
 	LavalinkResponse,
@@ -13,8 +13,8 @@ import {
 	RawTrack,
 	RoutePlanner,
 	UpdatePlayerInfo,
-} from '../Interface/Rest';
-import { NodeInfo } from '../Interface/Node';
+} from '../Interface/Rest'
+import { NodeInfo } from '../Interface/Node'
 
 /**
  * The rest class for get and calling
@@ -22,11 +22,11 @@ import { NodeInfo } from '../Interface/Node';
  */
 export class RainlinkRest {
 	/** The rainlink manager */
-	public manager: Rainlink;
-	protected options: RainlinkNodeOptions;
+	public manager: Rainlink
+	protected options: RainlinkNodeOptions
 	/** The node manager (RainlinkNode class) */
-	public nodeManager: RainlinkNode;
-	protected sessionId: string | null;
+	public nodeManager: RainlinkNode
+	protected sessionId: string | null
 
 	/**
    * The lavalink rest server handler class
@@ -35,10 +35,10 @@ export class RainlinkRest {
    * @param nodeManager The rainlink's lavalink server handler class
    */
 	constructor(manager: Rainlink, options: RainlinkNodeOptions, nodeManager: RainlinkNode) {
-		this.manager = manager;
-		this.options = options;
-		this.nodeManager = nodeManager;
-		this.sessionId = this.nodeManager.driver.sessionId ? this.nodeManager.driver.sessionId : '';
+		this.manager = manager
+		this.options = options
+		this.nodeManager = nodeManager
+		this.sessionId = this.nodeManager.driver.sessionId ? this.nodeManager.driver.sessionId : ''
 	}
 
 	/**
@@ -49,8 +49,8 @@ export class RainlinkRest {
 		const options: RainlinkRequesterOptions = {
 			path: `/sessions/${this.sessionId}/players`,
 			headers: { 'content-type': 'application/json' },
-		};
-		return (await this.nodeManager.driver.requester<LavalinkPlayer[]>(options)) ?? [];
+		}
+		return (await this.nodeManager.driver.requester<LavalinkPlayer[]>(options)) ?? []
 	}
 
 	/**
@@ -61,8 +61,8 @@ export class RainlinkRest {
 		const options: RainlinkRequesterOptions = {
 			path: '/stats',
 			headers: { 'content-type': 'application/json' },
-		};
-		return await this.nodeManager.driver.requester<LavalinkStats>(options);
+		}
+		return await this.nodeManager.driver.requester<LavalinkStats>(options)
 	}
 
 	/**
@@ -76,8 +76,8 @@ export class RainlinkRest {
 				encodedTrack: base64track,
 			},
 			headers: { 'content-type': 'application/json' },
-		};
-		return await this.nodeManager.driver.requester<RawTrack>(options);
+		}
+		return await this.nodeManager.driver.requester<RawTrack>(options)
 	}
 
 	/**
@@ -92,8 +92,8 @@ export class RainlinkRest {
 			method: 'PATCH',
 			data: data.playerOptions as Record<string, unknown>,
 			rawReqData: data,
-		};
-		await this.nodeManager.driver.requester<LavalinkPlayer>(options);
+		}
+		await this.nodeManager.driver.requester<LavalinkPlayer>(options)
 	}
 
 	/**
@@ -105,8 +105,8 @@ export class RainlinkRest {
 			path: `/sessions/${this.sessionId}/players/${guildId}`,
 			headers: { 'content-type': 'application/json' },
 			method: 'DELETE',
-		};
-		await this.nodeManager.driver.requester(options);
+		}
+		await this.nodeManager.driver.requester(options)
 	}
 
 	/**
@@ -119,16 +119,16 @@ export class RainlinkRest {
 			params: { identifier: data },
 			headers: { 'content-type': 'application/json' },
 			method: 'GET',
-		};
+		}
 
-		const resData = await this.nodeManager.driver.requester<LavalinkResponse>(options);
+		const resData = await this.nodeManager.driver.requester<LavalinkResponse>(options)
 
 		if (!resData) {
 			return {
 				loadType: LavalinkLoadType.EMPTY,
 				data: {},
-			};
-		} else return resData;
+			}
+		} else return resData
 	}
 
 	/**
@@ -139,8 +139,8 @@ export class RainlinkRest {
 		const options = {
 			path: '/routeplanner/status',
 			headers: { 'content-type': 'application/json' },
-		};
-		return await this.nodeManager.driver.requester<RoutePlanner>(options);
+		}
+		return await this.nodeManager.driver.requester<RoutePlanner>(options)
 	}
 
 	/**
@@ -153,8 +153,8 @@ export class RainlinkRest {
 			method: 'POST',
 			headers: { 'content-type': 'application/json' },
 			data: { address },
-		};
-		await this.nodeManager.driver.requester(options);
+		}
+		await this.nodeManager.driver.requester(options)
 	}
 
 	/**
@@ -164,19 +164,19 @@ export class RainlinkRest {
 		const options = {
 			path: '/info',
 			headers: { 'content-type': 'application/json' },
-		};
-		return await this.nodeManager.driver.requester(options);
+		}
+		return await this.nodeManager.driver.requester(options)
 	}
 
 	protected testJSON(text: string) {
 		if (typeof text !== 'string') {
-			return false;
+			return false
 		}
 		try {
-			JSON.parse(text);
-			return true;
+			JSON.parse(text)
+			return true
 		} catch (error) {
-			return false;
+			return false
 		}
 	}
 }

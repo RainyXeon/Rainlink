@@ -1,39 +1,39 @@
-import { RawTrack } from '../Interface/Rest';
-import { AbstractDecoder } from './AbstractDecoder';
+import { RawTrack } from '../Interface/Rest'
+import { AbstractDecoder } from './AbstractDecoder'
 
 /** A class to decode lavalink track */
 export class LavalinkDecoder extends AbstractDecoder {
 	/** The current position of base64 string */
-	protected position = 0;
+	protected position = 0
 	/** The current base64 buffer */
-	protected buffer: Buffer;
+	protected buffer: Buffer
 	/** The current base64 track */
-	protected track: string;
+	protected track: string
 
 	constructor(track: string) {
-		super();
-		this.track = track;
-		this.buffer = Buffer.from(track, 'base64');
+		super()
+		this.track = track
+		this.buffer = Buffer.from(track, 'base64')
 	}
 
 	/** Get the decoded track with version detector */
 	public get getTrack(): RawTrack | null {
 		try {
-			const isVersioned = (((this.readInt() & 0xc0000000) >> 30) & 1) !== 0;
-			const version = isVersioned ? Number(this.readByte()) : 1;
+			const isVersioned = (((this.readInt() & 0xc0000000) >> 30) & 1) !== 0
+			const version = isVersioned ? Number(this.readByte()) : 1
 
 			switch (version) {
 			case 1:
-				return this.trackVersionOne;
+				return this.trackVersionOne
 			case 2:
-				return this.trackVersionTwo;
+				return this.trackVersionTwo
 			case 3:
-				return this.trackVersionThree;
+				return this.trackVersionThree
 			default:
-				return null;
+				return null
 			}
 		} catch {
-			return null;
+			return null
 		}
 	}
 
@@ -56,9 +56,9 @@ export class LavalinkDecoder extends AbstractDecoder {
 					position: Number(this.readLong()),
 				},
 				pluginInfo: {},
-			};
+			}
 		} catch {
-			return null;
+			return null
 		}
 	}
 
@@ -81,9 +81,9 @@ export class LavalinkDecoder extends AbstractDecoder {
 					position: Number(this.readLong()),
 				},
 				pluginInfo: {},
-			};
+			}
 		} catch {
-			return null;
+			return null
 		}
 	}
 
@@ -106,9 +106,9 @@ export class LavalinkDecoder extends AbstractDecoder {
 					position: Number(this.readLong()),
 				},
 				pluginInfo: {},
-			};
+			}
 		} catch {
-			return null;
+			return null
 		}
 	}
 }

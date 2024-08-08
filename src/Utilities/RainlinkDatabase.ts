@@ -3,7 +3,7 @@
  * Aka: reduce version of Map
  */
 export class RainlinkDatabase<G = unknown> {
-	protected cache: Record<string, G> = {};
+	protected cache: Record<string, G> = {}
 
 	/**
    * Get data from database
@@ -11,7 +11,7 @@ export class RainlinkDatabase<G = unknown> {
    * @returns D
    */
 	get<D = G>(key: string): D | undefined {
-		return (this.cache[key] as unknown as D) ?? undefined;
+		return (this.cache[key] as unknown as D) ?? undefined
 	}
 
 	/**
@@ -20,16 +20,16 @@ export class RainlinkDatabase<G = unknown> {
    * @returns D
    */
 	delete<D = G>(key: string): D | undefined {
-		const data = (this.cache[key] as unknown as D) ?? undefined;
-		delete this.cache[key];
-		return data;
+		const data = (this.cache[key] as unknown as D) ?? undefined
+		delete this.cache[key]
+		return data
 	}
 
 	/**
    * detete all data from database
    */
 	clear(): void {
-		this.cache = {};
+		this.cache = {}
 	}
 
 	/**
@@ -39,8 +39,8 @@ export class RainlinkDatabase<G = unknown> {
    * @returns D
    */
 	set<D = G>(key: string, data: D): D | undefined {
-		this.cache[key] = data as unknown as G;
-		return data;
+		this.cache[key] = data as unknown as G
+		return data
 	}
 
 	/**
@@ -49,7 +49,7 @@ export class RainlinkDatabase<G = unknown> {
    */
 	forEach(callback: (value: G, key: string) => unknown): void {
 		for (const data of this.full) {
-			callback(data[1], data[0]);
+			callback(data[1], data[0])
 		}
 	}
 
@@ -58,7 +58,7 @@ export class RainlinkDatabase<G = unknown> {
    * @returns number
    */
 	get size(): number {
-		return Object.keys(this.cache).length;
+		return Object.keys(this.cache).length
 	}
 
 	/**
@@ -66,7 +66,7 @@ export class RainlinkDatabase<G = unknown> {
    * @returns unknown[]
    */
 	get values(): G[] {
-		return Object.values(this.cache);
+		return Object.values(this.cache)
 	}
 
 	/**
@@ -74,12 +74,12 @@ export class RainlinkDatabase<G = unknown> {
    * @returns unknown[]
    */
 	get full(): [string, G][] {
-		const finalRes: [string, G][] = [];
-		const keys = Object.keys(this.cache);
-		const values = Object.values(this.cache);
+		const finalRes: [string, G][] = []
+		const keys = Object.keys(this.cache)
+		const values = Object.values(this.cache)
 		for (let i = 0; i < keys.length; i++) {
-			finalRes.push([keys[i], values[i]]);
+			finalRes.push([keys[i], values[i]])
 		}
-		return finalRes;
+		return finalRes
 	}
 }

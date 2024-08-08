@@ -20,9 +20,6 @@ rules:
   quotes:
     - error
     - single
-  semi:
-    - error
-    - always
   no-console: "error"
   "@typescript-eslint/no-explicit-any": "off"
   no-mixed-spaces-and-tabs: "off"
