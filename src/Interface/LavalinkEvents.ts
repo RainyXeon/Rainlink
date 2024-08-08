@@ -22,18 +22,18 @@ export enum LavalinkPlayerEventsEnum {
 /**
  * Reason why track end
  */
-export type TrackEndReason = 'finished' | 'loadFailed' | 'stopped' | 'replaced' | 'cleanup';
+export type TrackEndReason = 'finished' | 'loadFailed' | 'stopped' | 'replaced' | 'cleanup'
 
 /**
  * Exception interface
  */
 export interface Exception {
-  message: string;
-  severity: Severity;
-  cause: string;
+  message: string
+  severity: Severity
+  cause: string
 }
 
 /**
  * Exception severity interface
  */
-export type Severity = 'common' | 'suspicious' | 'fault';
+export type Severity = 'common' | 'suspicious' | 'fault'

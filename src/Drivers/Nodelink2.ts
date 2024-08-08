@@ -1,14 +1,14 @@
-import { Rainlink } from '../Rainlink';
-import { metadata } from '../metadata';
-import { LavalinkLoadType, RainlinkEvents } from '../Interface/Constants';
-import { RainlinkRequesterOptions } from '../Interface/Rest';
-import { RainlinkNode } from '../Node/RainlinkNode';
-import { AbstractDriver } from './AbstractDriver';
-import { RainlinkPlayer } from '../Player/RainlinkPlayer';
-import util from 'node:util';
-import { RainlinkWebsocket } from '../Utilities/RainlinkWebsocket';
-import { RainlinkDatabase } from '../Utilities/RainlinkDatabase';
-import { LavalinkDecoder } from '../Utilities/LavalinkDecoder';
+import { Rainlink } from '../Rainlink'
+import { metadata } from '../metadata'
+import { LavalinkLoadType, RainlinkEvents } from '../Interface/Constants'
+import { RainlinkRequesterOptions } from '../Interface/Rest'
+import { RainlinkNode } from '../Node/RainlinkNode'
+import { AbstractDriver } from './AbstractDriver'
+import { RainlinkPlayer } from '../Player/RainlinkPlayer'
+import util from 'node:util'
+import { RainlinkWebsocket } from '../Utilities/RainlinkWebsocket'
+import { RainlinkDatabase } from '../Utilities/RainlinkDatabase'
+import { LavalinkDecoder } from '../Utilities/LavalinkDecoder'
 
 export enum Nodelink2loadType {
   SHORTS = 'shorts',
@@ -21,56 +21,59 @@ export enum Nodelink2loadType {
 }
 
 export interface NodelinkGetLyricsInterface {
-  loadType: Nodelink2loadType | LavalinkLoadType;
+  loadType: Nodelink2loadType | LavalinkLoadType
   data:
     | {
-        name: string;
-        synced: boolean;
+        name: string
+        synced: boolean
         data: {
-          startTime: number;
-          endTime: number;
-          text: string;
-        }[];
-        rtl: boolean;
+          startTime: number
+          endTime: number
+          text: string
+        }[]
+        rtl: boolean
       }
-    | Record<string, never>;
+    | Record<string, never>
 }
 
 export class Nodelink2 extends AbstractDriver {
-	public id: string = 'nodelink/v2/nari';
-	public wsUrl: string = '';
-	public httpUrl: string = '';
-	public sessionId: string | null;
-	public playerFunctions: RainlinkDatabase<(player: RainlinkPlayer, ...args: any) => unknown>;
-	public functions: RainlinkDatabase<(manager: Rainlink, ...args: any) => unknown>;
-	protected wsClient?: RainlinkWebsocket;
-	public manager: Rainlink | null = null;
-	public node: RainlinkNode | null = null;
+	public id: string = 'nodelink/v2/nari'
+	public wsUrl: string = ''
+	public httpUrl: string = ''
+	public sessionId: string | null
+	public playerFunctions: RainlinkDatabase<(player: RainlinkPlayer, ...args: any) => unknown>
+	public functions: RainlinkDatabase<(manager: Rainlink, ...args: any) => unknown>
+	protected wsClient?: RainlinkWebsocket
+	public manager: Rainlink | null = null
+	public node: RainlinkNode | null = null
 
 	constructor() {
-		super();
-		this.sessionId = null;
-		this.playerFunctions = new RainlinkDatabase<(player: RainlinkPlayer, ...args: any) => unknown>();
-		this.functions = new RainlinkDatabase<(manager: Rainlink, ...args: any) => unknown>();
-		this.playerFunctions.set('getLyric', this.getLyric);
+		super()
+		this.sessionId = null
+		this.playerFunctions = new RainlinkDatabase<(player: RainlinkPlayer, ...args: any) => unknown>()
+		this.functions = new RainlinkDatabase<(manager: Rainlink, ...args: any) => unknown>()
+		this.playerFunctions.set('getLyric', this.getLyric)
 	}
 
 	public get isRegistered(): boolean {
 		return (
-			this.manager !== null && this.node !== null && this.wsUrl.length !== 0 && this.httpUrl.length !== 0
-		);
+			this.manager !== null &&
+      this.node !== null &&
+      this.wsUrl.length !== 0 &&
+      this.httpUrl.length !== 0
+		)
 	}
 
 	public initial(manager: Rainlink, node: RainlinkNode): void {
-		this.manager = manager;
-		this.node = node;
-		this.wsUrl = `${this.node.options.secure ? 'wss' : 'ws'}://${this.node.options.host}:${this.node.options.port}/v4/websocket`;
-		this.httpUrl = `${this.node.options.secure ? 'https://' : 'http://'}${this.node.options.host}:${this.node.options.port}/v4`;
+		this.manager = manager
+		this.node = node
+		this.wsUrl = `${this.node.options.secure ? 'wss' : 'ws'}://${this.node.options.host}:${this.node.options.port}/v4/websocket`
+		this.httpUrl = `${this.node.options.secure ? 'https://' : 'http://'}${this.node.options.host}:${this.node.options.port}/v4`
 	}
 
 	public connect(): RainlinkWebsocket {
-		if (!this.isRegistered) throw new Error(`Driver ${this.id} not registered by using initial()`);
-		const isResume = this.manager!.rainlinkOptions.options!.resume;
+		if (!this.isRegistered) throw new Error(`Driver ${this.id} not registered by using initial()`)
+		const isResume = this.manager!.rainlinkOptions.options!.resume
 		const ws = new RainlinkWebsocket(this.wsUrl, {
 			headers: {
 				Authorization: this.node!.options.auth,
@@ -81,30 +84,30 @@ export class Nodelink2 extends AbstractDriver {
 				'user-agent': this.manager!.rainlinkOptions.options!.userAgent!,
 				'num-shards': this.manager!.shardCount,
 			},
-		});
+		})
 
 		ws.on('open', () => {
-      this.node!.wsOpenEvent();
-		});
-		ws.on('message', data => this.wsMessageEvent(data));
-		ws.on('error', err => this.node!.wsErrorEvent(err));
+      this.node!.wsOpenEvent()
+		})
+		ws.on('message', (data) => this.wsMessageEvent(data))
+		ws.on('error', (err) => this.node!.wsErrorEvent(err))
 		ws.on('close', (code: number, reason: Buffer) => {
-      this.node!.wsCloseEvent(code, reason);
-      ws.removeAllListeners();
-		});
-		this.wsClient = ws;
-		return ws;
+      this.node!.wsCloseEvent(code, reason)
+      ws.removeAllListeners()
+		})
+		this.wsClient = ws
+		return ws
 	}
 
 	public async requester<D = any>(options: RainlinkRequesterOptions): Promise<D | undefined> {
-		if (!this.isRegistered) throw new Error(`Driver ${this.id} not registered by using initial()`);
+		if (!this.isRegistered) throw new Error(`Driver ${this.id} not registered by using initial()`)
 		if (options.path.includes('/sessions') && this.sessionId == null)
-			throw new Error('sessionId not initalized! Please wait for nodelink get connected!');
-		const url = new URL(`${this.httpUrl}${options.path}`);
-		if (options.params) url.search = new URLSearchParams(options.params).toString();
+			throw new Error('sessionId not initalized! Please wait for nodelink get connected!')
+		const url = new URL(`${this.httpUrl}${options.path}`)
+		if (options.params) url.search = new URLSearchParams(options.params).toString()
 
 		if (options.data) {
-			options.body = JSON.stringify(options.data);
+			options.body = JSON.stringify(options.data)
 		}
 
 		const lavalinkHeaders = {
@@ -112,111 +115,111 @@ export class Nodelink2 extends AbstractDriver {
 			'user-agent': this.manager!.rainlinkOptions.options!.userAgent!,
 			'accept-encoding': (process as any).isBun ? 'gzip, deflate' : 'br, gzip, deflate',
 			...options.headers,
-		};
+		}
 
-		options.headers = lavalinkHeaders;
+		options.headers = lavalinkHeaders
 
 		if (options.path == '/decodetrack') {
 			const data = this.decode(
-				options.params ? (options.params as Record<string, string>).encodedTrack : '',
-			) as D;
-			if (data) return data;
+				options.params ? (options.params as Record<string, string>).encodedTrack : ''
+			) as D
+			if (data) return data
 		}
 
-		const res = await fetch(url, options);
+		const res = await fetch(url, options)
 
 		if (res.status == 204) {
 			this.debug(
-				`${options.method ?? 'GET'} ${url.pathname + url.search} payload=${options.body ? String(options.body) : '{}'}`,
-			);
-			return undefined;
+				`${options.method ?? 'GET'} ${url.pathname + url.search} payload=${options.body ? String(options.body) : '{}'}`
+			)
+			return undefined
 		}
 		if (res.status !== 200) {
 			this.debug(
-				`${options.method ?? 'GET'} ${url.pathname + url.search} payload=${options.body ? String(options.body) : '{}'}`,
-			);
+				`${options.method ?? 'GET'} ${url.pathname + url.search} payload=${options.body ? String(options.body) : '{}'}`
+			)
 			this.debug(
 				'Something went wrong with nodelink server. ' +
-          `Status code: ${res.status}\n Headers: ${util.inspect(options.headers)}`,
-			);
-			return undefined;
+          `Status code: ${res.status}\n Headers: ${util.inspect(options.headers)}`
+			)
+			return undefined
 		}
 
-		const preFinalData = (await res.json()) as D;
-		let finalData: any = preFinalData;
+		const preFinalData = (await res.json()) as D
+		let finalData: any = preFinalData
 
 		if (finalData.loadType) {
-			finalData = this.convertV4trackResponse(finalData) as D;
+			finalData = this.convertV4trackResponse(finalData) as D
 		}
 
 		this.debug(
-			`${options.method ?? 'GET'} ${url.pathname + url.search} payload=${options.body ? String(options.body) : '{}'}`,
-		);
+			`${options.method ?? 'GET'} ${url.pathname + url.search} payload=${options.body ? String(options.body) : '{}'}`
+		)
 
-		return finalData;
+		return finalData
 	}
 
 	protected wsMessageEvent(data: string) {
-		if (!this.isRegistered) throw new Error(`Driver ${this.id} not registered by using initial()`);
-		const wsData = JSON.parse(data.toString());
-    this.node!.wsMessageEvent(wsData);
+		if (!this.isRegistered) throw new Error(`Driver ${this.id} not registered by using initial()`)
+		const wsData = JSON.parse(data.toString())
+    this.node!.wsMessageEvent(wsData)
 	}
 
 	protected debug(logs: string) {
-		if (!this.isRegistered) throw new Error(`Driver ${this.id} not registered by using initial()`);
+		if (!this.isRegistered) throw new Error(`Driver ${this.id} not registered by using initial()`)
     this.manager!.emit(
     	RainlinkEvents.Debug,
-    	`[Rainlink] / [Node @ ${this.node?.options.name}] / [Driver] / [Nodelink2] | ${logs}`,
-    );
+    	`[Rainlink] / [Node @ ${this.node?.options.name}] / [Driver] / [Nodelink2] | ${logs}`
+    )
 	}
 
 	public wsClose(): void {
-		if (this.wsClient) this.wsClient.close(1006, 'Self closed');
+		if (this.wsClient) this.wsClient.close(1006, 'Self closed')
 	}
 
 	protected convertV4trackResponse(nl2Data: Record<string, any>): Record<string, any> {
-		if (!nl2Data) return {};
+		if (!nl2Data) return {}
 		switch (nl2Data.loadType) {
 		case Nodelink2loadType.SHORTS: {
-			nl2Data.loadType = LavalinkLoadType.TRACK;
-			return nl2Data;
+			nl2Data.loadType = LavalinkLoadType.TRACK
+			return nl2Data
 		}
 		case Nodelink2loadType.ALBUM: {
-			nl2Data.loadType = LavalinkLoadType.PLAYLIST;
-			return nl2Data;
+			nl2Data.loadType = LavalinkLoadType.PLAYLIST
+			return nl2Data
 		}
 		case Nodelink2loadType.ARTIST: {
-			nl2Data.loadType = LavalinkLoadType.PLAYLIST;
-			return nl2Data;
+			nl2Data.loadType = LavalinkLoadType.PLAYLIST
+			return nl2Data
 		}
 		case Nodelink2loadType.EPISODE: {
-			nl2Data.loadType = LavalinkLoadType.PLAYLIST;
-			return nl2Data;
+			nl2Data.loadType = LavalinkLoadType.PLAYLIST
+			return nl2Data
 		}
 		case Nodelink2loadType.STATION: {
-			nl2Data.loadType = LavalinkLoadType.PLAYLIST;
-			return nl2Data;
+			nl2Data.loadType = LavalinkLoadType.PLAYLIST
+			return nl2Data
 		}
 		case Nodelink2loadType.PODCAST: {
-			nl2Data.loadType = LavalinkLoadType.PLAYLIST;
-			return nl2Data;
+			nl2Data.loadType = LavalinkLoadType.PLAYLIST
+			return nl2Data
 		}
 		case Nodelink2loadType.SHOW: {
-			nl2Data.loadType = LavalinkLoadType.PLAYLIST;
-			return nl2Data;
+			nl2Data.loadType = LavalinkLoadType.PLAYLIST
+			return nl2Data
 		}
 		}
-		return nl2Data;
+		return nl2Data
 	}
 	// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	public async updateSession(sessionId: string, mode: boolean, timeout: number): Promise<void> {
-		this.debug('WARNING: Nodelink doesn\'t support resuming, set resume to true is useless');
-		return;
+		this.debug('WARNING: Nodelink doesn\'t support resuming, set resume to true is useless')
+		return
 	}
 
 	public async getLyric(
 		player: RainlinkPlayer,
-		language: string,
+		language: string
 	): Promise<NodelinkGetLyricsInterface | undefined> {
 		const options: RainlinkRequesterOptions = {
 			path: '/loadlyrics',
@@ -226,24 +229,24 @@ export class Nodelink2 extends AbstractDriver {
 			},
 			headers: { 'content-type': 'application/json' },
 			method: 'GET',
-		};
-		const data = await player.node.driver.requester<NodelinkGetLyricsInterface>(options);
-		return data;
+		}
+		const data = await player.node.driver.requester<NodelinkGetLyricsInterface>(options)
+		return data
 	}
 
 	protected testJSON(text: string) {
 		if (typeof text !== 'string') {
-			return false;
+			return false
 		}
 		try {
-			JSON.parse(text);
-			return true;
+			JSON.parse(text)
+			return true
 		} catch (error) {
-			return false;
+			return false
 		}
 	}
 
 	protected decode(base64: string) {
-		return new LavalinkDecoder(base64).getTrack ?? undefined;
+		return new LavalinkDecoder(base64).getTrack ?? undefined
 	}
 }

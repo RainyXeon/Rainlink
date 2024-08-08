@@ -1,5 +1,5 @@
-import { RainlinkSearchOptions, RainlinkSearchResult } from '../Interface/Manager';
-import { RainlinkPlugin } from './RainlinkPlugin';
+import { RainlinkSearchOptions, RainlinkSearchResult } from '../Interface/Manager'
+import { RainlinkPlugin } from './RainlinkPlugin'
 
 /** The interface class for track resolver plugin, extend it to use */
 export class SourceRainlinkPlugin extends RainlinkPlugin {
@@ -9,7 +9,7 @@ export class SourceRainlinkPlugin extends RainlinkPlugin {
    * @returns string
    */
 	public sourceName(): string {
-		throw new Error('Source plugin must implement sourceName() and return as string');
+		throw new Error('Source plugin must implement sourceName() and return as string')
 	}
 
 	/**
@@ -18,7 +18,7 @@ export class SourceRainlinkPlugin extends RainlinkPlugin {
    * @returns string
    */
 	public sourceIdentify(): string {
-		throw new Error('Source plugin must implement sourceIdentify() and return as string');
+		throw new Error('Source plugin must implement sourceIdentify() and return as string')
 	}
 
 	/**
@@ -26,9 +26,9 @@ export class SourceRainlinkPlugin extends RainlinkPlugin {
    * @returns boolean
    */
 	public directSearchChecker(query: string): boolean {
-		const directSearchRegex = /directSearch=(.*)/;
-		const isDirectSearch = directSearchRegex.exec(query);
-		return isDirectSearch == null;
+		const directSearchRegex = /directSearch=(.*)/
+		const isDirectSearch = directSearchRegex.exec(query)
+		return isDirectSearch == null
 	}
 
 	/**
@@ -36,8 +36,12 @@ export class SourceRainlinkPlugin extends RainlinkPlugin {
    * This will avoid overlaps in search function
    * @returns RainlinkSearchResult
    */
-	// eslint-disable-next-line @typescript-eslint/no-unused-vars
-	public async searchDirect(query: string, options?: RainlinkSearchOptions): Promise<RainlinkSearchResult> {
-		throw new Error('Source plugin must implement sourceIdentify() and return as string');
+	public async searchDirect(
+		// eslint-disable-next-line @typescript-eslint/no-unused-vars
+		query: string,
+		// eslint-disable-next-line @typescript-eslint/no-unused-vars
+		options?: RainlinkSearchOptions
+	): Promise<RainlinkSearchResult> {
+		throw new Error('Source plugin must implement sourceIdentify() and return as string')
 	}
 }

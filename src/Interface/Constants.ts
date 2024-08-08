@@ -6,7 +6,7 @@ export enum RainlinkEvents {
   // Node
   NodeConnect = 'nodeConnect',
   NodeDisconnect = 'nodeDisconnect',
-	NodeReconnect = 'nodeReconnect',
+  NodeReconnect = 'nodeReconnect',
   NodeClosed = 'nodeClosed',
   NodeError = 'nodeError',
   // Player
@@ -82,7 +82,7 @@ export const SourceIDs = [
 	{ name: 'youtube', id: 'yt' },
 	{ name: 'youtubeMusic', id: 'ytm' },
 	{ name: 'soundcloud', id: 'sc' },
-];
+]
 
 /**
  * Rainlink plugin type
@@ -368,6 +368,6 @@ export const RainlinkFilterData = {
 			rate: 0.8,
 		},
 	},
-};
+}
 
-export type RainlinkFilterMode = keyof typeof RainlinkFilterData;
+export type RainlinkFilterMode = keyof typeof RainlinkFilterData
