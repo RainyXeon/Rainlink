@@ -4,6 +4,7 @@ import {
 	RainlinkSearchOptions,
 	RainlinkSearchResult,
 	RainlinkSearchResultType,
+	Constructor,
 } from './Interface/Manager'
 import { EventEmitter } from 'node:events'
 import { AbstractLibrary } from './Library/AbstractLibrary'
@@ -67,7 +68,7 @@ export class Rainlink extends EventEmitter {
 	/**
    * The rainlink manager
    */
-	public drivers: AbstractDriver[]
+	public drivers: Constructor<AbstractDriver>[]
 	/**
    * The current bott's shard count
    */
@@ -85,7 +86,7 @@ export class Rainlink extends EventEmitter {
 				'Please set an new lib to connect, example: \nlibrary: new Library.DiscordJS(client) '
 			)
 		this.library = options.library.set(this)
-		this.drivers = [new Lavalink3(), new Nodelink2(), new Lavalink4(), new FrequenC()]
+		this.drivers = [Lavalink3, Nodelink2, Lavalink4, FrequenC]
 		this.rainlinkOptions = options
 		this.rainlinkOptions.options = this.mergeDefault<RainlinkAdditionalOptions>(
 			this.defaultOptions,
@@ -157,7 +158,7 @@ export class Rainlink extends EventEmitter {
 	async search(query: string, options?: RainlinkSearchOptions): Promise<RainlinkSearchResult> {
 		const node =
       options && options?.nodeName
-      	? this.nodes.get(options.nodeName) ?? (await this.nodes.getLeastUsed())
+      	? (this.nodes.get(options.nodeName) ?? (await this.nodes.getLeastUsed()))
       	: await this.nodes.getLeastUsed()
 
 		if (!node) throw new Error('No node is available')

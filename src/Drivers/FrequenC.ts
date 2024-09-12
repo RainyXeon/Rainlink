@@ -18,35 +18,21 @@ export class FrequenC extends AbstractDriver {
 	public playerFunctions: RainlinkDatabase<(player: RainlinkPlayer, ...args: any) => unknown>
 	public functions: RainlinkDatabase<(manager: Rainlink, ...args: any) => unknown>
 	protected wsClient?: RainlinkWebsocket
-	public manager: Rainlink | null = null
-	public node: RainlinkNode | null = null
 
-	constructor() {
+	constructor(
+    public manager: Rainlink,
+    public node: RainlinkNode
+	) {
 		super()
 		this.playerFunctions = new RainlinkDatabase<(player: RainlinkPlayer, ...args: any) => unknown>()
 		this.functions = new RainlinkDatabase<(manager: Rainlink, ...args: any) => unknown>()
 		this.sessionId = null
-	}
-
-	public get isRegistered(): boolean {
-		return (
-			this.manager !== null &&
-      this.node !== null &&
-      this.wsUrl.length !== 0 &&
-      this.httpUrl.length !== 0
-		)
-	}
-
-	public initial(manager: Rainlink, node: RainlinkNode): void {
-		this.manager = manager
-		this.node = node
 		this.wsUrl = `${this.node.options.secure ? 'wss' : 'ws'}://${this.node.options.host}:${this.node.options.port}/v1/websocket`
 		this.httpUrl = `${this.node.options.secure ? 'https://' : 'http://'}${this.node.options.host}:${this.node.options.port}/v1`
 		this.functions.set('decode', this.decode)
 	}
 
 	public connect(): RainlinkWebsocket {
-		if (!this.isRegistered) throw new Error(`Driver ${this.id} not registered by using initial()`)
 		const ws = new RainlinkWebsocket(this.wsUrl, {
 			headers: {
 				authorization: this.node!.options.auth,
@@ -71,7 +57,6 @@ export class FrequenC extends AbstractDriver {
 	}
 
 	public async requester<D = any>(options: RainlinkRequesterOptions): Promise<D | undefined> {
-		if (!this.isRegistered) throw new Error(`Driver ${this.id} not registered by using initial()`)
 		if (options.path.includes('/sessions') && this.sessionId == null)
 			throw new Error('sessionId not initalized! Please wait for lavalink get connected!')
 		const url = new URL(`${this.httpUrl}${options.path}`)
@@ -129,13 +114,11 @@ export class FrequenC extends AbstractDriver {
 	}
 
 	protected wsMessageEvent(data: string) {
-		if (!this.isRegistered) throw new Error(`Driver ${this.id} not registered by using initial()`)
 		const wsData = this.snakeToCamel(JSON.parse(data.toString()))
     this.node!.wsMessageEvent(wsData)
 	}
 
 	protected debug(logs: string) {
-		if (!this.isRegistered) throw new Error(`Driver ${this.id} not registered by using initial()`)
     this.manager!.emit(
     	RainlinkEvents.Debug,
     	`[Rainlink] / [Node @ ${this.node?.options.name}] / [Driver] / [FrequenC1] | ${logs}`
@@ -241,7 +224,7 @@ class Decoder extends AbstractDecoder {
 				},
 				pluginInfo: {},
 			}
-		} catch (err) {
+		} catch {
 			return null
 		}
 	}

@@ -93,7 +93,6 @@ export class RainlinkWebsocket extends EventEmitter {
 	/**
    * @param url The WS url have to connect
    * @param options Some additional options of PWSL
-   * @instance
    */
 	constructor(
     protected url: string,
@@ -114,7 +113,6 @@ export class RainlinkWebsocket extends EventEmitter {
 
 	/**
    * Connect to current websocket link
-   * @instance
    */
 	public connect() {
 		const parsedUrl = new URL(this.url)
