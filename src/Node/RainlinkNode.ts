@@ -39,15 +39,16 @@ export class RainlinkNode {
 	constructor(manager: Rainlink, options: RainlinkNodeOptions) {
 		this.manager = manager
 		this.options = options
-		const getDriver = this.manager.drivers.filter((driver) => driver.id === options.driver)
+		const getDriver = this.manager.drivers.filter(
+			(driver) => driver.prototype.id === options.driver
+		)
 		if (!getDriver || getDriver.length == 0) {
 			this.debug('No driver was found, using lavalink v4 driver instead')
-			this.driver = new Lavalink4()
+			this.driver = new Lavalink4(manager, this)
 		} else {
-			this.debug(`Now using driver: ${getDriver[0].id}`)
-			this.driver = getDriver[0]
+			this.debug(`Now using driver: ${getDriver[0].prototype.id}`)
+			this.driver = new getDriver[0](manager, this)
 		}
-		this.driver.initial(manager, this)
 		const customRest =
       this.manager.rainlinkOptions.options!.structures &&
       this.manager.rainlinkOptions.options!.structures.rest

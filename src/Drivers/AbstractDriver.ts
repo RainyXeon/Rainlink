@@ -23,15 +23,10 @@ export abstract class AbstractDriver {
   /** All function to extend support driver on Rainlink class */
   abstract functions: RainlinkDatabase<(manager: Rainlink, ...args: any) => unknown>
   /** Rainlink manager class */
-  abstract manager: Rainlink | null
+  abstract manager: Rainlink
   /** Rainlink reuqested lavalink/nodelink server */
-  abstract node: RainlinkNode | null
+  abstract node: RainlinkNode
 
-  /**
-   * Setup data and credentials for connect to lavalink/nodelink server
-   * @returns void
-   */
-  abstract initial(manager: Rainlink, node: RainlinkNode): void
   /**
    * Connect to lavalink/nodelink server
    * @returns WebSocket

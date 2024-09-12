@@ -58,8 +58,8 @@ export interface RainlinkNodeOptions {
  * Some rainlink additional config option
  */
 export interface RainlinkAdditionalOptions {
-  /** Additional custom driver for rainlink */
-  additionalDriver?: AbstractDriver[]
+  /** Additional custom driver for rainlink (no need 'new' keyword when add). Example: `additionalDriver: Lavalink4` */
+  additionalDriver?: Constructor<AbstractDriver>[]
   /** Timeout before trying to reconnect (ms) */
   retryTimeout?: number
   /** Number of times to try and reconnect to Lavalink before giving up */
