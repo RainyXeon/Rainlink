@@ -246,7 +246,6 @@ export class Lavalink3 extends AbstractDriver {
     this.node!.wsMessageEvent(wsData)
 	}
 
-	// eslint-disable-next-line @typescript-eslint/no-unused-vars
 	public async updateSession(sessionId: string, mode: boolean, timeout: number): Promise<void> {
 		if (!sessionId) {
 			this.wsSendData({
@@ -290,7 +289,7 @@ export class Lavalink3 extends AbstractDriver {
 		try {
 			JSON.parse(text)
 			return true
-		} catch (error) {
+		} catch {
 			return false
 		}
 	}

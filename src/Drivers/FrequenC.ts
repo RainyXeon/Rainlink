@@ -224,7 +224,7 @@ class Decoder extends AbstractDecoder {
 				},
 				pluginInfo: {},
 			}
-		} catch (err) {
+		} catch {
 			return null
 		}
 	}

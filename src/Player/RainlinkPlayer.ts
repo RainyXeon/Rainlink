@@ -511,7 +511,6 @@ export class RainlinkPlayer extends EventEmitter {
 	/**
    * Reset all data to default
    * @param emitEmpty Whenever emit empty event or not
-   * @inverval
    */
 	public clear(emitEmpty: boolean): void {
 		this.loop = RainlinkLoopMode.NONE

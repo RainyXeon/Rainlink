@@ -225,7 +225,7 @@ export class Nodelink2 extends AbstractDriver {
 		try {
 			JSON.parse(text)
 			return true
-		} catch (error) {
+		} catch {
 			return false
 		}
 	}

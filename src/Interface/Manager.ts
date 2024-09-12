@@ -97,7 +97,7 @@ export interface RainlinkOptions {
   nodes: RainlinkNodeOptions[]
   /** The discord library for using voice manager, example: discordjs, erisjs. Check {@link Library} */
   library: AbstractLibrary
-  /** The rainlink plugins array. Check {@link Plugin} */
+  /** The rainlink plugins array. Check {@link RainlinkPlugin} */
   plugins?: RainlinkPlugin[]
   /** Rainlink additional options  */
   options?: RainlinkAdditionalOptions
