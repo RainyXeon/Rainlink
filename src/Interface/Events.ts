@@ -19,7 +19,7 @@ export interface RainlinkEventsInterface {
    * Emitted when a lavalink server is disconnected.
    * @event Rainlink#nodeDisconnect
    */
-  nodeDisconnect: [node: RainlinkNode, code: number, reason: Buffer]
+  nodeDisconnect: [node: RainlinkNode, code: number, reason: Buffer | string]
   /**
    * Emitted when a lavalink server is trying to reconnect.
    * @event Rainlink#nodeReconnect

@@ -1,7 +1,6 @@
 import { AbstractLibrary } from '../Library/AbstractLibrary'
 import { RainlinkPlugin } from '../Plugin/RainlinkPlugin'
 import { RainlinkTrack } from '../Player/RainlinkTrack'
-import { RainlinkNodeManager } from '../Manager/RainlinkNodeManager'
 import { RainlinkNode } from '../Node/RainlinkNode'
 import { RainlinkRest } from '../Node/RainlinkRest'
 import { RainlinkPlayer } from '../Player/RainlinkPlayer'
@@ -52,6 +51,10 @@ export interface RainlinkNodeOptions {
   secure: boolean
   /** The driver class for handling lavalink response */
   driver?: string
+  /** Use legacy ws client (Require install [ws](https://www.npmjs.com/package/ws) package, If you use bun, do not enable this option) */
+  legacyWS?: boolean
+  /** The region of the node */
+  region?: string
 }
 
 /**
@@ -84,7 +87,7 @@ export interface RainlinkAdditionalOptions {
   /** User Agent to use when making requests to Lavalink */
   userAgent?: string
   /** Node Resolver to use if you want to customize it */
-  nodeResolver?: (nodes: RainlinkNodeManager) => Promise<RainlinkNode | undefined>
+  nodeResolver?: (nodes: RainlinkNode[]) => Promise<RainlinkNode | undefined>
   /** Custom structures for rainlink to use */
   structures?: Structures
 }

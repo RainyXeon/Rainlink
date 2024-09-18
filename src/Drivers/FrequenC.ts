@@ -34,9 +34,10 @@ export class FrequenC extends AbstractDriver {
 
 	public connect(): RainlinkWebsocket {
 		const ws = new RainlinkWebsocket(this.wsUrl, {
+			legacy: this.node.options.legacyWS,
 			headers: {
 				authorization: this.node!.options.auth,
-				'user-id': this.manager!.id,
+				'user-id': String(this.manager!.id),
 				'client-info': `${metadata.name}/${metadata.version} (${metadata.github})`,
 				'user-agent': this.manager!.rainlinkOptions.options!.userAgent!,
 				'num-shards': this.manager!.shardCount,
@@ -48,7 +49,7 @@ export class FrequenC extends AbstractDriver {
 		})
 		ws.on('message', (data) => this.wsMessageEvent(data))
 		ws.on('error', (err) => this.node!.wsErrorEvent(err))
-		ws.on('close', (code: number, reason: Buffer) => {
+		ws.on('close', (code, reason) => {
       this.node!.wsCloseEvent(code, reason)
       ws.removeAllListeners()
 		})

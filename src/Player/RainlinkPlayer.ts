@@ -1,4 +1,4 @@
-import { PlayOptions, VoiceChannelOptions } from '../Interface/Player.js'
+import { PlayOptions } from '../Interface/Player.js'
 import { Rainlink } from '../Rainlink.js'
 import { RainlinkNode } from '../Node/RainlinkNode.js'
 import { RainlinkQueue } from './RainlinkQueue.js'
@@ -7,20 +7,18 @@ import {
 	RainlinkLoopMode,
 	RainlinkPlayerState,
 	VoiceConnectState,
-	VoiceState,
 } from '../Interface/Constants.js'
 import { RainlinkTrack } from './RainlinkTrack.js'
 import { UpdatePlayerInfo, UpdatePlayerOptions } from '../Interface/Rest.js'
 import { RainlinkSearchOptions, RainlinkSearchResult } from '../Interface/Manager.js'
-import { ServerUpdate, StateUpdatePartial } from '../Interface/Connection.js'
-import { EventEmitter } from 'node:events'
 import { RainlinkDatabase } from '../Utilities/RainlinkDatabase.js'
 import { RainlinkFilter } from './RainlinkFilter.js'
+import { RainlinkVoice } from './RainlinkVoice.js'
 
 /**
  * A class for managing player action.
  */
-export class RainlinkPlayer extends EventEmitter {
+export class RainlinkPlayer {
 	/**
    * Main manager class
    */
@@ -52,11 +50,11 @@ export class RainlinkPlayer extends EventEmitter {
 	/**
    * Whether the player is paused or not
    */
-	public paused: boolean
+	public paused: boolean = true
 	/**
    * Get the current track's position of the player
    */
-	public position: number
+	public position: number = 0
 	/**
    * Get the current volume of the player
    */
@@ -64,7 +62,7 @@ export class RainlinkPlayer extends EventEmitter {
 	/**
    * Whether the player is playing or not
    */
-	public playing: boolean
+	public playing: boolean = false
 	/**
    * Get the current loop mode of the player
    */
@@ -84,7 +82,7 @@ export class RainlinkPlayer extends EventEmitter {
 	/**
    * ID of the current track
    */
-	public track: string | null
+	public track: string | null = null
 	/**
    * All function to extend support driver
    */
@@ -94,35 +92,15 @@ export class RainlinkPlayer extends EventEmitter {
    */
 	public shardId: number
 	/**
-   * ID of the last voiceId connected to
-   */
-	public lastvoiceId: string | null
-	/**
-   * ID of current session
-   */
-	public sessionId: string | null
-	/**
-   * Region of connected voice channel
-   */
-	public region: string | null
-	/**
-   * Last region of the connected voice channel
-   */
-	public lastRegion: string | null
-	/**
-   * Cached serverUpdate event from Lavalink
-   */
-	public serverUpdate: ServerUpdate | null
-	/**
-   * Connection state
-   */
-	public voiceState: VoiceConnectState
-	/**
    * Filter class to set, clear get the current filter data
    */
 	public filter: RainlinkFilter
+	/**
+   * Voice handler class
+   */
+	public voice: RainlinkVoice
 	/** @ignore */
-	public sudoDestroy: boolean
+	public sudoDestroy: boolean = false
 
 	/**
    * The rainlink player handler class
@@ -130,25 +108,19 @@ export class RainlinkPlayer extends EventEmitter {
    * @param voiceOptions The rainlink voice option, use VoiceChannelOptions interface
    * @param node The rainlink current use node
    */
-	constructor(manager: Rainlink, voiceOptions: VoiceChannelOptions, node: RainlinkNode) {
-		super()
+	constructor(manager: Rainlink, voice: RainlinkVoice, node: RainlinkNode) {
+		this.voice = voice
 		this.manager = manager
 		const rainlinkOptions = this.manager.rainlinkOptions.options!
-		this.guildId = voiceOptions.guildId
-		this.voiceId = voiceOptions.voiceId
-		this.shardId = voiceOptions.shardId
-		this.mute = voiceOptions.mute ?? false
-		this.deaf = voiceOptions.deaf ?? false
-		this.lastvoiceId = null
-		this.sessionId = null
-		this.region = null
-		this.lastRegion = null
-		this.serverUpdate = null
-		this.voiceState = VoiceConnectState.DISCONNECTED
+		this.guildId = this.voice.guildId
+		this.voiceId = this.voice.voiceId
+		this.shardId = this.voice.shardId
+		this.mute = this.voice.mute ?? false
+		this.deaf = this.voice.deaf ?? false
 		this.node = node
-		this.guildId = voiceOptions.guildId
-		this.voiceId = voiceOptions.voiceId
-		this.textId = voiceOptions.textId
+		this.guildId = this.voice.guildId
+		this.voiceId = this.voice.voiceId
+		this.textId = this.voice.options.textId
 		const customQueue = rainlinkOptions.structures && rainlinkOptions.structures.queue
 		this.queue = customQueue
 			? new customQueue(this.manager, this)
@@ -157,24 +129,19 @@ export class RainlinkPlayer extends EventEmitter {
 		if (rainlinkOptions.structures && rainlinkOptions.structures.filter)
 			this.filter = new rainlinkOptions.structures.filter(this)
 		else this.filter = new RainlinkFilter(this)
-		this.paused = true
-		this.position = 0
 		this.volume = rainlinkOptions.defaultVolume!
-		this.playing = false
 		this.loop = RainlinkLoopMode.NONE
 		this.state = RainlinkPlayerState.DESTROYED
-		this.deaf = voiceOptions.deaf ?? false
-		this.mute = voiceOptions.mute ?? false
-		this.sudoDestroy = false
-		this.track = null
+		this.deaf = this.voice.deaf ?? false
+		this.mute = this.voice.mute ?? false
 		this.functions = new RainlinkDatabase<(...args: any) => unknown>()
 		if (this.node.driver.playerFunctions.size !== 0) {
 			this.node.driver.playerFunctions.forEach((data, key) => {
 				this.functions.set(key, data.bind(null, this))
 			})
 		}
-		if (voiceOptions.volume && voiceOptions.volume !== this.volume)
-			this.volume = voiceOptions.volume
+		if (this.voice.options.volume && this.voice.options.volume !== this.volume)
+			this.volume = this.voice.options.volume
 	}
 
 	/**
@@ -186,9 +153,9 @@ export class RainlinkPlayer extends EventEmitter {
 			guildId: this.guildId,
 			playerOptions: {
 				voice: {
-					token: this.serverUpdate!.token,
-					endpoint: this.serverUpdate!.endpoint,
-					sessionId: this.sessionId!,
+					token: this.voice.serverUpdate!.token,
+					endpoint: this.voice.serverUpdate!.endpoint,
+					sessionId: this.voice.sessionId!,
 				},
 			},
 		}
@@ -476,7 +443,8 @@ export class RainlinkPlayer extends EventEmitter {
 		this.checkDestroyed()
 		if (enable == this.mute) return this
 		this.mute = enable
-		this.sendVoiceUpdate()
+		this.voice.mute = this.mute
+		this.voice.sendVoiceUpdate()
 		return this
 	}
 
@@ -536,7 +504,8 @@ export class RainlinkPlayer extends EventEmitter {
 		this.checkDestroyed()
 		if (enable == this.deaf) return this
 		this.deaf = enable
-		this.sendVoiceUpdate()
+		this.voice.deaf = this.deaf
+		this.voice.sendVoiceUpdate()
 		return this
 	}
 
@@ -546,65 +515,14 @@ export class RainlinkPlayer extends EventEmitter {
    */
 	public disconnect(): RainlinkPlayer {
 		this.checkDestroyed()
-		if (this.voiceState === VoiceConnectState.DISCONNECTED) return this
+		if (this.voice.state === VoiceConnectState.DISCONNECTED) return this
 		this.voiceId = null
 		this.deaf = false
 		this.mute = false
-		this.removeAllListeners()
-		this.sendVoiceUpdate()
-		this.voiceState = VoiceConnectState.DISCONNECTED
+		this.voice.disconnect()
 		this.pause()
 		this.state = RainlinkPlayerState.DISCONNECTED
 		this.debug('Player disconnected')
-		return this
-	}
-
-	/**
-   * Connect from the voice channel
-   * @returns RainlinkPlayer
-   */
-	public async connect(): Promise<RainlinkPlayer> {
-		if (this.state === RainlinkPlayerState.CONNECTED || !this.voiceId) return this
-		if (
-			this.voiceState === VoiceConnectState.CONNECTING ||
-      this.voiceState === VoiceConnectState.CONNECTED
-		)
-			return this
-		this.voiceState = VoiceConnectState.CONNECTING
-		this.sendVoiceUpdate()
-		this.debugDiscord('Requesting Connection')
-		const controller = new AbortController()
-		const timeout = setTimeout(
-			() => controller.abort(),
-      this.manager.rainlinkOptions.options!.voiceConnectionTimeout
-		)
-		try {
-			const [status] = await RainlinkPlayer.once(this, 'connectionUpdate', {
-				signal: controller.signal,
-			})
-			if (status !== VoiceState.SESSION_READY) {
-				switch (status) {
-				case VoiceState.SESSION_ID_MISSING:
-					throw new Error('The voice connection is not established due to missing session id')
-				case VoiceState.SESSION_ENDPOINT_MISSING:
-					throw new Error(
-						'The voice connection is not established due to missing connection endpoint'
-					)
-				}
-			}
-			this.voiceState = VoiceConnectState.CONNECTED
-		} catch (error: any) {
-			this.debugDiscord('Request Connection Failed')
-			if (error.name === 'AbortError')
-				throw new Error(
-					`The voice connection is not established in ${this.manager.rainlinkOptions.options!.voiceConnectionTimeout}ms`
-				)
-			throw error
-		} finally {
-			clearTimeout(timeout)
-			this.state = RainlinkPlayerState.CONNECTED
-			this.debug('Player connected')
-		}
 		return this
 	}
 
@@ -628,7 +546,8 @@ export class RainlinkPlayer extends EventEmitter {
 		this.checkDestroyed()
 		this.disconnect()
 		this.voiceId = voiceId
-		this.connect()
+		this.voice.voiceId = voiceId
+		this.voice.connect()
 		this.debugDiscord(`Player moved to voice channel ${voiceId}`)
 		return this
 	}
@@ -648,92 +567,14 @@ export class RainlinkPlayer extends EventEmitter {
 		this.manager.emit(RainlinkEvents.Debug, `[Rainlink] / [Player @ ${this.guildId}] | ${logs}`)
 	}
 
+	protected checkDestroyed(): void {
+		if (this.state === RainlinkPlayerState.DESTROYED) throw new Error('Player is destroyed')
+	}
+
 	protected debugDiscord(logs: string): void {
 		this.manager.emit(
 			RainlinkEvents.Debug,
 			`[Rainlink] / [Player @ ${this.guildId}] / [Voice] | ${logs}`
 		)
-	}
-
-	protected checkDestroyed(): void {
-		if (this.state === RainlinkPlayerState.DESTROYED) throw new Error('Player is destroyed')
-	}
-
-	/**
-   * Send voice data to discord
-   * @internal
-   */
-	public sendVoiceUpdate() {
-		this.sendDiscord({
-			guild_id: this.guildId,
-			channel_id: this.voiceId,
-			self_deaf: this.deaf,
-			self_mute: this.mute,
-		})
-	}
-
-	/**
-   * Send data to Discord
-   * @param data The data to send
-   * @internal
-   */
-	public sendDiscord(data: any): void {
-		this.manager.library.sendPacket(this.shardId, { op: 4, d: data }, false)
-	}
-
-	/**
-   * Sets the server update data for this connection
-   * @internal
-   */
-	public setServerUpdate(data: ServerUpdate): void {
-		if (!data.endpoint) {
-			this.emit('connectionUpdate', VoiceState.SESSION_ENDPOINT_MISSING)
-			return
-		}
-		if (!this.sessionId) {
-			this.emit('connectionUpdate', VoiceState.SESSION_ID_MISSING)
-			return
-		}
-
-		this.lastRegion = this.region?.repeat(1) || null
-		this.region = data.endpoint.split('.').shift()?.replace(/[0-9]/g, '') || null
-
-		if (this.region && this.lastRegion !== this.region) {
-			this.debugDiscord(
-				`Voice Region Moved | Old Region: ${this.lastRegion} New Region: ${this.region}`
-			)
-		}
-
-		this.serverUpdate = data
-		this.emit('connectionUpdate', VoiceState.SESSION_READY)
-		this.debugDiscord(`Server Update Received | Server: ${this.region}`)
-	}
-
-	/**
-   * Update Session ID, Channel ID, Deafen status and Mute status of this instance
-   * @internal
-   */
-	public setStateUpdate({
-		session_id,
-		channel_id,
-		self_deaf,
-		self_mute,
-	}: StateUpdatePartial): void {
-		this.lastvoiceId = this.voiceId?.repeat(1) || null
-		this.voiceId = channel_id || null
-
-		if (this.voiceId && this.lastvoiceId !== this.voiceId) {
-			this.debugDiscord(`Channel Moved | Old Channel: ${this.voiceId}`)
-		}
-
-		if (!this.voiceId) {
-			this.voiceState = VoiceConnectState.DISCONNECTED
-			this.debugDiscord('Channel Disconnected')
-		}
-
-		this.deaf = self_deaf
-		this.mute = self_mute
-		this.sessionId = session_id || null
-		this.debugDiscord(`State Update Received | Channel: ${this.voiceId} Session ID: ${session_id}`)
 	}
 }
