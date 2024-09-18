@@ -61,16 +61,20 @@ export class Nodelink2 extends AbstractDriver {
 
 	public connect(): RainlinkWebsocket {
 		const isResume = this.manager.rainlinkOptions.options!.resume
+
+		const headers: Record<string, string | number> = {
+			Authorization: this.node.options.auth,
+			'user-id': String(this.manager.id),
+			'accept-encoding': (process as any).isBun ? 'gzip, deflate' : 'br, gzip, deflate',
+			'client-name': `${metadata.name}/${metadata.version} (${metadata.github})`,
+			'user-agent': this.manager.rainlinkOptions.options!.userAgent!,
+			'num-shards': String(this.manager.shardCount),
+		}
+		if (this.sessionId !== null && isResume) headers['session-id'] = this.sessionId
+
 		const ws = new RainlinkWebsocket(this.wsUrl, {
-			headers: {
-				Authorization: this.node.options.auth,
-				'user-id': this.manager.id,
-				'accept-encoding': (process as any).isBun ? 'gzip, deflate' : 'br, gzip, deflate',
-				'client-name': `${metadata.name}/${metadata.version} (${metadata.github})`,
-				'session-id': this.sessionId !== null && isResume ? this.sessionId : '',
-				'user-agent': this.manager.rainlinkOptions.options!.userAgent!,
-				'num-shards': this.manager.shardCount,
-			},
+			legacy: this.node.options.legacyWS,
+			headers,
 		})
 
 		ws.on('open', () => {
@@ -78,7 +82,7 @@ export class Nodelink2 extends AbstractDriver {
 		})
 		ws.on('message', (data) => this.wsMessageEvent(data))
 		ws.on('error', (err) => this.node.wsErrorEvent(err))
-		ws.on('close', (code: number, reason: Buffer) => {
+		ws.on('close', (code, reason) => {
 			this.node.wsCloseEvent(code, reason)
 			ws.removeAllListeners()
 		})

@@ -132,7 +132,7 @@ export class RainlinkNode {
 	}
 
 	/** @ignore */
-	public async wsCloseEvent(code: number, reason: Buffer) {
+	public async wsCloseEvent(code: number, reason: Buffer | string) {
 		this.online = false
 		this.state = RainlinkConnectState.Disconnected
 		this.debug(`Node disconnected! URL: ${this.driver.wsUrl}`)

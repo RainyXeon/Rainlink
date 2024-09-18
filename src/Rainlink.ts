@@ -30,6 +30,7 @@ import { Lavalink4 } from './Drivers/Lavalink4'
 import { RainlinkDatabase } from './Utilities/RainlinkDatabase'
 import { FrequenC } from './Drivers/FrequenC'
 import { RainlinkEventsInterface } from './Interface/Events'
+import { RainlinkVoice } from './Player/RainlinkVoice'
 
 /** The heart of Rainlink. Manage all package action */
 export class Rainlink extends EventEmitter {
@@ -73,6 +74,10 @@ export class Rainlink extends EventEmitter {
    * The current bott's shard count
    */
 	public shardCount: number = 1
+	/**
+   * All voice handler currently
+   */
+	public voices: RainlinkDatabase<RainlinkVoice>
 
 	/**
    * The main class that handle all works in lavalink server.
@@ -99,6 +104,7 @@ export class Rainlink extends EventEmitter {
 			this.drivers.push(...this.rainlinkOptions.options.additionalDriver)
 		this.nodes = new RainlinkNodeManager(this)
 		this.players = new RainlinkPlayerManager(this)
+		this.voices = new RainlinkDatabase<RainlinkVoice>()
 		this.searchEngines = new RainlinkDatabase<string>()
 		this.searchPlugins = new RainlinkDatabase<SourceRainlinkPlugin>()
 		this.plugins = new RainlinkDatabase<RainlinkPlugin>()

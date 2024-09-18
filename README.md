@@ -134,6 +134,28 @@ client.login('');
 ```
 
 # 📃 Migrtation logs:
+## 1.1.0 -> 1.2.0
+```diff
+src/Interface/Manager.ts
++ RainlinkNodeOptions.legacyWS
++ RainlinkNodeOptions.region
+
++ src/Player/RainlinkVoice
+
+src/Player/RainlinkPLayer
+- RainlinkPlayer.state
+- RainlinkPlayer.lastvoiceId
+- RainlinkPlayer.region
+- RainlinkPlayer.lastRegion
+- RainlinkPlayer.serverUpdat
+- RainlinkPlayer.sessionId
+```
+
+## 1.0.0 -> 1.1.0
+```diff
++ src/Interface/Events.ts
+```
+
 ## 0.9.2 -> 1.0.0
 ```diff
 src/index.ts

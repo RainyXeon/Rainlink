@@ -61,11 +61,11 @@ export abstract class AbstractLibrary {
   protected raw(packet: any): void {
   	if (!AllowedPackets.includes(packet.t)) return
   	const guildId = packet.d.guild_id
-  	const players = this.manager!.players.get(guildId)
-  	if (!players) return
-  	if (packet.t === 'VOICE_SERVER_UPDATE') return players.setServerUpdate(packet.d)
+  	const voice = this.manager!.voices.get(guildId)
+  	if (!voice) return
+  	if (packet.t === 'VOICE_SERVER_UPDATE') return voice.setServerUpdate(packet.d)
   	const userId = packet.d.user_id
   	if (userId !== this.manager!.id) return
-  	players.setStateUpdate(packet.d)
+  	voice.setStateUpdate(packet.d)
   }
 }

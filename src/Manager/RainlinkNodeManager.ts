@@ -34,12 +34,12 @@ export class RainlinkNodeManager extends RainlinkDatabase<RainlinkNode> {
    * Get a least used node.
    * @returns RainlinkNode
    */
-	public async getLeastUsed(): Promise<RainlinkNode> {
+	public async getLeastUsed(customNodeArray?: RainlinkNode[]): Promise<RainlinkNode> {
+		const nodes = customNodeArray ? customNodeArray : this.values
 		if (this.manager.rainlinkOptions.options!.nodeResolver) {
-			const resolverData = await this.manager.rainlinkOptions.options!.nodeResolver(this)
+			const resolverData = await this.manager.rainlinkOptions.options!.nodeResolver(nodes)
 			if (resolverData) return resolverData
 		}
-		const nodes: RainlinkNode[] = this.values
 
 		const onlineNodes = nodes.filter((node) => node.state === RainlinkConnectState.Connected)
 		if (!onlineNodes.length) throw new Error('No nodes are online')
