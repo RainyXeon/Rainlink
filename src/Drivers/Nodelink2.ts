@@ -207,13 +207,21 @@ export class Nodelink2 extends AbstractDriver {
 
 	public async getLyric(
 		player: RainlinkPlayer,
-		language: string
+		trackName?: string,
+		language?: string
 	): Promise<NodelinkGetLyricsInterface | undefined> {
+		let track: string = String(player.queue.current?.encoded)
+		if (trackName) {
+			const nodeName = player.node.options.name
+			const res = await player.search('trackName', { nodeName })
+			if (res.tracks.length == 0) return undefined
+			track = res.tracks[0].encoded
+		}
 		const options: RainlinkRequesterOptions = {
 			path: '/loadlyrics',
 			params: {
-				encodedTrack: String(player.queue.current?.encoded),
-				language: language,
+				encodedTrack: track,
+				language: language ? language : 'en',
 			},
 			headers: { 'content-type': 'application/json' },
 			method: 'GET',
