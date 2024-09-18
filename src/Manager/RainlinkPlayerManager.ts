@@ -31,7 +31,10 @@ export class RainlinkPlayerManager extends RainlinkDatabase<RainlinkPlayer> {
 
 		// Check voice
 		const getCurrVoice = this.manager.voices.get(options.guildId)
-		if (getCurrVoice) getCurrVoice.disconnect()
+		if (getCurrVoice) {
+			getCurrVoice.disconnect()
+			this.manager.voices.delete(options.guildId)
+		}
 
 		// Create voice handler
 		const voiceHandler = new RainlinkVoice(this.manager, options)
