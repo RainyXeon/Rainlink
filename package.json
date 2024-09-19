@@ -7,7 +7,7 @@
     "url": "https://github.com/RainyXeon/Rainlink.git"
   },
   "scripts": {
-    "build": "npx tsc",
+    "build": "npx tsup-node",
     "prettier": "npx prettier -w ./src",
     "build:doc": "typedoc --options ./typedoc.json --sort kind",
     "build:full": "npm run prettier && npm run build:eslint && npm run build && npm run build:doc",
@@ -16,6 +16,13 @@
   "main": "dist/index.js",
   "module": "dist/index.mjs",
   "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.js"
+    }
+  },
   "keywords": [
     "bot",
     "music",
@@ -45,7 +52,28 @@
     "eslint": "^9.10.0",
     "globals": "^15.9.0",
     "prettier": "^3.2.5",
+    "tsup": "^8.3.0",
     "typedoc": "^0.26.7",
     "typescript": "^5.6.2"
+  },
+  "tsup": {
+    "dts": true,
+    "entry": [
+      "./src/index.ts"
+    ],
+    "splitting": false,
+    "sourcemap": true,
+    "clean": true,
+    "format": [
+      "cjs",
+      "esm"
+    ]
+  },
+  "prettier": {
+    "trailingComma": "es5",
+    "tabWidth": 2,
+    "semi": false,
+    "singleQuote": true,
+    "printWidth": 100
   }
 }

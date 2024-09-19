@@ -14,6 +14,7 @@ import { RainlinkSearchOptions, RainlinkSearchResult } from '../Interface/Manage
 import { RainlinkDatabase } from '../Utilities/RainlinkDatabase.js'
 import { RainlinkFilter } from './RainlinkFilter.js'
 import { RainlinkVoice } from './RainlinkVoice.js'
+import { RainlinkFunctions } from '../Utilities/RainlinkFunctions.js'
 
 /**
  * A class for managing player action.
@@ -86,7 +87,7 @@ export class RainlinkPlayer {
 	/**
    * All function to extend support driver
    */
-	public functions: RainlinkDatabase<(...args: any) => unknown>
+	public functions: RainlinkFunctions
 	/**
    * ID of the Shard that contains the guild that contains the connected voice channel
    */
@@ -134,7 +135,7 @@ export class RainlinkPlayer {
 		this.state = RainlinkPlayerState.DESTROYED
 		this.deaf = this.voice.deaf ?? false
 		this.mute = this.voice.mute ?? false
-		this.functions = new RainlinkDatabase<(...args: any) => unknown>()
+		this.functions = new RainlinkFunctions()
 		if (this.node.driver.playerFunctions.size !== 0) {
 			this.node.driver.playerFunctions.forEach((data, key) => {
 				this.functions.set(key, data.bind(null, this))

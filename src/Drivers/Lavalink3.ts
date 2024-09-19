@@ -5,10 +5,9 @@ import { RainlinkRequesterOptions, UpdatePlayerInfo } from '../Interface/Rest'
 import { RainlinkNode } from '../Node/RainlinkNode'
 import { AbstractDriver } from './AbstractDriver'
 import util from 'node:util'
-import { RainlinkPlayer } from '../Player/RainlinkPlayer'
 import { RainlinkWebsocket } from '../Utilities/RainlinkWebsocket'
-import { RainlinkDatabase } from '../Utilities/RainlinkDatabase'
 import { LavalinkDecoder } from '../Utilities/LavalinkDecoder'
+import { RainlinkFunctions } from '../Utilities/RainlinkFunctions'
 
 export enum Lavalink3loadType {
   TRACK_LOADED = 'TRACK_LOADED',
@@ -23,8 +22,8 @@ export class Lavalink3 extends AbstractDriver {
 	public wsUrl: string = ''
 	public httpUrl: string = ''
 	public sessionId: string | null
-	public playerFunctions: RainlinkDatabase<(player: RainlinkPlayer, ...args: any) => unknown>
-	public functions: RainlinkDatabase<(manager: Rainlink, ...args: any) => unknown>
+	public playerFunctions: RainlinkFunctions
+	public functions: RainlinkFunctions
 	protected wsClient?: RainlinkWebsocket
 
 	constructor(
@@ -32,8 +31,8 @@ export class Lavalink3 extends AbstractDriver {
     public node: RainlinkNode
 	) {
 		super()
-		this.playerFunctions = new RainlinkDatabase<(player: RainlinkPlayer, ...args: any) => unknown>()
-		this.functions = new RainlinkDatabase<(manager: Rainlink, ...args: any) => unknown>()
+		this.playerFunctions = new RainlinkFunctions()
+		this.functions = new RainlinkFunctions()
 		this.sessionId = null
 		this.wsUrl = `${this.node.options.secure ? 'wss' : 'ws'}://${this.node.options.host}:${this.node.options.port}/`
 		this.httpUrl = `${this.node.options.secure ? 'https://' : 'http://'}${this.node.options.host}:${this.node.options.port}`

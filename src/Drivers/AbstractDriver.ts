@@ -1,9 +1,8 @@
 import { RainlinkRequesterOptions } from '../Interface/Rest'
-import { RainlinkDatabase } from '../Utilities/RainlinkDatabase'
 import { RainlinkNode } from '../Node/RainlinkNode'
 import { RainlinkWebsocket } from '../Utilities/RainlinkWebsocket'
-import { RainlinkPlayer } from '../Player/RainlinkPlayer'
 import { Rainlink } from '../Rainlink'
+import { RainlinkFunctions } from '../Utilities/RainlinkFunctions'
 
 /**
  * The abstract class for developing driver
@@ -19,9 +18,9 @@ export abstract class AbstractDriver {
   /** The lavalink server season id to resume */
   abstract sessionId: string | null
   /** All function to extend support driver on RainlinkPlayer class */
-  abstract playerFunctions: RainlinkDatabase<(player: RainlinkPlayer, ...args: any) => unknown>
+  abstract playerFunctions: RainlinkFunctions
   /** All function to extend support driver on Rainlink class */
-  abstract functions: RainlinkDatabase<(manager: Rainlink, ...args: any) => unknown>
+  abstract functions: RainlinkFunctions
   /** Rainlink manager class */
   abstract manager: Rainlink
   /** Rainlink reuqested lavalink/nodelink server */

@@ -5,18 +5,17 @@ import { RainlinkRequesterOptions } from '../Interface/Rest'
 import { RainlinkNode } from '../Node/RainlinkNode'
 import { AbstractDriver } from './AbstractDriver'
 import util from 'node:util'
-import { RainlinkPlayer } from '../Player/RainlinkPlayer'
 import { RainlinkWebsocket } from '../Utilities/RainlinkWebsocket'
-import { RainlinkDatabase } from '../Utilities/RainlinkDatabase'
 import { LavalinkDecoder } from '../Utilities/LavalinkDecoder'
+import { RainlinkFunctions } from '../Utilities/RainlinkFunctions'
 
 export class Lavalink4 extends AbstractDriver {
 	public id: string = 'lavalink/v4/koinu'
 	public wsUrl: string = ''
 	public httpUrl: string = ''
 	public sessionId: string | null
-	public playerFunctions: RainlinkDatabase<(player: RainlinkPlayer, ...args: any) => unknown>
-	public functions: RainlinkDatabase<(manager: Rainlink, ...args: any) => unknown>
+	public playerFunctions: RainlinkFunctions
+	public functions: RainlinkFunctions
 	protected wsClient?: RainlinkWebsocket
 
 	constructor(
@@ -24,8 +23,8 @@ export class Lavalink4 extends AbstractDriver {
     public node: RainlinkNode
 	) {
 		super()
-		this.playerFunctions = new RainlinkDatabase<(player: RainlinkPlayer, ...args: any) => unknown>()
-		this.functions = new RainlinkDatabase<(manager: Rainlink, ...args: any) => unknown>()
+		this.playerFunctions = new RainlinkFunctions()
+		this.functions = new RainlinkFunctions()
 		this.sessionId = null
 		this.wsUrl = `${this.node.options.secure ? 'wss' : 'ws'}://${this.node.options.host}:${this.node.options.port}/v4/websocket`
 		this.httpUrl = `${this.node.options.secure ? 'https://' : 'http://'}${this.node.options.host}:${this.node.options.port}/v4`

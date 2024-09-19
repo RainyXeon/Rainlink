@@ -4,11 +4,11 @@ import { LavalinkLoadType, RainlinkEvents } from '../Interface/Constants'
 import { RainlinkRequesterOptions } from '../Interface/Rest'
 import { RainlinkNode } from '../Node/RainlinkNode'
 import { AbstractDriver } from './AbstractDriver'
-import { RainlinkPlayer } from '../Player/RainlinkPlayer'
 import util from 'node:util'
 import { RainlinkWebsocket } from '../Utilities/RainlinkWebsocket'
-import { RainlinkDatabase } from '../Utilities/RainlinkDatabase'
 import { LavalinkDecoder } from '../Utilities/LavalinkDecoder'
+import { RainlinkFunctions } from '../Utilities/RainlinkFunctions'
+import { RainlinkPlayer } from '../Player/RainlinkPlayer'
 
 export enum Nodelink2loadType {
   SHORTS = 'shorts',
@@ -41,8 +41,8 @@ export class Nodelink2 extends AbstractDriver {
 	public wsUrl: string = ''
 	public httpUrl: string = ''
 	public sessionId: string | null
-	public playerFunctions: RainlinkDatabase<(player: RainlinkPlayer, ...args: any) => unknown>
-	public functions: RainlinkDatabase<(manager: Rainlink, ...args: any) => unknown>
+	public playerFunctions: RainlinkFunctions
+	public functions: RainlinkFunctions
 	protected wsClient?: RainlinkWebsocket
 
 	constructor(
@@ -51,8 +51,8 @@ export class Nodelink2 extends AbstractDriver {
 	) {
 		super()
 		this.sessionId = null
-		this.playerFunctions = new RainlinkDatabase<(player: RainlinkPlayer, ...args: any) => unknown>()
-		this.functions = new RainlinkDatabase<(manager: Rainlink, ...args: any) => unknown>()
+		this.playerFunctions = new RainlinkFunctions()
+		this.functions = new RainlinkFunctions()
 		this.wsUrl = `${this.node.options.secure ? 'wss' : 'ws'}://${this.node.options.host}:${this.node.options.port}/v4/websocket`
 		this.httpUrl = `${this.node.options.secure ? 'https://' : 'http://'}${this.node.options.host}:${this.node.options.port}/v4`
 		this.playerFunctions.set('getLyric', this.getLyric)
