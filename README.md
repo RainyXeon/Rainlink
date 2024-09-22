@@ -30,6 +30,7 @@ Here: [https://rainlinkjs.vercel.app/](https://rainlinkjs.vercel.app/)
 | Name                                                 | Creator      | Variants          |
 |------------------------------------------------------|--------------|-------------------|
 | [ByteBlaze](https://github.com/RainyXeon/ByteBlaze)  | RainyXeon    | Modded / Built in |
+| [Lunox](https://github.com/adh319/Lunox)             | adh319       |  Rainlink v1.2.2  |
 
 If you want to add your own bot create a pull request with your bot added. Please add your full name.
 
