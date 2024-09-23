@@ -52,8 +52,8 @@ export class RainlinkPlayerManager extends RainlinkDatabase<RainlinkPlayer> {
 			.filter(([, node]) => node.options.region)
 			.map(([, node]) => node)
 		if (!getCustomNode && voiceHandler.region && reigonedNode.length !== 0) {
-			const node = reigonedNode.filter((node) => node.options.region == voiceHandler.region)
-			if (node) getCustomNode = await this.manager.nodes.getLeastUsed(node)
+			const nodes = reigonedNode.filter((node) => node.options.region === voiceHandler.region)
+			if (nodes.length !== 0) getCustomNode = await this.manager.nodes.getLeastUsed(nodes)
 		}
 		const node = getCustomNode ? getCustomNode : await this.manager.nodes.getLeastUsed()
 		if (!node) throw new Error('Can\'t find any nodes to connect on')

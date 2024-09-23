@@ -42,7 +42,7 @@ export class RainlinkNode {
 		const getDriver = this.manager.drivers.filter(
 			(driver) => driver.prototype.id === options.driver
 		)
-		if (!getDriver || getDriver.length == 0) {
+		if (!getDriver || getDriver.length == 0 || !options.driver) {
 			this.debug('No driver was found, using lavalink v4 driver instead')
 			this.driver = new Lavalink4(manager, this)
 		} else {
