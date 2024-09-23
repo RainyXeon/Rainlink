@@ -14,6 +14,7 @@ Another lavalink wrapper but focus on stability and rich features
  - Driver based (avaliable to run Nodelink v2 and port older lavalink version)
  - Plugin system
  - Using [PWSL](https://github.com/PerformanC/internals) by [The PerformanC Organization](https://github.com/PerformanC) for better WS implementation
+ - Compatible with bun
 
 # 🛠️ Installation
 
@@ -29,8 +30,8 @@ Here: [https://rainlinkjs.vercel.app/](https://rainlinkjs.vercel.app/)
 
 | Name                                                 | Creator      | Variants          |
 |------------------------------------------------------|--------------|-------------------|
-| [ByteBlaze](https://github.com/RainyXeon/ByteBlaze)  | RainyXeon    | Modded / Built in |
-| [Lunox](https://github.com/adh319/Lunox)             | adh319       |  Rainlink v1.2.2  |
+| [ByteBlaze](https://github.com/RainyXeon/ByteBlaze)  | RainyXeon    | Original          |
+| [Lunox](https://github.com/adh319/Lunox)             | adh319       | Original          |
 
 If you want to add your own bot create a pull request with your bot added. Please add your full name.
 
