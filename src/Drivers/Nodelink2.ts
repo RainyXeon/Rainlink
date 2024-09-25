@@ -213,7 +213,7 @@ export class Nodelink2 extends AbstractDriver {
 		let track: string = String(player.queue.current?.encoded)
 		if (trackName) {
 			const nodeName = player.node.options.name
-			const res = await player.search('trackName', { nodeName })
+			const res = await player.search(trackName, { nodeName })
 			if (res.tracks.length == 0) return undefined
 			track = res.tracks[0].encoded
 		}
