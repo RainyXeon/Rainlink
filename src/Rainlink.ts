@@ -162,10 +162,13 @@ export class Rainlink extends EventEmitter {
    * @returns RainlinkSearchResult
    */
 	async search(query: string, options?: RainlinkSearchOptions): Promise<RainlinkSearchResult> {
-		const node =
-      options && options?.nodeName
-      	? (this.nodes.get(options.nodeName) ?? (await this.nodes.getLeastUsed()))
-      	: await this.nodes.getLeastUsed()
+		const node_name = options && options?.nodeName ? options?.nodeName : null
+		let node = await this.nodes.getLeastUsed()
+
+		if (options && options?.nodeName && node_name) {
+			const get_exist_target_node = this.nodes.get(node_name)
+			if (get_exist_target_node) node = get_exist_target_node
+		}
 
 		if (!node) throw new Error('No node is available')
 
