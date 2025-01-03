@@ -134,4 +134,6 @@ export interface RainlinkSearchOptions {
   nodeName?: string
   /** Which search engine do user want to use (get using search engine name) */
   engine?: string
+  /** Directlly search with source id avaliable in Lavalink (bypass all plugins) */
+  sourceID?: string
 }

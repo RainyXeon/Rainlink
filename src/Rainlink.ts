@@ -191,7 +191,7 @@ export class Rainlink extends EventEmitter {
 			if (pluginData.tracks.length !== 0) return pluginData
 		}
 
-		const source =
+		let source =
       options && options?.engine
       	? this.searchEngines.get(options.engine)
       	: this.searchEngines.get(
@@ -199,6 +199,8 @@ export class Rainlink extends EventEmitter {
             	? this.rainlinkOptions.options!.defaultSearchEngine
             	: 'youtube'
       	)
+
+		if (options?.sourceID) source = options.sourceID
 
 		const finalQuery =
       isDirectSearch !== null ? isDirectSearch[1] : !isUrl ? `${source}search:${query}` : query
